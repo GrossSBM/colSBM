@@ -161,12 +161,12 @@ plot.fitSimpleSBMPop <- function(
           #    order(Z)] %>%
           reshape2::melt() %>%
           dplyr::pull(value))
-        if (x$Q > 1) {
-          vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q,2)]) + .5
-        } else {
-          vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
-        }
-        ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
+      if (x$Q > 1) {
+        vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q, 2)]) + .5
+      } else {
+        vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
+      }
+      ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
         ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
           fill = "red", linewidth = 0, show.legend = FALSE
         ) +
@@ -464,6 +464,7 @@ plot.fitBipartiteSBMPop <- function(
             ifelse(x$distribution == "bernoulli", 1, max(x$alpha))
           )
         ) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = "α")) +
         ggplot2::geom_hline(yintercept = seq(x$Q[1]) + .5) +
         ggplot2::geom_vline(xintercept = seq(x$Q[2]) + .5) +
         ggplot2::scale_x_continuous(breaks = seq(x$Q[2])) +
@@ -662,7 +663,17 @@ plot.fitBipartiteSBMPop <- function(
           xintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])) + .5,
           col = "red", linewidth = .5
         ) +
-        ggplot2::scale_fill_gradient2(high = "black", mid = "white", low = "transparent") +
+        ggplot2::scale_fill_gradient2(high = "black", mid = "white", low = "transparent")
+      if (values) {
+        p_block <- p_block +
+          ggplot2::geom_rect(ggplot2::aes(
+            xmin = xmin, ymin = ymin,
+            xmax = xmax, ymax = ymax, alpha = value
+          ), fill = "red", data = connection_df) +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = "α")) +
+          scale_alpha_continuous(limits = c(0, max(x$alpha)))
+      }
+      p_block <- p_block +
         ggplot2::ylab("") +
         ggplot2::xlab(x$net_id[net_id]) +
         ggplot2::scale_x_discrete(
