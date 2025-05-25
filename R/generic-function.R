@@ -148,7 +148,7 @@ plot.fitSimpleSBMPop <- function(
     },
     "block" = {
       Z <- factor(x$Z[[net_id]], levels = rev(ord))
-      as.matrix(x$A[[net_id]])[
+      block_con_df <- as.matrix(x$A[[net_id]])[
         order(Z),
         order(Z)
       ] %>% # t() %>%
@@ -160,8 +160,13 @@ plot.fitSimpleSBMPop <- function(
           #  order(Z),
           #    order(Z)] %>%
           reshape2::melt() %>%
-          dplyr::pull(value)) %>%
-        ggplot2::ggplot(ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
+          dplyr::pull(value))
+        if (x$Q > 1) {
+          vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q,2)]) + .5
+        } else {
+          vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
+        }
+        ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
         ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
           fill = "red", linewidth = 0, show.legend = FALSE
         ) +
@@ -171,7 +176,7 @@ plot.fitSimpleSBMPop <- function(
           col = "red", linewidth = .5
         ) +
         ggplot2::geom_vline(
-          xintercept = cumsum(tabulate(Z)[ifelse(x$Q > 1, (x$Q):2, 1)]) + .5,
+          xintercept = vlines_xintercept,
           col = "red", linewidth = .5
         ) +
         ggplot2::scale_fill_gradient(low = "white", high = "black") +
