@@ -161,12 +161,12 @@ plot.fitSimpleSBMPop <- function(
           #    order(Z)] %>%
           reshape2::melt() %>%
           dplyr::pull(value))
-        if (x$Q > 1) {
-          vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q,2)]) + .5
-        } else {
-          vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
-        }
-        ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
+      if (x$Q > 1) {
+        vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q, 2)]) + .5
+      } else {
+        vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
+      }
+      ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
         ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
           fill = "red", linewidth = 0, show.legend = FALSE
         ) +
