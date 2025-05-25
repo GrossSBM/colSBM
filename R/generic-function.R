@@ -161,8 +161,8 @@ plot.fitSimpleSBMPop <- function(
           #    order(Z)] %>%
           reshape2::melt() %>%
           dplyr::pull(value)) %>%
-        ggplot2::ggplot(ggplot2::aes(x = as.factor(Var2), y = as.factor(Var1), fill = value, alpha = value)) +
-        ggplot2::geom_tile(ggplot2::aes(alpha = con),
+        ggplot2::ggplot(ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
+        ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
           fill = "red", linewidth = 0, show.legend = FALSE
         ) +
         ggplot2::geom_tile(show.legend = FALSE) +
@@ -410,12 +410,12 @@ plot.fitBipartiteSBMPop <- function(
           low = "white", mid = "red",
           midpoint = 1, limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = "α")) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf('\u03B1'))) +
         ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]), linewidth = .2) +
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
         p_graphon <- p_graphon +
-          ggplot2::geom_text(ggplot2::aes(x = (Var2 - min(Var2)) / max(Var2), y = (Var1 - 0.5 * min(Var1)) / max(Var1), label = round(value, 2)), color = "black")
+          ggplot2::geom_text(ggplot2::aes(x = (.data$Var2 - min(.data$Var2)) / max(.data$Var2), y = (.data$Var1 - 0.5 * min(.data$Var1)) / max(.data$Var1), label = round(.data$value, 2)), color = "black")
       }
 
       p_graphon <- p_graphon +
@@ -449,7 +449,7 @@ plot.fitBipartiteSBMPop <- function(
       p_alpha <- x$alpha[oRow, oCol, drop = FALSE] |>
         t() |>
         reshape2::melt() |>
-        ggplot2::ggplot(ggplot2::aes(x = Var1, y = Var2, fill = value)) +
+        ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2, fill = .data$value)) +
         ggplot2::geom_tile() +
         ggplot2::scale_fill_gradient2("alpha",
           low = "white",
@@ -621,7 +621,7 @@ plot.fitBipartiteSBMPop <- function(
           t() |>
           reshape2::melt()
         connection_df <- connection_df |>
-          dplyr::arrange(desc(Var2), Var1) |>
+          dplyr::arrange(desc(.data$Var2), .data$Var1) |>
           dplyr::mutate(
             xmin = xmin,
             ymin = ymin,
@@ -677,7 +677,7 @@ plot.fitBipartiteSBMPop <- function(
             xmin = xmin, ymin = ymin,
             xmax = xmax, ymax = ymax, alpha = value
           ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = "α")) +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf('\u03B1'))) +
           scale_alpha_continuous(limits = c(0, max(x$alpha)))
       }
       return(p_block)
@@ -706,8 +706,8 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   # One value of BIC-L per Q1 Q2
   criterion_df <- x[[criterion]] |>
     reshape2::melt(value.name = "criterion") |>
-    dplyr::rename(Q1 = Var1, Q2 = Var2) |>
-    dplyr::mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
+    dplyr::rename(Q1 = .data$Var1, Q2 = .data$Var2) |>
+    dplyr::mutate(Q1 = as.factor(.data$Q1), Q2 = as.factor(.data$Q2)) |>
     # mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
     # Remove -Inf values
     dplyr::filter(criterion > -Inf)
