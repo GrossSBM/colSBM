@@ -898,16 +898,95 @@ clusterize_bipartite_networks_graphon <- function(
   return(out)
 }
 
+#' Clusterize bipartite networks with descending and ascending steps
+#'
+#' @inheritParams clusterize_bipartite_networks
+#' @param max_nb_steps An integer, the maximum number of steps to perform.
+#' @param temp_save_path A string, the path where to save the temporary results.
+#' Defaults to a temporary directory.
 clusterize_bipartite_networks_d_a <- function(
     netlist,
     colsbm_model,
+    max_nb_steps = 10L,
     net_id = NULL,
     distribution = "bernoulli",
     nb_run = 3L,
     global_opts = list(),
     fit_opts = list(),
-    fit_init = NULL, # Use this to store a list of fits from which to start clustering
+    partition_init = NULL, # Use this to store a list of fits from which to start clustering
     full_inference = FALSE,
-    keep_history = FALSE,
     verbose = TRUE,
-    temp_save_path = tempfile(fileext = ".Rds")) {}
+    temp_save_path = tempdir()) {
+  step <- 1L
+  bicl_increased <- TRUE
+  prefit <- NULL
+  if (verbose) {
+    cli::cli_h1("Clustering bipartite networks")
+  }
+  while (bicl_increased && step <= max_nb_steps) {
+    # Call the clustering function with the current step
+    if (verbose) {
+      cli::cli_h2("Step {.val {step}} on a max of {.val {max_nb_steps}} steps")
+      cli::cli_h3("Descending order clustering")
+      if (!is.null(partition_init) && step == 1L) {
+        cli::cli_alert_info("Using a provided partition_init to initialize the clustering")
+      } else {
+        cli::cli_alert_info("No partition_init provided, starting from scratch")
+      }
+    }
+    desc_res <- clusterize_bipartite_networks(
+      netlist = netlist,
+      colsbm_model = colsbm_model,
+      net_id = net_id,
+      distribution = distribution,
+      nb_run = nb_run,
+      global_opts = global_opts,
+      fit_opts = fit_opts,
+      partition_init = partition_init,
+      full_inference = full_inference,
+      verbose = verbose,
+      temp_save_path = file.path(temp_save_path, paste0("descending_step_", step, ".Rds"))
+    )
+    if (verbose) {
+      cli::cli_alert_info("Desc clustering completed for step {.val {step}}")
+      cli::cli_alert_info("BIC-L for descending step {.val {step}} is {.val {compute_bicl_partition(desc_res$partition)}}")
+    }
+
+    partition_init <- desc_res$partition
+
+    if (verbose) {
+      cli::cli_h3("Ascending order clustering")
+    }
+    asc_res <- clusterize_bipartite_networks_graphon(
+      netlist = netlist,
+      colsbm_model = colsbm_model,
+      net_id = net_id,
+      distribution = distribution,
+      nb_run = nb_run,
+      global_opts = global_opts,
+      fit_opts = fit_opts,
+      partition_init = partition_init,
+      full_inference = full_inference,
+      verbose = verbose,
+      temp_save_path = file.path(temp_save_path, paste0("ascending_step_", step, ".Rds"))
+    )
+    if (verbose) {
+      cli::cli_alert_info("Asc clustering completed for step {.val {step}}")
+      cli::cli_alert_info("BIC-L for ascending step {.val {step}} is {.val {compute_bicl_partition(asc_res$partition)}}")
+    }
+    # Check if the BIC-L has increased
+    bicl_increased <- (compute_bicl_partition(asc_res$partition) > compute_bicl_partition(desc_res$partition))
+    if (bicl_increased) {
+      if (verbose) {
+        cli::cli_alert_success("BIC-L increased, continuing to the next step")
+      }
+      partition_init <- asc_res$partition
+    } else {
+      if (verbose) {
+        cli::cli_alert_danger("BIC-L did not increase, stopping clustering")
+        return(asc_res)
+      }
+    }
+    step <- step + 1L
+  }
+}
