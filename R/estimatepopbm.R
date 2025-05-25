@@ -787,11 +787,20 @@ clusterize_bipartite_networks_graphon <- function(
     dist_matrix <- matrix(Inf, nrow = M, ncol = M)
     for (i in seq_len(M)) {
       for (j in seq_len(i - 1)) {
-        dist_matrix[i, j] <- dist_graphon_bipartite_all_permutations(
-          pis = list(collections[[i]]$best_fit$parameters$pi[[1]], collections[[j]]$best_fit$parameters$pi[[1]]),
-          rhos = list(collections[[i]]$best_fit$parameters$rho[[1]], collections[[j]]$best_fit$parameters$rho[[1]]),
-          alphas = list(collections[[i]]$best_fit$parameters$alpha, collections[[j]]$best_fit$parameters$alpha)
-        )
+        if (inherits(collections[[i]], "fitBipartiteSBMPop") && inherits(collections[[j]], "fitBipartiteSBMPop")) {
+          dist_matrix[i, j] <- dist_graphon_bipartite_all_permutations(
+            pis = list(collections[[i]]$parameters$pi[[1]], collections[[j]]$parameters$pi[[1]]),
+            rhos = list(collections[[i]]$parameters$rho[[1]], collections[[j]]$parameters$rho[[1]]),
+            alphas = list(collections[[i]]$parameters$alpha, collections[[j]]$parameters$alpha)
+          )
+        } else if (inherits(collections[[i]], "bisbmpop") && inherits(collections[[j]], "bisbmpop")) {
+          dist_matrix[i, j] <- dist_graphon_bipartite_all_permutations(
+            pis = list(collections[[i]]$best_fit$parameters$pi[[1]], collections[[j]]$best_fit$parameters$pi[[1]]),
+            rhos = list(collections[[i]]$best_fit$parameters$rho[[1]], collections[[j]]$best_fit$parameters$rho[[1]]),
+            alphas = list(collections[[i]]$best_fit$parameters$alpha, collections[[j]]$best_fit$parameters$alpha)
+          )
+        }
+
         dist_matrix[j, i] <- dist_matrix[i, j]
       }
     }
