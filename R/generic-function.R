@@ -410,7 +410,7 @@ plot.fitBipartiteSBMPop <- function(
           low = "white", mid = "red",
           midpoint = 1, limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf('\u03B1'))) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
         ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]), linewidth = .2) +
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
@@ -677,7 +677,7 @@ plot.fitBipartiteSBMPop <- function(
             xmin = xmin, ymin = ymin,
             xmax = xmax, ymax = ymax, alpha = value
           ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf('\u03B1'))) +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
           scale_alpha_continuous(limits = c(0, max(x$alpha)))
       }
       return(p_block)
