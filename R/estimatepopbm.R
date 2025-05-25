@@ -344,11 +344,11 @@ clusterize_bipartite_networks <- function(netlist,
   } else {
     # If a full collection is provided, use it to initialize the clustering
     cli::cli_h1("Using a provided full collection to initialize the clustering")
-    stopifnot("full_collection_init should be a bisbmpop object" = is(full_collection_init, "bisbmpop"), "full_collection$A should be identical to netlist" = identical(full_collection_init$A, netlist))
+    stopifnot("full_collection_init should be a bisbmpop object" = inherits(full_collection_init, "bisbmpop"), "full_collection$A should be identical to netlist" = identical(full_collection_init$A, netlist))
     my_bisbmpop <- full_collection_init
   }
 
-  if (is.null(partition_init) || is(partition_init, "bisbmpop")) {
+  if (is.null(partition_init) || inherits(partition_init, "bisbmpop")) {
     clustering_queue <- list(my_bisbmpop)
     list_model_binary <- list()
     cluster <- rep(1, length(netlist))
@@ -359,7 +359,7 @@ clusterize_bipartite_networks <- function(netlist,
       cli::cli_inform("A list of fits was provided, the clustering will start from this list")
     }
     # Starting from a list of fits
-    stopifnot("fit_init should be a list of bisbmpop objects" = is(partition_init, "list"))
+    stopifnot("fit_init should be a list of bisbmpop objects" = inherits(partition_init, "list"))
     clustering_queue <- partition_init
     list_model_binary <- list()
     cluster <- unlist(lapply(seq_along(clustering_queue), function(i) {
