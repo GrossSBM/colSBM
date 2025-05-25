@@ -359,7 +359,7 @@ clusterize_bipartite_networks <- function(netlist,
       cli::cli_inform("A list of fits was provided, the clustering will start from this list")
     }
     # Starting from a list of fits
-    stopifnot("fit_init should be a list of bisbmpop objects" = inherits(partition_init, "list"))
+    stopifnot("partition_init should be a list of bisbmpop objects" = inherits(partition_init, "list"))
     clustering_queue <- partition_init
     list_model_binary <- list()
     cluster <- unlist(lapply(seq_along(clustering_queue), function(i) {
@@ -682,7 +682,7 @@ partition_networks_list_from_dissimilarity <- function(
 #' @param nb_run An integer, the number of run the algorithm do. Defaults to 3.
 #' @param global_opts Global options for the outer algorithm and the output
 #' @param fit_opts Fit options for the VEM algorithm
-#' @param fit_init WIP A list of fitted collections from which to start the
+#' @param partition_init WIP A list of fitted collections from which to start the
 #' fusions
 #' Optional fit init from where initializing the algorithm.
 #' @param full_inference The default "FALSE", the algorithm stop once splitting
@@ -713,7 +713,7 @@ clusterize_bipartite_networks_graphon <- function(
     nb_run = 3L,
     global_opts = list(),
     fit_opts = list(),
-    fit_init = NULL, # Use this to store a list of fits from which to start clustering
+    partition_init = NULL, # Use this to store a list of fits from which to start clustering
     full_inference = FALSE,
     keep_history = FALSE,
     verbose = TRUE,
@@ -739,7 +739,7 @@ clusterize_bipartite_networks_graphon <- function(
   if (verbose) {
     cli::cli_text("Temporary results will be saved as {.val {temp_save_path}} after each step")
   }
-  if (is.null(fit_init)) {
+  if (is.null(partition_init)) {
     # Initializing separated collections
     cli::cli_h1("Beginning the clustering")
     cli::cli_h2("Fitting separated BiSBM models")
@@ -763,13 +763,13 @@ clusterize_bipartite_networks_graphon <- function(
     nb_cores = global_opts$nb_cores
     )
   } else {
-    collections <- fit_init
+    collections <- partition_init
   }
 
   cluster <- seq_len(length(netlist))
   names(cluster) <- net_id
 
-  if (!is.null(fit_init) & verbose) {
+  if (!is.null(partition_init) & verbose) {
     cli::cli_alert_info("Starting from a list of fits")
     cli::cli_alert_warning("This feature is still experimental and cluster vector may not be accurate\n\n")
   }
