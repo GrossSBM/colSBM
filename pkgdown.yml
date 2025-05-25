@@ -1,10 +1,10 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   tutorial-bipartite: tutorial-bipartite.html
   tutorial: tutorial.html
-last_built: 2025-05-16T13:13Z
+last_built: 2025-05-25T18:37Z
 urls:
   reference: https://chabert-liddel.github.io/colSBM/reference
   article: https://chabert-liddel.github.io/colSBM/articles
