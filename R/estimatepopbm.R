@@ -832,7 +832,7 @@ clusterize_bipartite_networks_graphon <- function(
     i <- sorted_pairs[1, 1]
     j <- sorted_pairs[1, 2]
     if (verbose) {
-      cli::cli_alert_info("Try merging{cli::qty({collections[[i]]$net_id})} network{?s} {.val {collections[[i]]$net_id}} with{cli::qty({collections[[j]]$net_id})} network{?s} {.val {collections[[j]]$net_id}}")
+      cli::cli_alert_info("Try merging{cli::qty({length(collections[[i]]$net_id)})} network{?s} {.val {collections[[i]]$net_id}} with{cli::qty({length(collections[[j]]$net_id)})} network{?s} {.val {collections[[j]]$net_id}}")
     }
     candidate_collection <- estimate_colBiSBM(
       netlist = c(collections[[i]]$A, collections[[j]]$A),
