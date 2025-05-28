@@ -904,6 +904,7 @@ clusterize_bipartite_networks_graphon <- function(
 #' @param max_nb_steps An integer, the maximum number of steps to perform.
 #' @param temp_save_path A string, the path where to save the temporary results.
 #' Defaults to a temporary directory.
+#' @export
 clusterize_bipartite_networks_d_a <- function(
     netlist,
     colsbm_model,
