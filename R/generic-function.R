@@ -590,22 +590,30 @@ plot.fitBipartiteSBMPop <- function(
     },
     "block" = {
       # The below order use net_id parameters
-      if (x$Q[2] == 1) {
-        mean_rho <- 1
-      } else {
-        mean_rho <- x[["pi"]][[net_id]][[2]]
-      }
+
       if (is.null(oRow)) {
-        oRow <- order(x$alpham[[net_id]] %*% mean_rho, decreasing = TRUE)
+        if (x$Q[2] == 1) {
+          mean_rho <- 1
+          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+        } else if (x$free_mixture_row || x$free_mixture_col) {
+          mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[2]]))
+          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+        } else {
+          oRow <- order(rowMeans(x$alpha), decreasing = TRUE)
+        }
       }
       #  Once order of tile in block will be fix, need to go back in nullity cond
-      if (x$Q[1] == 1) {
-        mean_pi <- 1
-      } else {
-        mean_pi <- x[["pi"]][[net_id]][[1]]
-      }
+
       if (is.null(oCol)) {
-        oCol <- order(mean_pi %*% x$alpham[[net_id]], decreasing = TRUE)
+        if (x$Q[1] == 1) {
+          mean_pi <- 1
+          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+        } else if (x$free_mixture_row || x$free_mixture_col) {
+          mean_pi <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[1]]))
+          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+        } else {
+          oCol <- order(colMeans(x$alpha), decreasing = TRUE)
+        }
       }
 
       if (x$Q[1] == 1) {
