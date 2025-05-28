@@ -948,8 +948,8 @@ clusterize_bipartite_networks_d_a <- function(
       temp_save_path = file.path(temp_save_path, paste0("descending_step_", clust_step, ".Rds"))
     )
     if (verbose) {
-      cli::cli_alert_info("Desc clustering completed for step {.val {step}}")
-      cli::cli_alert_info("BIC-L for descending step {.val {step}} is {.val {compute_bicl_partition(desc_res$partition)}}")
+      cli::cli_alert_info("Desc clustering completed for step {.val {clust_step}}")
+      cli::cli_alert_info("BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition)}}")
     }
 
     partition_init <- desc_res$partition
@@ -971,8 +971,8 @@ clusterize_bipartite_networks_d_a <- function(
       temp_save_path = file.path(temp_save_path, paste0("ascending_step_", clust_step, ".Rds"))
     )
     if (verbose) {
-      cli::cli_alert_info("Asc clustering completed for step {.val {step}}")
-      cli::cli_alert_info("BIC-L for ascending step {.val {step}} is {.val {compute_bicl_partition(asc_res$partition)}}")
+      cli::cli_alert_info("Asc clustering completed for step {.val {clust_step}}")
+      cli::cli_alert_info("BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition)}}")
     }
     # Check if the BIC-L has increased
     bicl_increased <- (compute_bicl_partition(asc_res$partition) > compute_bicl_partition(desc_res$partition))
