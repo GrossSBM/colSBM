@@ -518,8 +518,12 @@ fitBipartiteSBMPop <- R6::R6Class(
     },
 
     #' Computes the BICL criterion
+    #' @param penalty_factor The penalty factor, a numeric, defaults to
+    #' self$fit_opts$penalty_factor, which is 0.5 by default.
     #' @param MAP Wether to use the MAP parameters or not, a boolean, defaults
     #' to FALSE.
+    #' @param store A boolean indicating if the BICL should be stored in the
+    #' object or not, defaults to TRUE.
     #' @return The BICL for the model.
     compute_BICL = function(MAP = TRUE,
                             penalty_factor = self$fit_opts$penalty_factor,
