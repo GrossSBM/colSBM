@@ -926,7 +926,7 @@ clusterize_bipartite_networks_d_a <- function(
   while (bicl_increased && clust_step <= max_nb_steps) {
     # Call the clustering function with the current step
     if (verbose) {
-      cli::cli_h2("Step {.val {step}} on a max of {.val {max_nb_steps}} steps")
+      cli::cli_h2("Step {.val {clust_step}} on a max of {.val {max_nb_steps}} steps")
       cli::cli_h3("Descending order clustering")
       if (!is.null(partition_init) && clust_step == 1L) {
         cli::cli_alert_info("Using a provided partition_init to initialize the clustering")
