@@ -917,18 +917,17 @@ clusterize_bipartite_networks_d_a <- function(
     full_inference = FALSE,
     verbose = TRUE,
     temp_save_path = tempdir()) {
-  step <- 1L
+  clust_step <- 1L
   bicl_increased <- TRUE
-  prefit <- NULL
   if (verbose) {
     cli::cli_h1("Clustering bipartite networks")
   }
-  while (bicl_increased && step <= max_nb_steps) {
+  while (bicl_increased && clust_step <= max_nb_steps) {
     # Call the clustering function with the current step
     if (verbose) {
       cli::cli_h2("Step {.val {step}} on a max of {.val {max_nb_steps}} steps")
       cli::cli_h3("Descending order clustering")
-      if (!is.null(partition_init) && step == 1L) {
+      if (!is.null(partition_init) && clust_step == 1L) {
         cli::cli_alert_info("Using a provided partition_init to initialize the clustering")
       } else {
         cli::cli_alert_info("No partition_init provided, starting from scratch")
@@ -945,7 +944,7 @@ clusterize_bipartite_networks_d_a <- function(
       partition_init = partition_init,
       full_inference = full_inference,
       verbose = verbose,
-      temp_save_path = file.path(temp_save_path, paste0("descending_step_", step, ".Rds"))
+      temp_save_path = file.path(temp_save_path, paste0("descending_step_", clust_step, ".Rds"))
     )
     if (verbose) {
       cli::cli_alert_info("Desc clustering completed for step {.val {step}}")
@@ -968,7 +967,7 @@ clusterize_bipartite_networks_d_a <- function(
       partition_init = partition_init,
       full_inference = full_inference,
       verbose = verbose,
-      temp_save_path = file.path(temp_save_path, paste0("ascending_step_", step, ".Rds"))
+      temp_save_path = file.path(temp_save_path, paste0("ascending_step_", clust_step, ".Rds"))
     )
     if (verbose) {
       cli::cli_alert_info("Asc clustering completed for step {.val {step}}")
@@ -987,6 +986,7 @@ clusterize_bipartite_networks_d_a <- function(
         return(asc_res)
       }
     }
-    step <- step + 1L
+    clust_step <- clust_step + 1L
   }
+}
 }
