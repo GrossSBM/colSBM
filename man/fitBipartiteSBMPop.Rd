@@ -413,6 +413,12 @@ Computes the BICL criterion
 \describe{
 \item{\code{MAP}}{Wether to use the MAP parameters or not, a boolean, defaults
 to FALSE.}
+
+\item{\code{penalty_factor}}{The penalty factor, a numeric, defaults to
+self$fit_opts$penalty_factor, which is 0.5 by default.}
+
+\item{\code{store}}{A boolean indicating if the BICL should be stored in the
+object or not, defaults to TRUE.}
 }
 \if{html}{\out{</div>}}
 }
