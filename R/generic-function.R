@@ -148,7 +148,7 @@ plot.fitSimpleSBMPop <- function(
     },
     "block" = {
       Z <- factor(x$Z[[net_id]], levels = rev(ord))
-      as.matrix(x$A[[net_id]])[
+      block_con_df <- as.matrix(x$A[[net_id]])[
         order(Z),
         order(Z)
       ] %>% # t() %>%
@@ -160,9 +160,14 @@ plot.fitSimpleSBMPop <- function(
           #  order(Z),
           #    order(Z)] %>%
           reshape2::melt() %>%
-          dplyr::pull(value)) %>%
-        ggplot2::ggplot(ggplot2::aes(x = as.factor(Var2), y = as.factor(Var1), fill = value, alpha = value)) +
-        ggplot2::geom_tile(ggplot2::aes(alpha = con),
+          dplyr::pull(value))
+      if (x$Q > 1) {
+        vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q, 2)]) + .5
+      } else {
+        vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
+      }
+      ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
+        ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
           fill = "red", linewidth = 0, show.legend = FALSE
         ) +
         ggplot2::geom_tile(show.legend = FALSE) +
@@ -171,7 +176,7 @@ plot.fitSimpleSBMPop <- function(
           col = "red", linewidth = .5
         ) +
         ggplot2::geom_vline(
-          xintercept = cumsum(tabulate(Z)[ifelse(x$Q > 1, (x$Q):2, 1)]) + .5,
+          xintercept = vlines_xintercept,
           col = "red", linewidth = .5
         ) +
         ggplot2::scale_fill_gradient(low = "white", high = "black") +
@@ -410,12 +415,12 @@ plot.fitBipartiteSBMPop <- function(
           low = "white", mid = "red",
           midpoint = 1, limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = "α")) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
         ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]), linewidth = .2) +
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
         p_graphon <- p_graphon +
-          ggplot2::geom_text(ggplot2::aes(x = (Var2 - min(Var2)) / max(Var2), y = (Var1 - 0.5 * min(Var1)) / max(Var1), label = round(value, 2)), color = "black")
+          ggplot2::geom_text(ggplot2::aes(x = (.data$Var2 - min(.data$Var2)) / max(.data$Var2), y = (.data$Var1 - 0.5 * min(.data$Var1)) / max(.data$Var1), label = round(.data$value, 2)), color = "black")
       }
 
       p_graphon <- p_graphon +
@@ -449,7 +454,7 @@ plot.fitBipartiteSBMPop <- function(
       p_alpha <- x$alpha[oRow, oCol, drop = FALSE] |>
         t() |>
         reshape2::melt() |>
-        ggplot2::ggplot(ggplot2::aes(x = Var1, y = Var2, fill = value)) +
+        ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2, fill = .data$value)) +
         ggplot2::geom_tile() +
         ggplot2::scale_fill_gradient2("alpha",
           low = "white",
@@ -585,22 +590,30 @@ plot.fitBipartiteSBMPop <- function(
     },
     "block" = {
       # The below order use net_id parameters
-      if (x$Q[2] == 1) {
-        mean_rho <- 1
-      } else {
-        mean_rho <- x[["pi"]][[net_id]][[2]]
-      }
+
       if (is.null(oRow)) {
-        oRow <- order(x$alpham[[net_id]] %*% mean_rho, decreasing = TRUE)
+        if (x$Q[2] == 1) {
+          mean_rho <- 1
+          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+        } else if (x$free_mixture_row || x$free_mixture_col) {
+          mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[2]]))
+          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+        } else {
+          oRow <- order(rowMeans(x$alpha), decreasing = TRUE)
+        }
       }
       #  Once order of tile in block will be fix, need to go back in nullity cond
-      if (x$Q[1] == 1) {
-        mean_pi <- 1
-      } else {
-        mean_pi <- x[["pi"]][[net_id]][[1]]
-      }
+
       if (is.null(oCol)) {
-        oCol <- order(mean_pi %*% x$alpham[[net_id]], decreasing = TRUE)
+        if (x$Q[1] == 1) {
+          mean_pi <- 1
+          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+        } else if (x$free_mixture_row || x$free_mixture_col) {
+          mean_pi <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[1]]))
+          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+        } else {
+          oCol <- order(colMeans(x$alpha), decreasing = TRUE)
+        }
       }
 
       if (x$Q[1] == 1) {
@@ -622,7 +635,7 @@ plot.fitBipartiteSBMPop <- function(
           t() |>
           reshape2::melt()
         connection_df <- connection_df |>
-          dplyr::arrange(desc(Var2), Var1) |>
+          dplyr::arrange(desc(.data$Var2), .data$Var1) |>
           dplyr::mutate(
             xmin = xmin,
             ymin = ymin,
@@ -682,6 +695,15 @@ plot.fitBipartiteSBMPop <- function(
         ggplot2::coord_equal(expand = FALSE) +
         ggplot2::theme_bw(base_size = 15) +
         ggplot2::theme(axis.ticks = ggplot2::element_blank())
+      if (values) {
+        p_block <- p_block +
+          ggplot2::geom_rect(ggplot2::aes(
+            xmin = xmin, ymin = ymin,
+            xmax = xmax, ymax = ymax, alpha = value
+          ), fill = "red", data = connection_df) +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
+          scale_alpha_continuous(limits = c(0, max(x$alpha)))
+      }
       return(p_block)
     }
   )
@@ -708,8 +730,8 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   # One value of BIC-L per Q1 Q2
   criterion_df <- x[[criterion]] |>
     reshape2::melt(value.name = "criterion") |>
-    dplyr::rename(Q1 = Var1, Q2 = Var2) |>
-    dplyr::mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
+    dplyr::rename(Q1 = .data$Var1, Q2 = .data$Var2) |>
+    dplyr::mutate(Q1 = as.factor(.data$Q1), Q2 = as.factor(.data$Q2)) |>
     # mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
     # Remove -Inf values
     dplyr::filter(criterion > -Inf)
