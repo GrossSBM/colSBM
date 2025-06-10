@@ -762,16 +762,18 @@ clusterize_bipartite_networks_graphon <- function(
     backend = global_opts$backend,
     nb_cores = global_opts$nb_cores
     )
+    cluster <- seq_len(length(netlist))
+    names(cluster) <- net_id
   } else {
     collections <- partition_init
-  }
-
-  cluster <- seq_len(length(netlist))
-  names(cluster) <- net_id
-
-  if (!is.null(partition_init) & verbose) {
-    cli::cli_alert_info("Starting from a list of fits")
-    cli::cli_alert_warning("This feature is still experimental and cluster vector may not be accurate\n\n")
+    cluster <- unlist(lapply(seq_along(collections), function(idx) {
+      setNames(rep(idx, length(collections[[idx]]$net_id)), nm = collections[[idx]]$net_id)
+    }))
+    stopifnot("Cluster vector should be the same length as net_id" = length(cluster) == length(net_id))
+    cluster <- cluster[match(net_id, names(cluster))]
+    if (verbose) {
+      cli::cli_alert_info("Starting from a list of fits")
+    }
   }
 
   # Historique des fusions
