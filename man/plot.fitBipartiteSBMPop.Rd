@@ -12,7 +12,7 @@
   mixture = FALSE,
   net_id = 1L,
   values = FALSE,
-  values_min = 0.1,
+  values_min = 0.2,
   ...
 )
 }
@@ -33,7 +33,8 @@ well?}
 \item{values}{Wether or not to plot values on the alpha, pi and rho
 representation.}
 
-\item{values_min}{The minimum value to plot the value.}
+\item{values_min}{The minimum numeric value to plot the value on
+proportions plots}
 
 \item{...}{Further argument to be passed}
 }
