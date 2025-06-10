@@ -409,7 +409,7 @@ plot.fitBipartiteSBMPop <- function(
         ) |>
         ggplot2::ggplot(ggplot2::aes(
           xmin = xmin, ymin = ymin,
-          xmax = xmax, ymax = ymax, fill = value
+          xmax = xmax, ymax = ymax, fill = .data[["value"]]
         )) +
         ggplot2::geom_rect() +
         ggplot2::scale_fill_gradient2("alpha",
@@ -421,7 +421,11 @@ plot.fitBipartiteSBMPop <- function(
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
         p_graphon <- p_graphon +
-          ggplot2::geom_text(ggplot2::aes(x = (.data$Var2 - min(.data$Var2)) / max(.data$Var2), y = (.data$Var1 - 0.5 * min(.data$Var1)) / max(.data$Var1), label = round(.data$value, 2)), color = "black")
+          ggplot2::geom_text(ggplot2::aes(
+            x = (.data$xmin + .data$xmax) / 2,
+            y = (.data$ymin + .data$ymax) / 2,
+            label = round(.data$value, 2)
+          ), color = "black")
       }
 
       p_graphon <- p_graphon +
