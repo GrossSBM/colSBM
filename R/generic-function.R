@@ -321,7 +321,8 @@ plot.bmpop <- function(x, type = "trace", ...) {
 #' well?
 #' @param values Wether or not to plot values on the alpha, pi and rho
 #' representation.
-#' @param values_min The minimum value to plot the value.
+#' @param values_min The minimum numeric value to plot the value on
+#' proportions plots
 #' @param net_id Use to plot only on network in "graphon" view.
 #' @param ... Further argument to be passed
 #' @return A plot, a ggplot2 object.
@@ -360,7 +361,7 @@ plot.fitBipartiteSBMPop <- function(
     mixture = FALSE,
     net_id = 1L,
     values = FALSE,
-    values_min = 0.1,
+    values_min = 0.2,
     ...) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
   p <- switch(type,
@@ -557,16 +558,16 @@ plot.fitBipartiteSBMPop <- function(
           ggplot2::theme(aspect.ratio = 1 / x$Q[2])
         if (values) {
           p_pi <- p_pi +
-            ggplot2::geom_text(ggplot2::aes(label = round(Proportion, 2)),
+            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
-              data = subset(df_pi, round(Proportion, 2) > values_min)
+              data = df_pi
             )
           p_rho <- p_rho +
-            ggplot2::geom_text(ggplot2::aes(label = round(Proportion, 2)),
+            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
-              data = subset(df_rho, round(Proportion, 2) > values_min)
+              data = df_rho
             )
         }
         # Merging the plots with patchwork
@@ -580,11 +581,7 @@ plot.fitBipartiteSBMPop <- function(
         p_alpha <- patchwork::wrap_plots(
           R = p_pi, C = p_rho, A = p_alpha,
           design = mixture_layout
-        ) +
-          patchwork::plot_layout(
-            guides = "collect",
-            design = mixture_layout
-          )
+        )
       }
       return(p_alpha)
     },
