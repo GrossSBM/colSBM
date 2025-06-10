@@ -922,6 +922,8 @@ clusterize_bipartite_networks_d_a <- function(
     temp_save_path = tempdir()) {
   clust_step <- 1L
   bicl_increased <- TRUE
+  old_desc_BICL <- -Inf
+  old_asc_BICL <- -Inf
   if (verbose) {
     cli::cli_h1("Clustering bipartite networks")
   }
@@ -954,6 +956,8 @@ clusterize_bipartite_networks_d_a <- function(
       cli::cli_alert_info("BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition)}}")
     }
 
+    desc_increased_BICL <- compute_bicl_partition(desc_res$partition) > old_asc_BICL
+
     partition_init <- desc_res$partition
 
     if (verbose) {
@@ -977,12 +981,15 @@ clusterize_bipartite_networks_d_a <- function(
       cli::cli_alert_info("BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition)}}")
     }
     # Check if the BIC-L has increased
-    bicl_increased <- (compute_bicl_partition(asc_res$partition) > compute_bicl_partition(desc_res$partition))
+    asc_increased_BICL <- (compute_bicl_partition(asc_res$partition) > compute_bicl_partition(desc_res$partition))
+
+    bicl_increased <- asc_increased_BICL || desc_increased_BICL
     if (bicl_increased) {
       if (verbose) {
-        cli::cli_alert_success("BIC-L increased, continuing to the next step")
+        cli::cli_alert_success("BIC-L increased at {ifelse(asc_increased_BICL, 'ascending', 'descending')} step, continuing to the next step")
       }
       partition_init <- asc_res$partition
+      old_asc_BICL <- compute_bicl_partition(asc_res$partition)
     } else {
       if (verbose) {
         cli::cli_alert_danger("BIC-L did not increase, stopping clustering")
