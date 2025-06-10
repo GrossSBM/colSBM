@@ -8,9 +8,7 @@ reference:
       - "`estimate_colSBM`"
       - "`dist_bmpop_max`"
       - "`adjust_colBiSBM`"
-      - "`clusterize_unipartite_networks`"
-      - "`clusterize_bipartite_networks`"
-      - "`clusterize_bipartite_networks_graphon`"
+      - starts_with("clusterize")
       - "`dist_bisbmpop_max`"
       - "`estimate_colBiSBM`"
       - "`generate_bipartite_collection`"
@@ -25,10 +23,7 @@ reference:
       - fitBipartiteSBMPop
   - title: Generic methods
     contents:
-      - "`plot.fitSimpleSBMPop`"
-      - "`plot.bmpop`"
-      - "`plot.fitBipartiteSBMPop`"
-      - "`plot.bisbmpop`"
+      - starts_with("plot.")
   - title: "Data"
     contents:
       - foodwebs
