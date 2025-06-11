@@ -321,7 +321,8 @@ plot.bmpop <- function(x, type = "trace", ...) {
 #' well?
 #' @param values Wether or not to plot values on the alpha, pi and rho
 #' representation.
-#' @param values_min The minimum value to plot the value.
+#' @param values_min The minimum numeric value to plot the value on
+#' proportions plots
 #' @param net_id Use to plot only on network in "graphon" view.
 #' @param ... Further argument to be passed
 #' @return A plot, a ggplot2 object.
@@ -360,7 +361,7 @@ plot.fitBipartiteSBMPop <- function(
     mixture = FALSE,
     net_id = 1L,
     values = FALSE,
-    values_min = 0.1,
+    values_min = 0.2,
     ...) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
   p <- switch(type,
@@ -408,7 +409,7 @@ plot.fitBipartiteSBMPop <- function(
         ) |>
         ggplot2::ggplot(ggplot2::aes(
           xmin = xmin, ymin = ymin,
-          xmax = xmax, ymax = ymax, fill = value
+          xmax = xmax, ymax = ymax, fill = .data[["value"]]
         )) +
         ggplot2::geom_rect() +
         ggplot2::scale_fill_gradient2("alpha",
@@ -420,7 +421,11 @@ plot.fitBipartiteSBMPop <- function(
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
         p_graphon <- p_graphon +
-          ggplot2::geom_text(ggplot2::aes(x = (.data$Var2 - min(.data$Var2)) / max(.data$Var2), y = (.data$Var1 - 0.5 * min(.data$Var1)) / max(.data$Var1), label = round(.data$value, 2)), color = "black")
+          ggplot2::geom_text(ggplot2::aes(
+            x = (.data$xmin + .data$xmax) / 2,
+            y = (.data$ymin + .data$ymax) / 2,
+            label = round(.data$value, 2)
+          ), color = "black")
       }
 
       p_graphon <- p_graphon +
@@ -464,7 +469,7 @@ plot.fitBipartiteSBMPop <- function(
             ifelse(x$distribution == "bernoulli", 1, max(x$alpha))
           )
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = "α")) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
         ggplot2::geom_hline(yintercept = seq(x$Q[1]) + .5) +
         ggplot2::geom_vline(xintercept = seq(x$Q[2]) + .5) +
         ggplot2::scale_x_continuous(breaks = seq(x$Q[2])) +
@@ -557,16 +562,16 @@ plot.fitBipartiteSBMPop <- function(
           ggplot2::theme(aspect.ratio = 1 / x$Q[2])
         if (values) {
           p_pi <- p_pi +
-            ggplot2::geom_text(ggplot2::aes(label = round(Proportion, 2)),
+            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
-              data = subset(df_pi, round(Proportion, 2) > values_min)
+              data = df_pi
             )
           p_rho <- p_rho +
-            ggplot2::geom_text(ggplot2::aes(label = round(Proportion, 2)),
+            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
-              data = subset(df_rho, round(Proportion, 2) > values_min)
+              data = df_rho
             )
         }
         # Merging the plots with patchwork
@@ -580,15 +585,11 @@ plot.fitBipartiteSBMPop <- function(
         p_alpha <- patchwork::wrap_plots(
           R = p_pi, C = p_rho, A = p_alpha,
           design = mixture_layout
-        ) +
-          patchwork::plot_layout(
-            guides = "collect",
-            design = mixture_layout
-          )
+        )
       }
       return(p_alpha)
     },
-    "block" = {
+    block = {
       # The below order use net_id parameters
 
       if (is.null(oRow)) {
@@ -597,10 +598,11 @@ plot.fitBipartiteSBMPop <- function(
           oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
         } else if (x$free_mixture_row || x$free_mixture_col) {
           mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[2]]))
-          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+          oRow <- order(x$alpham[[net_id]] %*% mean_rho, decreasing = TRUE)
         } else {
           oRow <- order(rowMeans(x$alpha), decreasing = TRUE)
         }
+        oRow <- rev(oRow)
       }
       #  Once order of tile in block will be fix, need to go back in nullity cond
 
@@ -610,59 +612,55 @@ plot.fitBipartiteSBMPop <- function(
           oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
         } else if (x$free_mixture_row || x$free_mixture_col) {
           mean_pi <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[1]]))
-          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+          oCol <- order(mean_pi %*% x$alpham[[net_id]], decreasing = TRUE)
         } else {
           oCol <- order(colMeans(x$alpha), decreasing = TRUE)
         }
       }
 
       if (x$Q[1] == 1) {
-        ymin <- rep(0, each = x$Q[2])
-        ymax <- rep(1, each = x$Q[2])
+        ymin <- rep(0, each = x$Q[2]) + 0.5
+        ymax <- rep(x$n[[1]][[net_id]], each = x$Q[2]) + 0.5
       } else {
         ymin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[1]])[oRow][1:(x$Q[1] - 1)])), each = x$Q[2]) + 0.5
         ymax <- rep(c(cumsum(tabulate(x$Z[[net_id]][[1]])[oRow])), each = x$Q[2]) + 0.5
       }
       if (x$Q[2] == 1) {
-        xmin <- rep(0, x$Q[1])
-        xmax <- rep(1, x$Q[1])
+        xmin <- rep(0, x$Q[1]) + 0.5
+        xmax <- rep(x$n[[2]][[net_id]], x$Q[1]) + 0.5
       } else {
         xmin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])), x$Q[1]) + 0.5
         xmax <- rep(cumsum(tabulate(x$Z[[net_id]][[2]])[oCol]), x$Q[1]) + 0.5
       }
-      if (values) {
-        connection_df <- x$alpha[oRow, oCol] |>
-          t() |>
-          reshape2::melt()
-        connection_df <- connection_df |>
-          dplyr::arrange(desc(.data$Var2), .data$Var1) |>
-          dplyr::mutate(
-            xmin = xmin,
-            ymin = ymin,
-            xmax = xmax,
-            ymax = ymax
-          )
-      }
+
       Z1_ordered <- ordered(x$Z[[net_id]][[1]], levels = oRow)
       Z2_ordered <- ordered(x$Z[[net_id]][[2]], levels = oCol)
       row_order <- order(Z1_ordered)
       col_order <- order(Z2_ordered)
 
+      # Sorting the adjacency matrix by the order of the Z
       block_df <- as.matrix(x$A[[net_id]])[
         row_order,
         col_order
       ] |>
         reshape2::melt()
+      if (values) {
+        block_df$alpha <- x$alpha[x$Z[[net_id]][[1]], x$Z[[net_id]][[2]]][
+          row_order,
+          col_order
+        ] |>
+          reshape2::melt() |>
+          dplyr::pull(value)
+      }
 
       p_block <- ggplot2::ggplot(
         data = block_df, ggplot2::aes(
           x = .data$Var2,
-          y = rev(.data$Var1),
+          y = .data$Var1,
           fill = .data$value
         )
       ) +
         ggplot2::geom_tile(show.legend = FALSE) +
-        # Order will need to reworked to allow to change tile order
         ggplot2::geom_hline(
           yintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[1]])[rev(oRow)][x$Q[1]:2])) + .5,
           col = "red", linewidth = .5
@@ -672,38 +670,30 @@ plot.fitBipartiteSBMPop <- function(
           col = "red", linewidth = .5
         ) +
         ggplot2::scale_fill_gradient2(high = "black", mid = "white", low = "transparent")
+
       if (values) {
         p_block <- p_block +
-          ggplot2::geom_rect(ggplot2::aes(
-            xmin = xmin, ymin = ymin,
-            xmax = xmax, ymax = ymax, alpha = value
-          ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = "α")) +
-          scale_alpha_continuous(limits = c(0, max(x$alpha)))
+          ggplot2::geom_tile(ggplot2::aes(
+            alpha = alpha
+          ), fill = "red") +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"), reverse = T)) +
+          scale_alpha_continuous(limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha))))
       }
+
       p_block <- p_block +
         ggplot2::ylab("") +
         ggplot2::xlab(x$net_id[net_id]) +
         ggplot2::scale_x_discrete(
           breaks = ""
         ) +
-        # ggplot2::scale_y_reverse() +
+        # # ggplot2::scale_y_reverse() +
         ggplot2::scale_y_discrete(
-          breaks = "",
-          limits = rev
+          breaks = ""
         ) +
         ggplot2::coord_equal(expand = FALSE) +
         ggplot2::theme_bw(base_size = 15) +
         ggplot2::theme(axis.ticks = ggplot2::element_blank())
-      if (values) {
-        p_block <- p_block +
-          ggplot2::geom_rect(ggplot2::aes(
-            xmin = xmin, ymin = ymin,
-            xmax = xmax, ymax = ymax, alpha = value
-          ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
-          scale_alpha_continuous(limits = c(0, max(x$alpha)))
-      }
+
       return(p_block)
     }
   )
@@ -730,7 +720,7 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   # One value of BIC-L per Q1 Q2
   criterion_df <- x[[criterion]] |>
     reshape2::melt(value.name = "criterion") |>
-    dplyr::rename(Q1 = .data$Var1, Q2 = .data$Var2) |>
+    dplyr::rename(Q1 = "Var1", Q2 = "Var2") |>
     dplyr::mutate(Q1 = as.factor(.data$Q1), Q2 = as.factor(.data$Q2)) |>
     # mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
     # Remove -Inf values
@@ -745,9 +735,9 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   }))
   completeness_df <- completeness_mat |>
     reshape2::melt(value.name = "clustering_is_complete") |>
-    dplyr::rename(Q1 = Var1, Q2 = Var2) |>
+    dplyr::rename(Q1 = "Var1", Q2 = "Var2") |>
     dplyr::mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
-    dplyr::select(Q1, Q2, clustering_is_complete) |>
+    dplyr::select(all_of(c("Q1", "Q2", "clustering_is_complete"))) |>
     dplyr::filter(!is.na(clustering_is_complete)) |>
     dplyr::mutate(clustering_is_complete = ifelse(clustering_is_complete, "Yes", "No"))
 
@@ -773,3 +763,8 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
     ggplot2::theme_classic()
   p
 }
+utils::globalVariables(c(
+  "Q", "Q1", "Q2", "Criterion", "Proportion",
+  "clustering_is_complete", "is_max",
+  "Var1", "Var2", "value", "name"
+))
