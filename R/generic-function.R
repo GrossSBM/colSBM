@@ -731,7 +731,7 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   # One value of BIC-L per Q1 Q2
   criterion_df <- x[[criterion]] |>
     reshape2::melt(value.name = "criterion") |>
-    dplyr::rename(Q1 = .data$Var1, Q2 = .data$Var2) |>
+    dplyr::rename(Q1 = "Var1", Q2 = "Var2") |>
     dplyr::mutate(Q1 = as.factor(.data$Q1), Q2 = as.factor(.data$Q2)) |>
     # mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
     # Remove -Inf values
@@ -746,9 +746,9 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   }))
   completeness_df <- completeness_mat |>
     reshape2::melt(value.name = "clustering_is_complete") |>
-    dplyr::rename(Q1 = Var1, Q2 = Var2) |>
+    dplyr::rename(Q1 = "Var1", Q2 = "Var2") |>
     dplyr::mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
-    dplyr::select(Q1, Q2, clustering_is_complete) |>
+    dplyr::select(all_of(c("Q1", "Q2", "clustering_is_complete"))) |>
     dplyr::filter(!is.na(clustering_is_complete)) |>
     dplyr::mutate(clustering_is_complete = ifelse(clustering_is_complete, "Yes", "No"))
 
@@ -774,3 +774,8 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
     ggplot2::theme_classic()
   p
 }
+utils::globalVariables(c(
+  "Q", "Q1", "Q2", "Criterion", "Proportion",
+  "clustering_is_complete", "is_max",
+  "Var1", "Var2", "value", "name"
+))
