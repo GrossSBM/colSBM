@@ -589,7 +589,7 @@ plot.fitBipartiteSBMPop <- function(
       }
       return(p_alpha)
     },
-    "block" = {
+    block = {
       # The below order use net_id parameters
 
       if (is.null(oRow)) {
@@ -598,10 +598,11 @@ plot.fitBipartiteSBMPop <- function(
           oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
         } else if (x$free_mixture_row || x$free_mixture_col) {
           mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[2]]))
-          oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
+          oRow <- order(x$alpham[[net_id]] %*% mean_rho, decreasing = TRUE)
         } else {
           oRow <- order(rowMeans(x$alpha), decreasing = TRUE)
         }
+        oRow <- rev(oRow)
       }
       #  Once order of tile in block will be fix, need to go back in nullity cond
 
@@ -611,59 +612,55 @@ plot.fitBipartiteSBMPop <- function(
           oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
         } else if (x$free_mixture_row || x$free_mixture_col) {
           mean_pi <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[1]]))
-          oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
+          oCol <- order(mean_pi %*% x$alpham[[net_id]], decreasing = TRUE)
         } else {
           oCol <- order(colMeans(x$alpha), decreasing = TRUE)
         }
       }
 
       if (x$Q[1] == 1) {
-        ymin <- rep(0, each = x$Q[2])
-        ymax <- rep(1, each = x$Q[2])
+        ymin <- rep(0, each = x$Q[2]) + 0.5
+        ymax <- rep(x$n[[1]][[net_id]], each = x$Q[2]) + 0.5
       } else {
         ymin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[1]])[oRow][1:(x$Q[1] - 1)])), each = x$Q[2]) + 0.5
         ymax <- rep(c(cumsum(tabulate(x$Z[[net_id]][[1]])[oRow])), each = x$Q[2]) + 0.5
       }
       if (x$Q[2] == 1) {
-        xmin <- rep(0, x$Q[1])
-        xmax <- rep(1, x$Q[1])
+        xmin <- rep(0, x$Q[1]) + 0.5
+        xmax <- rep(x$n[[2]][[net_id]], x$Q[1]) + 0.5
       } else {
         xmin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])), x$Q[1]) + 0.5
         xmax <- rep(cumsum(tabulate(x$Z[[net_id]][[2]])[oCol]), x$Q[1]) + 0.5
       }
-      if (values) {
-        connection_df <- x$alpha[oRow, oCol] |>
-          t() |>
-          reshape2::melt()
-        connection_df <- connection_df |>
-          dplyr::arrange(desc(.data$Var2), .data$Var1) |>
-          dplyr::mutate(
-            xmin = xmin,
-            ymin = ymin,
-            xmax = xmax,
-            ymax = ymax
-          )
-      }
+
       Z1_ordered <- ordered(x$Z[[net_id]][[1]], levels = oRow)
       Z2_ordered <- ordered(x$Z[[net_id]][[2]], levels = oCol)
       row_order <- order(Z1_ordered)
       col_order <- order(Z2_ordered)
 
+      # Sorting the adjacency matrix by the order of the Z
       block_df <- as.matrix(x$A[[net_id]])[
         row_order,
         col_order
       ] |>
         reshape2::melt()
+      if (values) {
+        block_df$alpha <- x$alpha[x$Z[[net_id]][[1]], x$Z[[net_id]][[2]]][
+          row_order,
+          col_order
+        ] |>
+          reshape2::melt() |>
+          dplyr::pull(value)
+      }
 
       p_block <- ggplot2::ggplot(
         data = block_df, ggplot2::aes(
           x = .data$Var2,
-          y = rev(.data$Var1),
+          y = .data$Var1,
           fill = .data$value
         )
       ) +
         ggplot2::geom_tile(show.legend = FALSE) +
-        # Order will need to reworked to allow to change tile order
         ggplot2::geom_hline(
           yintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[1]])[rev(oRow)][x$Q[1]:2])) + .5,
           col = "red", linewidth = .5
@@ -673,38 +670,30 @@ plot.fitBipartiteSBMPop <- function(
           col = "red", linewidth = .5
         ) +
         ggplot2::scale_fill_gradient2(high = "black", mid = "white", low = "transparent")
+
       if (values) {
         p_block <- p_block +
-          ggplot2::geom_rect(ggplot2::aes(
-            xmin = xmin, ymin = ymin,
-            xmax = xmax, ymax = ymax, alpha = value
-          ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
-          scale_alpha_continuous(limits = c(0, max(x$alpha)))
+          ggplot2::geom_tile(ggplot2::aes(
+            alpha = alpha
+          ), fill = "red") +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"), reverse = T)) +
+          scale_alpha_continuous(limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha))))
       }
+
       p_block <- p_block +
         ggplot2::ylab("") +
         ggplot2::xlab(x$net_id[net_id]) +
         ggplot2::scale_x_discrete(
           breaks = ""
         ) +
-        # ggplot2::scale_y_reverse() +
+        # # ggplot2::scale_y_reverse() +
         ggplot2::scale_y_discrete(
-          breaks = "",
-          limits = rev
+          breaks = ""
         ) +
         ggplot2::coord_equal(expand = FALSE) +
         ggplot2::theme_bw(base_size = 15) +
         ggplot2::theme(axis.ticks = ggplot2::element_blank())
-      if (values) {
-        p_block <- p_block +
-          ggplot2::geom_rect(ggplot2::aes(
-            xmin = xmin, ymin = ymin,
-            xmax = xmax, ymax = ymax, alpha = value
-          ), fill = "red", data = connection_df) +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
-          scale_alpha_continuous(limits = c(0, max(x$alpha)))
-      }
+
       return(p_block)
     }
   )
