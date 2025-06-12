@@ -593,7 +593,7 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
   global_opts$penalty_factor <- 0
 
   # Fit the initial model on the full collection
-  if (verbose & !is.null(temp_save_path)) {
+  if (verbose && !is.null(temp_save_path)) {
     cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
   }
   start_time <- Sys.time()
@@ -665,7 +665,7 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
       next
     }
     # Will iterate on the proposed models to find the best cut
-    lapply(fit$model_list, function(model) {
+    all_clustering <- lapply(fit$model_list, function(model) {
       if (is.null(model)) {
         return(NULL)
       }
@@ -679,11 +679,11 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
       return(cl)
     })
 
+    all_clustering <- unique(all_clustering)
 
-    # Compute the dissimilarity matrix
-    dist_bm <- compute_dissimilarity_matrix(collection = fit)
-    # Partition the networks based on the dissimilarity matrix
-
+    proposed_fits <- lapply(all_clustering, function(cl) {
+      return(NULL)
+    })
 
     if (verbose) {
       cli::cli_h2("Trying to split the collection of {.val {fit$net_id}}")
