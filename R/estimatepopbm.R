@@ -150,7 +150,7 @@ clusterize_unipartite_networks <- function(netlist,
       cli::cli_h2("Trying to split the collection of {.val {fit$net_id}}")
     }
     # Fit models for the sub-collections
-    fits <- future.apply::future_lapply(
+    fits <- colsbm_lapply(
       c(1, 2),
       function(k) {
         Z_init <- lapply(
@@ -181,7 +181,8 @@ clusterize_unipartite_networks <- function(netlist,
           )
         )
       },
-      future.seed = TRUE
+      backend = global_opts[["backend"]],
+      nb_cores = global_opts[["nb_cores"]]
     )
 
 
@@ -405,7 +406,7 @@ clusterize_bipartite_networks <- function(netlist,
       cli::cli_h2("Trying to split the collection of {.val {fit$net_id}}")
     }
     # Fit models for the sub-collections
-    fits <- future.apply::future_lapply(
+    fits <- colsbm_lapply(
       seq(1, length(unique(cl))),
       function(k) {
         Z_init <- lapply(
@@ -443,7 +444,8 @@ clusterize_bipartite_networks <- function(netlist,
           )
         )
       },
-      future.seed = TRUE
+      backend = global_opts[["backend"]],
+      nb_cores = global_opts[["nb_cores"]]
     )
 
 
@@ -1399,7 +1401,7 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
       cli::cli_h2("Trying to split the collection of {.val {fit$net_id}}")
     }
     # Fit models for the sub-collections
-    fits <- future.apply::future_lapply(
+    fits <- colsbm_lapply(
       seq(1, length(unique(cl))),
       function(k) {
         Z_init <- lapply(
@@ -1437,7 +1439,8 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
           )
         )
       },
-      future.seed = TRUE
+      backend = global_opts[["backend"]],
+      nb_cores = global_opts[["nb_cores"]]
     )
 
 
