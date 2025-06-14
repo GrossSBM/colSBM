@@ -491,7 +491,7 @@ clusterize_bipartite_networks <- function(netlist,
     clustering_history = clustering_history
   )
   if (verbose) {
-    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition)}}")
+    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}")
   }
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
@@ -1068,9 +1068,9 @@ clusterize_bipartite_networks_graphon <- function(
 
   # Historique des fusions
   if (verbose) {
-    cli::cli_alert_info("Fully separated BIC-L is {.val {compute_bicl_partition(collections)}}")
+    cli::cli_alert_info("Fully separated BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}")
   }
-  bicl_history <- c(compute_bicl_partition(collections))
+  bicl_history <- c(compute_bicl_partition(collections, verbose = FALSE))
   fusion_history <- list(collections)
 
   # Fonction pour calculer les distances de graphon entre toutes les paires de collections
@@ -1149,8 +1149,8 @@ clusterize_bipartite_networks_graphon <- function(
       # Mettre à jour les collections
       collections <- collections[-c(i, j)]
       collections <- c(collections, list(new_collection))
-      bicl_history <- c(bicl_history, compute_bicl_partition(collections))
-      cli::cli_alert_info("Current collection BIC-L is {.val {compute_bicl_partition(collections)}}")
+      bicl_history <- c(bicl_history, compute_bicl_partition(collections, verbose = FALSE))
+      cli::cli_alert_info("Current collection BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}")
       if (!has_bicl_increased && full_inference && verbose) {
         cli::cli_alert_info("Full inference requested, clustering will continue, but BIC-L has not improved")
       }
@@ -1245,10 +1245,10 @@ clusterize_bipartite_networks_d_a <- function(
     )
     if (verbose) {
       cli::cli_alert_info("Desc clustering completed for step {.val {clust_step}}")
-      cli::cli_alert_info("BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition)}}")
+      cli::cli_alert_info("BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition, verbose = FALSE)}}")
     }
 
-    desc_increased_BICL <- compute_bicl_partition(desc_res$partition) > old_asc_BICL
+    desc_increased_BICL <- compute_bicl_partition(desc_res$partition, verbose = FALSE) > old_asc_BICL
 
     partition_init <- desc_res$partition
 
@@ -1270,10 +1270,10 @@ clusterize_bipartite_networks_d_a <- function(
     )
     if (verbose) {
       cli::cli_alert_info("Asc clustering completed for step {.val {clust_step}}")
-      cli::cli_alert_info("BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition)}}")
+      cli::cli_alert_info("BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition, verbose = FALSE)}}")
     }
     # Check if the BIC-L has increased
-    asc_increased_BICL <- (compute_bicl_partition(asc_res$partition) > compute_bicl_partition(desc_res$partition))
+    asc_increased_BICL <- (compute_bicl_partition(asc_res$partition, verbose = FALSE) > compute_bicl_partition(desc_res$partition, verbose = FALSE))
 
     bicl_increased <- asc_increased_BICL || desc_increased_BICL
     if (bicl_increased) {
@@ -1281,7 +1281,7 @@ clusterize_bipartite_networks_d_a <- function(
         cli::cli_alert_success("BIC-L increased at {ifelse(asc_increased_BICL, 'ascending', 'descending')} step, continuing to the next step")
       }
       partition_init <- asc_res$partition
-      old_asc_BICL <- compute_bicl_partition(asc_res$partition)
+      old_asc_BICL <- compute_bicl_partition(asc_res$partition, verbose = FALSE)
     } else {
       if (verbose) {
         cli::cli_alert_danger("BIC-L did not increase, stopping clustering")
@@ -1488,7 +1488,7 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
     full_collection = my_bisbmpop
   )
   if (verbose) {
-    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition)}}")
+    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}")
   }
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
