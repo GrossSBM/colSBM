@@ -599,7 +599,7 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
   fit_opts <- fo
 
   cli::cli_inform("Note: No penalty will be applied on {.val {nb_exploration_step}} exploration steps, to provide better exploration.")
-  global_opts$penalty_factor <- 0
+  fit_opts$penalty_factor <- 0
 
   # Fit the initial model on the full collection
   if (verbose && !is.null(temp_save_path)) {
@@ -664,7 +664,7 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
     }
     if (clusteringStep >= nb_exploration_step) {
       cli::cli_inform("Reached the maximum number of exploration steps, switching to full penalization")
-      global_opts$penalty_factor <- 0.5
+      fit_opts$penalty_factor <- 0.5
     }
     fit <- clustering_queue[[1]]
     clustering_queue <- clustering_queue[-1]
