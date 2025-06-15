@@ -111,8 +111,8 @@ plot(res_pp_iid$best_fit, type = "block", net_id = 1) +
 Or make different plots to exhibit the mesoscale structure:
 
 ```{r, fig.cap=c("Graphon type plot", "Mesoscale type plot")}
-plot(res_pp_iid$best_fit, type = "graphon")
-plot(res_pp_iid$best_fit, type = "meso", mixture = TRUE)
+plot(res_pp_iid$best_fit, type = "graphon", values = TRUE)
+plot(res_pp_iid$best_fit, type = "meso", mixture = TRUE, values = TRUE)
 ```
 
 
