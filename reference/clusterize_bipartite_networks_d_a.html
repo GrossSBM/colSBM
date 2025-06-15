@@ -53,6 +53,7 @@
 <span>  global_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  fit_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  partition_init <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  full_collection_init <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  full_inference <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  temp_save_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -99,6 +100,11 @@
 <dt id="arg-partition-init">partition_init<a class="anchor" aria-label="anchor" href="#arg-partition-init"></a></dt>
 <dd><p>Optional partition list, a list of fitted collections
 (bisbmpop) from which to start partitioning</p></dd>
+
+
+<dt id="arg-full-collection-init">full_collection_init<a class="anchor" aria-label="anchor" href="#arg-full-collection-init"></a></dt>
+<dd><p>Optional full collection, a bisbmpop object
+containing the fit of all the networks</p></dd>
 
 
 <dt id="arg-full-inference">full_inference<a class="anchor" aria-label="anchor" href="#arg-full-inference"></a></dt>
