@@ -659,6 +659,8 @@ build_fold_matrix <- function(X, K) {
 #' @param verbose A boolean, should the function print additional information.
 #' Defaults to TRUE.
 #'
+#' @export
+#'
 #' @return A numeric value, the BIC-L of the partition
 #' @noRd
 compute_bicl_partition <- function(partition, penalty_factor = 0.5, verbose = TRUE) {
