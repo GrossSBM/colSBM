@@ -745,7 +745,7 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
       )
       return(fits)
     })
-    proposed_partitions_bicl <- sapply(proposed_partitions, function(partition) sum(sapply(partition, compute_bicl_partition, verbose = FALSE)))
+    proposed_partitions_bicl <- sapply(proposed_partitions, function(partition) sum(sapply(partition, compute_bicl_partition, verbose = FALSE, penalty_factor = 0.5)))
     best_proposed_partition <- proposed_partitions[[which.max(proposed_partitions_bicl)]]
     cl <- all_clustering[[which.max(proposed_partitions_bicl)]]
 
@@ -761,7 +761,8 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
 
     fits <- best_proposed_partition
     clusteringStep <- clusteringStep + 1L
-    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    bicl_increased <- (compute_bicl_partition(partition = fits[[1]]$best_fit, penalty_factor = 0.5) +
+      compute_bicl_partition(partition = fits[[2]]$best_fit, penalty_factor = 0.5) > compute_bicl_partition(partition = fit$best_fit, penalty_factor = 0.5))
     # Decide whether to continue splitting or add to final list
     if (full_inference || bicl_increased) {
       clustering_queue <- append(clustering_queue, fits)
