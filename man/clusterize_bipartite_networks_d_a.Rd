@@ -14,6 +14,7 @@ clusterize_bipartite_networks_d_a(
   global_opts = list(),
   fit_opts = list(),
   partition_init = NULL,
+  full_collection_init = NULL,
   full_inference = FALSE,
   verbose = TRUE,
   temp_save_path = tempdir()
@@ -39,6 +40,9 @@ clusterize_bipartite_networks_d_a(
 
 \item{partition_init}{Optional partition list, a list of fitted collections
 (bisbmpop) from which to start partitioning}
+
+\item{full_collection_init}{Optional full collection, a bisbmpop object
+containing the fit of all the networks}
 
 \item{full_inference}{The default "FALSE", the algorithm stop once splitting
 groups of networks does not improve the BICL criterion. If "TRUE", then
