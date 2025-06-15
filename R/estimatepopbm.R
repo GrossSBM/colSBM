@@ -132,8 +132,12 @@ clusterize_unipartite_networks <- function(netlist,
     clustering_queue <- clustering_queue[-1]
 
     # If the collection contains only one network, add it to the final list
-    if (fit$best_fit$M == 1) {
+    if (inherits(fit, "bisbmpop") && fit$best_fit$M == 1) {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      next
+    }
+    if (inherits(fit, "fitBipartiteSBMPop") && fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit))
       next
     }
 
@@ -792,11 +796,10 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
     partition = list_model_binary,
     cluster = cluster,
     elapsed_time = Sys.time() - start_time,
-    clustering_history = clustering_history,
-    full_collection = my_bisbmpop
+    clustering_history = clustering_history
   )
   if (verbose) {
-    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition)}}")
+    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}")
   }
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)

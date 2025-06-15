@@ -1478,8 +1478,8 @@ bisbmpop <- R6::R6Class(
 
         # Improvement criterion
         has_the_mode_moved <- all(Q != self$best_fit$Q)
-        self$improved <- (self$best_fit$BICL - current_max_BICL) > self$fit_opts$tolerance ||
-          has_the_mode_moved
+        self$improved <- ((self$best_fit$BICL - current_max_BICL) > self$fit_opts$tolerance ||
+          has_the_mode_moved)
 
         # We now set the new Q and check if the fit is better
         Q <- which(self$BICL == max(self$BICL), arr.ind = TRUE)
