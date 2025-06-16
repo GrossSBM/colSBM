@@ -525,7 +525,7 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param store A boolean indicating if the BICL should be stored in the
     #' object or not, defaults to TRUE.
     #' @return The BICL for the model.
-    compute_BICL = function(MAP = TRUE,
+    compute_BICL = function(MAP = FALSE,
                             penalty_factor = self$fit_opts$penalty_factor,
                             store = TRUE) {
       BICL <- self$compute_vbound() - self$compute_penalty(penalty_factor = penalty_factor)
