@@ -745,6 +745,22 @@ clusterize_bipartite_networks_more_exploration <- function(netlist,
       )
       return(fits)
     })
+
+    # Now setting good penalty factor for proposed partitions
+    #  And updating the BIC-L for each model in the partition
+    proposed_partitions <- lapply(proposed_partitions, function(partition) {
+      #  Recomputing the BIC-L for each model of the partition
+      for (model in partition$model_list) {
+        if (is.null(model)) {
+          next
+        }
+        model$fit_opts$penalty_factor <- 0.5
+        model$compute_BICL(penalty_factor = 0.5, store = TRUE)
+      }
+      partition$store_criteria_and_best_fit()
+      return(partition)
+    })
+
     proposed_partitions_bicl <- sapply(proposed_partitions, function(partition) sum(sapply(partition, compute_bicl_partition, verbose = FALSE, penalty_factor = 0.5)))
     best_proposed_partition <- proposed_partitions[[which.max(proposed_partitions_bicl)]]
     cl <- all_clustering[[which.max(proposed_partitions_bicl)]]
