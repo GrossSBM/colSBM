@@ -403,7 +403,7 @@ Computes the BICL criterion
 \subsection{Method \code{compute_BICL()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{fitBipartiteSBMPop$compute_BICL(
-  MAP = TRUE,
+  MAP = FALSE,
   penalty_factor = self$fit_opts$penalty_factor,
   store = TRUE
 )}\if{html}{\out{</div>}}
