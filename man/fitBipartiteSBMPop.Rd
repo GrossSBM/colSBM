@@ -35,6 +35,9 @@ once $optimize() is done
 
 \item{\code{pi}}{List of M vectors of size Q, the mixture parameters}
 
+\item{\code{delta}}{Vector of size M, containing the density parameters for each
+network}
+
 \item{\code{pim}}{List of M vectors of size Q, the mixture parameters in case
 of free_mixture}
 
@@ -161,6 +164,7 @@ parameters}
 \item \href{#method-fitBipartiteSBMPop-compute_BICL}{\code{fitBipartiteSBMPop$compute_BICL()}}
 \item \href{#method-fitBipartiteSBMPop-update_MAP_parameters}{\code{fitBipartiteSBMPop$update_MAP_parameters()}}
 \item \href{#method-fitBipartiteSBMPop-fixed_point_tau}{\code{fitBipartiteSBMPop$fixed_point_tau()}}
+\item \href{#method-fitBipartiteSBMPop-fixed_point_alpha_delta}{\code{fitBipartiteSBMPop$fixed_point_alpha_delta()}}
 \item \href{#method-fitBipartiteSBMPop-update_pim}{\code{fitBipartiteSBMPop$update_pim()}}
 \item \href{#method-fitBipartiteSBMPop-update_pi}{\code{fitBipartiteSBMPop$update_pi()}}
 \item \href{#method-fitBipartiteSBMPop-update_alpham}{\code{fitBipartiteSBMPop$update_alpham()}}
@@ -464,6 +468,36 @@ self$fit_opts$tolerance}
 }
 \subsection{Returns}{
 The new tau values
+Fixed point to update alpha and delta with the Poisson emission
+formulas
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitBipartiteSBMPop-fixed_point_alpha_delta"></a>}}
+\if{latex}{\out{\hypertarget{method-fitBipartiteSBMPop-fixed_point_alpha_delta}{}}}
+\subsection{Method \code{fixed_point_alpha_delta()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fitBipartiteSBMPop$fixed_point_alpha_delta(
+  MAP = FALSE,
+  max_iter = 50,
+  tol = self$fit_opts$tolerance
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{MAP}}{A boolean wether to use MAP parameters or not, defaults to
+FALSE}
+
+\item{\code{max_iter}}{The maximum number of iterations, default to 50}
+
+\item{\code{tol}}{The tolerance for which to stop iterating}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+nothing; stores the values
 Computes the pi per network, known as the pim
 }
 }
