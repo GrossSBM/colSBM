@@ -700,6 +700,53 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$tau[[m]][[d]] <- tau_new
       invisible(tau_new)
     },
+    #' Fixed point to update alpha and delta with the Poisson emission 
+    #' formulas
+    #'
+    #' @param MAP A boolean wether to use MAP parameters or not, defaults to
+    #' FALSE
+    #' @param max_iter The maximum number of iterations, default to 50
+    #' @param tol The tolerance for which to stop iterating
+    #'
+    #' @return nothing; stores the values
+    fixed_point_alpha_delta = function(
+      MAP = FALSE, 
+      max_iter = 50, # TODO : allow users to control this 
+      tol = self$fit_opts$tolerance) {
+      condition <- TRUE
+      d <- self$delta
+      a <- self$alpha
+      d_old <- d
+      a_old <- a
+      it <- 0
+      if (MAP) {
+        emqr <- self$MAP$emqr
+        nmqr <- self$MAP$nmqr
+      } else {
+        emqr <- self$emqr
+        nmqr <- self$nmqr
+      }
+      while (condition) {
+        d <- rowSums(emqr, dim = 1) /
+          rowSums(aperm(array(a, c(self$Q[1], self$Q[2], self$M))) * nmqr, dim = 1)
+        d[1] <- 1
+        a <- colSums(emqr, dim = 1) /
+          colSums(array(d, c(self$M, self$Q[1], self$Q[2])) * nmqr, dim = 1)
+        a[is.nan(a)] <- 0
+        it <- it + 1
+        condition <- (mean((a - a_old)**2) + mean((d - d_old)**2) > 2 * tol &
+          it < max_iter)
+        d_old <- d
+        a_old <- a
+      }
+      if (MAP) {
+        self$MAP$alpha <- a
+        self$MAP$delta <- d
+      } else {
+        self$alpha <- a
+        self$delta <- d
+      }
+    },
     #' Computes the pi per network, known as the pim
     #'
     #' @param m The number of the network in the netlist
