@@ -20,8 +20,9 @@ names(netlist) <- fit_iid$net_id
 #     )
 # )
 library(future)
+library(future.callr)
 options(future.globals.maxSize = 10 * 1024^3) # 100 MB
-plan("multisession", workers = 8L)
+plan("callr", workers = 8L)
 res <- clusterize_bipartite_networks_more_exploration(
     netlist = netlist,
     net_id = names(netlist),
