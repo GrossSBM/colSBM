@@ -31,6 +31,9 @@ fitBipartiteSBMPop <- R6::R6Class(
     alpha = NULL, #
     #' @field pi List of M vectors of size Q, the mixture parameters
     pi = NULL, #
+    #' @field delta Vector of size M, containing the density parameters for each
+    #' network
+    delta = NULL,
     #' @field pim List of M vectors of size Q, the mixture parameters in case
     #' of free_mixture
     pim = NULL,
@@ -301,6 +304,7 @@ fitBipartiteSBMPop <- R6::R6Class(
 
       self$pi <- vector("list", self$M)
       self$pim <- vector("list", self$M)
+      self$delta <- rep(1, self$M)
       self$tau <- vector("list", self$M)
       self$alpham <- vector("list", self$M)
       self$vloss <- vector("list", self$M)
@@ -313,6 +317,7 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$MAP$nmqr <- self$nmqr
       self$MAP$pi <- self$pi
       self$MAP$pim <- self$pim
+      self$MAP$delta <- self$delta
 
       # Degrees of freedom
       # for iid
