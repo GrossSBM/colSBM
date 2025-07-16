@@ -26,6 +26,7 @@ Imports:
     gtools,
     magrittr,
     matrixStats,
+    nloptr,
     parallel,
     patchwork,
     progressr,
