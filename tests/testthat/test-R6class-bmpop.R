@@ -38,7 +38,7 @@ test_that("clusterize_unipartite_networks_iid", {
     directed = FALSE,
     distribution = "bernoulli",
     nb_run = 1,
-    global_opts = list(nb_cores = 1),
+    global_opts = list(nb_cores = 1, backend = "no_mc"),
     fit_opts = list(
       Q_max = 2,
       nb_init = 1,
