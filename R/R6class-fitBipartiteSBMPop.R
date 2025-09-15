@@ -610,7 +610,7 @@ fitBipartiteSBMPop <- R6::R6Class(
                     eps = NULL
                   ),
                   self$Q[d], self$n[[1]][m]
-                )) +
+                )) + # TODO Ask for a review of this line as there might be broadcasting
                 ((self$nonNAs[[m]]) * self$A[[m]]) %*%
                 t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
                 t(.logit(self$Calpha * self$alpha,
@@ -700,7 +700,7 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$tau[[m]][[d]] <- tau_new
       invisible(tau_new)
     },
-    #' Fixed point to update alpha and delta with the Poisson emission 
+    #' Fixed point to update alpha and delta with the Poisson emission
     #' formulas
     #'
     #' @param MAP A boolean wether to use MAP parameters or not, defaults to
@@ -709,10 +709,9 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param tol The tolerance for which to stop iterating
     #'
     #' @return nothing; stores the values
-    fixed_point_alpha_delta = function(
-      MAP = FALSE, 
-      max_iter = 50, # TODO : allow users to control this 
-      tol = self$fit_opts$tolerance) {
+    fixed_point_alpha_delta = function(MAP = FALSE,
+                                       max_iter = 50, # TODO : allow users to control this
+                                       tol = self$fit_opts$tolerance) {
       condition <- TRUE
       d <- self$delta
       a <- self$alpha
