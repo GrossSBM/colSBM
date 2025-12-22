@@ -362,6 +362,7 @@ plot.fitBipartiteSBMPop <- function(
     net_id = 1L,
     values = FALSE,
     values_min = 0.2,
+    text_size = 8,
     ...) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
   p <- switch(type,
@@ -416,7 +417,7 @@ plot.fitBipartiteSBMPop <- function(
           low = "white", mid = "red",
           midpoint = 1, limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
+        ggplot2::guides(fill = ggplot2::guide_legend(title = "Connectivity")) +
         ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]), linewidth = .2) +
         ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
       if (values) {
@@ -467,21 +468,29 @@ plot.fitBipartiteSBMPop <- function(
           limits = c(
             0,
             ifelse(x$distribution == "bernoulli", 1, max(x$alpha))
-          )
+          ),
+          breaks = c(0.1, 0.5, 0.9)
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
+        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
+        ggplot2::theme(legend.position = "bottom") +
+        ggplot2::guides(fill = ggplot2::guide_colourbar(
+          title = "Connectivity",
+          frame.colour = "black",
+          frame.linewidth = 1,
+          raster = FALSE,
+          ticks.colour = "black"
+        )) +
         ggplot2::geom_hline(yintercept = seq(x$Q[1]) + .5) +
         ggplot2::geom_vline(xintercept = seq(x$Q[2]) + .5) +
         ggplot2::scale_x_continuous(breaks = seq(x$Q[2])) +
         ggplot2::scale_y_reverse(breaks = seq(x$Q[1])) +
-        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
         ggplot2::xlab("") +
         ggplot2::ylab("") +
         ggplot2::coord_fixed(expand = FALSE)
 
       if (values) {
         p_alpha <- p_alpha +
-          ggplot2::geom_text(ggplot2::aes(label = round(value, 2)), color = "black")
+          ggplot2::geom_text(ggplot2::aes(label = round(value, 2)), color = "black", size = text_size)
       }
       #  scale_y_reverse()
       xl <- ""
@@ -499,30 +508,35 @@ plot.fitBipartiteSBMPop <- function(
           dplyr::mutate(q = seq(x$Q[1])) |>
           tidyr::pivot_longer(cols = -c(q)) |>
           dplyr::mutate(Proportion = value)
+        row_ncol_legend <- ifelse(x$Q[1] >= 6, x$Q[1] %/% 3 + 1, x$Q[1])
         p_pi <-
           df_pi |>
           ggplot2::ggplot(ggplot2::aes(
             fill = as.factor(q), y = name,
             x = Proportion
           )) +
-          ggplot2::geom_col() +
+          ggplot2::geom_col(width = 0.9) +
           ggplot2::coord_flip(expand = FALSE) +
           ggplot2::scale_fill_brewer("Row block",
             type = "qual", palette = "Paired",
             direction = -1
           ) +
           ggplot2::guides(fill = ggplot2::guide_legend(
-            ncol = x$Q[1] %/% 3 + 1,
+            ncol = row_ncol_legend,
             byrow = TRUE
           )) +
           ggplot2::ylab("") +
           ggplot2::ylab(xl) +
           ggplot2::xlab("Row proportions") +
           ggplot2::theme_classic() +
-          ggplot2::theme(axis.text.x = ggplot2::element_text(
-            angle = 90, vjust = .5,
-            hjust = 1
-          ), aspect.ratio = 1 / x$Q[1])
+          ggplot2::theme(
+            axis.text.x = ggplot2::element_text(
+              angle = 90, vjust = .5,
+              hjust = 1
+            ),
+            aspect.ratio = x$Q[1] / 2,
+            legend.position = "top"
+          )
 
         df_rho <- purrr::map_dfc(
           seq_along(x$net_id),
@@ -536,12 +550,13 @@ plot.fitBipartiteSBMPop <- function(
           dplyr::mutate(q = seq(x$Q[2])) |>
           tidyr::pivot_longer(cols = -c(q)) |>
           dplyr::mutate(Proportion = value)
+        col_ncol_legend <- ifelse(x$Q[2] >= 6, x$Q[2] %/% 3 + 1, x$Q[2])
         p_rho <- df_rho |>
           ggplot2::ggplot(ggplot2::aes(
             fill = as.factor(q), y = name,
             x = Proportion
           )) +
-          ggplot2::geom_col() +
+          ggplot2::geom_col(width = 0.8) +
           # ggplot2::coord_flip(expand = FALSE) +
           ggplot2::scale_fill_brewer("Column block",
             type = "qual", palette = "Set2",
@@ -552,30 +567,34 @@ plot.fitBipartiteSBMPop <- function(
           # Reversing prop order to match the alpha
           ggplot2::scale_x_reverse() +
           ggplot2::guides(fill = ggplot2::guide_legend(
-            ncol = x$Q[2] %/% 3 + 1,
+            ncol = col_ncol_legend,
             byrow = TRUE
           )) +
           ggplot2::ylab("") +
           ggplot2::ylab(xl) +
           ggplot2::xlab("Column proportions") +
           ggplot2::theme_classic() +
-          ggplot2::theme(aspect.ratio = 1 / x$Q[2])
+          ggplot2::theme(aspect.ratio = 2 / (x$Q[2]), legend.position = "top")
         if (values) {
           p_pi <- p_pi +
             ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
+              size = text_size,
+              angle = 90,
               color = "black",
               data = df_pi
             )
           p_rho <- p_rho +
             ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
               position = ggplot2::position_stack(vjust = 0.5),
+              size = text_size,
               color = "black",
               data = df_rho
             )
         }
         # Merging the plots with patchwork
         mixture_layout <- "
+                              ##CCCC
                               ##CCCC
                               ##CCCC
                               RRAAAA
@@ -676,7 +695,7 @@ plot.fitBipartiteSBMPop <- function(
           ggplot2::geom_tile(ggplot2::aes(
             alpha = alpha
           ), fill = "red") +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"), reverse = T)) +
+          ggplot2::guides(alpha = ggplot2::guide_legend(title = "Connectivity", reverse = T)) +
           scale_alpha_continuous(limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha))))
       }
 
