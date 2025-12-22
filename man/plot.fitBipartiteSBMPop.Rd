@@ -13,6 +13,7 @@
   net_id = 1L,
   values = FALSE,
   values_min = 0.2,
+  text_size = 8,
   ...
 )
 }
