@@ -105,7 +105,7 @@ criteria evolve with the number of clusters. Here, the BICL criterion
 selects Q = 6 blocks.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">best_fit</span> <span class="op">&lt;-</span> <span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span></span></code></pre></div>
 </div>
@@ -463,14 +463,14 @@ by trophic levels:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span>, type <span class="op">=</span> <span class="st">"block"</span>, net_id <span class="op">=</span> <span class="fl">1</span>, ord <span class="op">=</span> <span class="va">ord</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span>, type <span class="op">=</span> <span class="st">"block"</span>, net_id <span class="op">=</span> <span class="fl">2</span>, ord <span class="op">=</span> <span class="va">ord</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span>, type <span class="op">=</span> <span class="st">"block"</span>, net_id <span class="op">=</span> <span class="fl">3</span>, ord <span class="op">=</span> <span class="va">ord</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plot-block-1.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/plot-block-1.png" class="r-plt" alt="" width="700"></p>
 <p>Or make different plots to exhibit the mesoscale structure:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span>, type <span class="op">=</span> <span class="st">"graphon"</span>, ord <span class="op">=</span> <span class="va">ord</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res_fw_iid</span><span class="op">$</span><span class="va">best_fit</span>, type <span class="op">=</span> <span class="st">"meso"</span>, mixture <span class="op">=</span> <span class="cn">TRUE</span>, ord <span class="op">=</span> <span class="va">ord</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-8-2.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="clustering-of-networks">Clustering of networks<a class="anchor" aria-label="anchor" href="#clustering-of-networks"></a>
@@ -524,7 +524,7 @@ that looks alike foodwebs.</p>
 following:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">best_partition</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 <p>but then we can compare the mesoscale structures of the 2 groups:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">best_partition</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>,</span>
@@ -536,7 +536,7 @@ following:</p>
 <span>    ord <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">best_partition</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">alpha</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">best_partition</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">pi</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>guides <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span>tag_levels <span class="op">=</span> <span class="st">"1"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="tutorial_files/figure-html/plot-part-1.png" width="700"></p>
+<p><img src="tutorial_files/figure-html/plot-part-1.png" class="r-plt" alt="" width="700"></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -549,7 +549,7 @@ following:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

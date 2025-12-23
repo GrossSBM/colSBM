@@ -1,0 +1,68 @@
+# Package index
+
+## User functions
+
+- [`estimate_colSBM()`](https://chabert-liddel.github.io/colSBM/reference/estimate_colSBM.md)
+  : Estimate a colSBM on a collection of networks
+- [`dist_bmpop_max()`](https://chabert-liddel.github.io/colSBM/reference/dist_bmpop_max.md)
+  : Compute the dissimilarity between 2 mesoscale structures
+- [`adjust_colBiSBM()`](https://chabert-liddel.github.io/colSBM/reference/adjust_colBiSBM.md)
+  : Adjust a colBiSBM on a given point
+- [`clusterize_bipartite_networks()`](https://chabert-liddel.github.io/colSBM/reference/clusterize_bipartite_networks.md)
+  : Partition of a collection of bipartite networks based on their
+  common mesoscale structures
+- [`clusterize_bipartite_networks_d_a()`](https://chabert-liddel.github.io/colSBM/reference/clusterize_bipartite_networks_d_a.md)
+  : Clusterize bipartite networks with descending and ascending steps
+- [`clusterize_bipartite_networks_graphon()`](https://chabert-liddel.github.io/colSBM/reference/clusterize_bipartite_networks_graphon.md)
+  : Clusterize bipartite networks in a bottom up fashion with graphon
+  distance
+- [`clusterize_unipartite_networks()`](https://chabert-liddel.github.io/colSBM/reference/clusterize_unipartite_networks.md)
+  : Partition of a collection of unipartite networks based on their
+  common mesoscale structures
+- [`dist_bisbmpop_max()`](https://chabert-liddel.github.io/colSBM/reference/dist_bisbmpop_max.md)
+  : Compute the dissimilarity between 2 mesoscale structures for
+  bipartite SBM
+- [`estimate_colBiSBM()`](https://chabert-liddel.github.io/colSBM/reference/estimate_colBiSBM.md)
+  : Estimate a colBiSBM on a collection of networks
+- [`generate_bipartite_collection()`](https://chabert-liddel.github.io/colSBM/reference/generate_bipartite_collection.md)
+  : Generate collection of bipartite networks
+- [`generate_unipartite_collection()`](https://chabert-liddel.github.io/colSBM/reference/generate_unipartite_collection.md)
+  : Generate collection of unipartite
+- [`extract_nodes_groups()`](https://chabert-liddel.github.io/colSBM/reference/extract_nodes_groups.md)
+  : Extract nodes groups from a fitSimpleSBMPop, fitBipartiteSBMPop,
+  bmpop or bisbmpop object
+
+## colSBM R6 class objects
+
+- [`bmpop`](https://chabert-liddel.github.io/colSBM/reference/bmpop.md)
+  : An R6 Class object, a collection of model for population of sbm
+  netowrks
+- [`fitSimpleSBMPop`](https://chabert-liddel.github.io/colSBM/reference/fitSimpleSBMPop.md)
+  : An R6 Class object, a fitted population of netowrks sbm once
+  \$optimize() is done
+- [`bisbmpop`](https://chabert-liddel.github.io/colSBM/reference/bisbmpop.md)
+  : An R6 Class object, a collection of model for population of BiSBM
+  networks
+- [`fitBipartiteSBMPop`](https://chabert-liddel.github.io/colSBM/reference/fitBipartiteSBMPop.md)
+  : An R6 Class object, a fitted population of netowrks sbm once
+  \$optimize() is done
+
+## Generic methods
+
+- [`plot(`*`<bisbmpop>`*`)`](https://chabert-liddel.github.io/colSBM/reference/plot.bisbmpop.md)
+  : Plot the state-space exploration plot for a bipartite collection
+  object
+- [`plot(`*`<bmpop>`*`)`](https://chabert-liddel.github.io/colSBM/reference/plot.bmpop.md)
+  : Plot the trace of the different criteria in function of the number
+  of clusters
+- [`plot(`*`<fitBipartiteSBMPop>`*`)`](https://chabert-liddel.github.io/colSBM/reference/plot.fitBipartiteSBMPop.md)
+  : Plot matrix summaries of the collection mesoscale structure
+- [`plot(`*`<fitSimpleSBMPop>`*`)`](https://chabert-liddel.github.io/colSBM/reference/plot.fitSimpleSBMPop.md)
+  : Plot matrix summaries of the collection mesoscale structure
+
+## Data
+
+- [`foodwebs`](https://chabert-liddel.github.io/colSBM/reference/foodwebs.md)
+  : A collection of 8 food webs
+- [`dorebipartite`](https://chabert-liddel.github.io/colSBM/reference/dorebipartite.md)
+  : A collection of 15 plant-pollinator bipartite networks
