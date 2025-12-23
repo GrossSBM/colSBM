@@ -161,6 +161,8 @@ parameters}
 \item \href{#method-fitBipartiteSBMPop-compute_BICL}{\code{fitBipartiteSBMPop$compute_BICL()}}
 \item \href{#method-fitBipartiteSBMPop-update_MAP_parameters}{\code{fitBipartiteSBMPop$update_MAP_parameters()}}
 \item \href{#method-fitBipartiteSBMPop-fixed_point_tau}{\code{fitBipartiteSBMPop$fixed_point_tau()}}
+\item \href{#method-fitBipartiteSBMPop-bernoulli_ve_step}{\code{fitBipartiteSBMPop$bernoulli_ve_step()}}
+\item \href{#method-fitBipartiteSBMPop-bernoulli_sve_step}{\code{fitBipartiteSBMPop$bernoulli_sve_step()}}
 \item \href{#method-fitBipartiteSBMPop-update_pim}{\code{fitBipartiteSBMPop$update_pim()}}
 \item \href{#method-fitBipartiteSBMPop-update_pi}{\code{fitBipartiteSBMPop$update_pi()}}
 \item \href{#method-fitBipartiteSBMPop-update_alpham}{\code{fitBipartiteSBMPop$update_alpham()}}
@@ -462,6 +464,60 @@ self$fit_opts$tolerance}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+The new tau values
+Updates the tau values for the bernoulli emission distribution
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitBipartiteSBMPop-bernoulli_ve_step"></a>}}
+\if{latex}{\out{\hypertarget{method-fitBipartiteSBMPop-bernoulli_ve_step}{}}}
+\subsection{Method \code{bernoulli_ve_step()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fitBipartiteSBMPop$bernoulli_ve_step(m, d)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{m}}{The number of the network for which to update the taus}
+
+\item{\code{d}}{The dimension (1 or 2) for which to update the taus}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+The new tau values
+Stochastic VE update for the bernoulli emission distribution
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitBipartiteSBMPop-bernoulli_sve_step"></a>}}
+\if{latex}{\out{\hypertarget{method-fitBipartiteSBMPop-bernoulli_sve_step}{}}}
+\subsection{Method \code{bernoulli_sve_step()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{fitBipartiteSBMPop$bernoulli_sve_step(
+  m,
+  d,
+  prop_to_update = self$fit_opts$prop_to_update
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{m}}{The number of the network for which to update the taus}
+
+\item{\code{d}}{The dimension (1 or 2) for which to update the taus}
+
+\item{\code{prop_to_update}}{The proportion of nodes to use for update}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+This aims to reduce the cost of tau times Y
+}
+
 \subsection{Returns}{
 The new tau values
 Computes the pi per network, known as the pim
