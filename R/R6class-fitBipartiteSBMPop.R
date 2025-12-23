@@ -695,6 +695,50 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$tau[[m]][[d]] <- tau_new
       invisible(tau_new)
     },
+    #' Updates the tau values for the bernoulli emission distribution
+    #'
+    #' @param m The number of the network for which to update the taus
+    #' @param d The dimension (1 or 2) for which to update the taus
+    #'
+    #' @return The new tau values
+    bernoulli_ve_step = function(m, d, prop_to_update = self$fit_opts$prop_to_update) {
+      update_dim <- d
+      other_dim <- ifelse(update_dim == 1, 2, 1)
+
+      # Replicate the mixture for each row of the variational posterior
+      #  probabilities
+      log_mixture <- t(matrix(
+        .xlogy(self$Cpi[[update_dim]][, m],
+          self$pi[[m]][[update_dim]],
+          eps = NULL
+        ),
+        self$Q[update_dim], self$n[[update_dim]][m]
+      ))
+
+      # The support to set to 0 the unused block
+      mat_Cpi <- t(matrix(self$Cpi[[other_dim]][, m],
+        nrow = self$Q[other_dim], ncol = self$n[[other_dim]][m]
+      ))
+      other_tau <- (self$tau[[m]][[other_dim]] * mat_Cpi)
+
+      Y <- ((self$nonNAs[[m]]) * self$A[[m]])
+      log_alpha <- t(.log(self$Calpha * self$alpha))
+
+      one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))
+      log_one_minus_alpha <- t(.log(self$Calpha * (1 - self$alpha)))
+
+      if (update_dim == 1L) {
+        log_tau <- log_mixture +
+          Y %*% other_tau %*% log_alpha +
+          one_minus_Y %*% other_tau %*% log_one_minus_alpha
+      } else {
+        # We transpose the transpose of the actual rule to extract some variables at top
+        log_tau <- t(t(log_mixture) +
+          log_alpha %*% t(other_tau) %*% Y +
+          log_one_minus_alpha %*% t(other_tau) %*% one_minus_Y)
+      }
+      return(.softmax(x = log_tau))
+    },
     #' Computes the pi per network, known as the pim
     #'
     #' @param m The number of the network in the netlist
