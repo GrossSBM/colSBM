@@ -1,4 +1,4 @@
-#' An R6 Class object, a collection of model for population of sbm netowrks
+#' An R6 Class object, a collection of model for population of sbm networks
 #'
 #' @import R6
 #'

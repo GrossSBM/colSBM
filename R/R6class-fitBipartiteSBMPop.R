@@ -1,4 +1,4 @@
-#' An R6 Class object, a fitted population of netowrks sbm
+#' An R6 Class object, a fitted population of networks sbm
 #' once $optimize() is done
 #'
 #' @importFrom R6 R6Class
