@@ -2,11 +2,11 @@
 % Please edit documentation in R/R6class-bmpop.R
 \name{bmpop}
 \alias{bmpop}
-\title{An R6 Class object, a collection of model for population of sbm netowrks}
+\title{An R6 Class object, a collection of model for population of sbm networks}
 \description{
-An R6 Class object, a collection of model for population of sbm netowrks
+An R6 Class object, a collection of model for population of sbm networks
 
-An R6 Class object, a collection of model for population of sbm netowrks
+An R6 Class object, a collection of model for population of sbm networks
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

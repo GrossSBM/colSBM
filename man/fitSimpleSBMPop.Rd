@@ -2,13 +2,13 @@
 % Please edit documentation in R/R6class-fitSimpleSBMPop.R
 \name{fitSimpleSBMPop}
 \alias{fitSimpleSBMPop}
-\title{An R6 Class object, a fitted population of netowrks sbm
+\title{An R6 Class object, a fitted population of networks sbm
 once $optimize() is done}
 \description{
-An R6 Class object, a fitted population of netowrks sbm
+An R6 Class object, a fitted population of networks sbm
 once $optimize() is done
 
-An R6 Class object, a fitted population of netowrks sbm
+An R6 Class object, a fitted population of networks sbm
 once $optimize() is done
 }
 \section{Public fields}{
