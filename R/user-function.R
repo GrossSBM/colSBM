@@ -355,22 +355,6 @@ estimate_colBiSBM <-
       networks_list = netlist,
       emission_distribution = distribution
     )
-    stopifnot(
-      "Distribution must be either 'bernoulli' or 'poisson'" =
-        distribution %in% c("bernoulli", "poisson"),
-      "Network list must be binary matrices if 'bernoulli' distribution is selected" =
-        (distribution == "poisson" | (distribution == "bernoulli" & all(sapply(
-          netlist,
-          function(net) {
-            setequal(unique(net), c(0, 1)) || setequal(unique(net), c(0, 1, NA))
-          }
-        )))),
-      "Network list must be positive integer matrices if 'poisson' is selected" =
-        (distribution == "bernoulli" | (distribution == "poisson" &
-          all(sapply(netlist, function(mat) {
-            rlang::is_integerish(mat) & all(mat >= 0)
-          }))))
-    )
 
     # Fit options
     fo <- default_fit_opts_bipartite()
