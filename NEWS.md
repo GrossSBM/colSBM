@@ -1,3 +1,7 @@
+# colSBM 0.4.7
+
+* Fixing a bug in which `table` won't be automatically converted to a matrix and cause crash with `sbm`
+
 # colSBM 0.4.6
 
 * Added `colSBM::compute_bicl_partition()` to compute BIC-L for various objects
