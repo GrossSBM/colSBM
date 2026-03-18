@@ -1090,9 +1090,7 @@ fitSimpleSBMPop <- R6::R6Class(
       }
     },
     #' @description TODO Remove
-    make_permutation = function() {
-
-    },
+    make_permutation = function() {},
     #' @description
     #' The M step of the VEM
     #'

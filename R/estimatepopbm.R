@@ -115,7 +115,6 @@ clusterize_unipartite_networks <- function(netlist,
   cluster_history <- as.data.frame(matrix(cluster, nrow = 1L))
 
 
-
   if (verbose) {
     cli::cli_h1("Beginning clustering")
   }
@@ -533,9 +532,10 @@ clusterize_bipartite_networks <- function(netlist,
 #'
 #' @keywords internal
 compute_dissimilarity_matrix <- function(
-    collection,
-    weight = "max",
-    norm = "L2") {
+  collection,
+  weight = "max",
+  norm = "L2"
+) {
   stopifnot(
     "Can't build the distance matrix, this is not a bmpop or bisbmpop object" =
       (inherits(collection, "bisbmpop") | inherits(collection, "bmpop") | inherits(collection, "fitBipartiteSBMPop") | inherits(collection, "fitSimpleSBMPop"))
@@ -574,9 +574,10 @@ compute_dissimilarity_matrix <- function(
 #' @inheritParams compute_dissimilarity_matrix
 #' @keywords internal
 compute_dissimilarity_matrix.bisbmpop <- function(
-    collection,
-    weight = "max",
-    norm = "L2") {
+  collection,
+  weight = "max",
+  norm = "L2"
+) {
   M <- collection$M
   dist_matrix <- matrix(0, nrow = M, ncol = M)
 
@@ -605,9 +606,10 @@ compute_dissimilarity_matrix.bisbmpop <- function(
 #' @inheritParams compute_dissimilarity_matrix
 #' @keywords internal
 compute_dissimilarity_matrix.bmpop <- function(
-    collection,
-    weight = "max",
-    norm = "L2") {
+  collection,
+  weight = "max",
+  norm = "L2"
+) {
   M <- collection$M
   dist_matrix <- matrix(0, nrow = M, ncol = M)
 
@@ -650,10 +652,11 @@ compute_dissimilarity_matrix.bmpop <- function(
 #'
 #' @keywords internal
 partition_networks_list_from_dissimilarity <- function(
-    networks_list,
-    dissimilarity_matrix,
-    method = "single",
-    nb_groups = 2L) {
+  networks_list,
+  dissimilarity_matrix,
+  method = "single",
+  nb_groups = 2L
+) {
   # Sanity checks
   check_networks_list(networks_list)
   check_dissimilarity_matrix(dissimilarity_matrix)
@@ -715,18 +718,19 @@ partition_networks_list_from_dissimilarity <- function(
 #' @return A list of models for the recursive partition of
 #' the collection of networks.
 clusterize_bipartite_networks_graphon <- function(
-    netlist,
-    colsbm_model,
-    net_id = NULL,
-    distribution = "bernoulli",
-    nb_run = 3L,
-    global_opts = list(),
-    fit_opts = list(),
-    partition_init = NULL, # Use this to store a list of fits from which to start clustering
-    full_inference = FALSE,
-    keep_history = FALSE,
-    verbose = TRUE,
-    temp_save_path = tempfile(fileext = ".Rds")) {
+  netlist,
+  colsbm_model,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  partition_init = NULL, # Use this to store a list of fits from which to start clustering
+  full_inference = FALSE,
+  keep_history = FALSE,
+  verbose = TRUE,
+  temp_save_path = tempfile(fileext = ".Rds")
+) {
   # Check the colSBM model
   check_bipartite_colsbm_models(colsbm_model = colsbm_model)
   stopifnot("Only iid model is implemented" = colsbm_model == "iid")
@@ -917,19 +921,20 @@ clusterize_bipartite_networks_graphon <- function(
 #' Defaults to a temporary directory.
 #' @export
 clusterize_bipartite_networks_d_a <- function(
-    netlist,
-    colsbm_model,
-    max_nb_steps = 10L,
-    net_id = NULL,
-    distribution = "bernoulli",
-    nb_run = 3L,
-    global_opts = list(),
-    fit_opts = list(),
-    partition_init = NULL, # Use this to store a list of fits from which to start clustering
-    full_collection_init = NULL, # Use this to store a full collection from which to start clustering
-    full_inference = FALSE,
-    verbose = TRUE,
-    temp_save_path = tempdir()) {
+  netlist,
+  colsbm_model,
+  max_nb_steps = 10L,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  partition_init = NULL, # Use this to store a list of fits from which to start clustering
+  full_collection_init = NULL, # Use this to store a full collection from which to start clustering
+  full_inference = FALSE,
+  verbose = TRUE,
+  temp_save_path = tempdir()
+) {
   clust_step <- 1L
   bicl_increased <- TRUE
   old_desc_BICL <- -Inf

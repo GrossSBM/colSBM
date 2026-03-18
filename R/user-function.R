@@ -525,10 +525,11 @@ estimate_colBiSBM <-
 #' @export
 #'
 adjust_colBiSBM <- function(
-    fitted_bisbmpop,
-    Q,
-    depth = 1L,
-    nb_pass = 1L) {
+  fitted_bisbmpop,
+  Q,
+  depth = 1L,
+  nb_pass = 1L
+) {
   # Sanity checks
   stopifnot(inherits(fitted_bisbmpop, "bisbmpop"))
   stopifnot(length(Q) == 2)

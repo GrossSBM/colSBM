@@ -12,9 +12,10 @@
 #' @noMd
 #' @noRd
 generate_unipartite_network <- function(
-    n, pi, alpha,
-    distribution = "bernoulli",
-    return_memberships = FALSE) {
+  n, pi, alpha,
+  distribution = "bernoulli",
+  return_memberships = FALSE
+) {
   stopifnot(
     "All alpha coefficients must be positive" = all(alpha >= 0),
     "With bernoulli, the alpha must be between 0 and 1" = (
@@ -72,9 +73,10 @@ generate_unipartite_network <- function(
 #'
 #' @export
 generate_unipartite_collection <- function(
-    n, pi, alpha, M,
-    distribution = "bernoulli",
-    return_memberships = FALSE) {
+  n, pi, alpha, M,
+  distribution = "bernoulli",
+  return_memberships = FALSE
+) {
   if (length(n) == 1) {
     n <- rep(n, M)
   }
@@ -112,8 +114,9 @@ generate_unipartite_collection <- function(
 #' @noMd
 #' @noRd
 generate_bipartite_network <- function(
-    nr, nc, pi, rho, alpha, distribution = "bernoulli",
-    return_memberships = FALSE) {
+  nr, nc, pi, rho, alpha, distribution = "bernoulli",
+  return_memberships = FALSE
+) {
   stopifnot(
     "All alpha coefficients must be positive" = all(alpha >= 0L),
     "With bernoulli, the alpha must be between 0 and 1" = (
@@ -186,10 +189,11 @@ generate_bipartite_network <- function(
 #'
 #' @export
 generate_bipartite_collection <- function(
-    nr, nc, pi, rho, alpha, M,
-    model = "iid",
-    distribution = "bernoulli",
-    return_memberships = FALSE) {
+  nr, nc, pi, rho, alpha, M,
+  model = "iid",
+  distribution = "bernoulli",
+  return_memberships = FALSE
+) {
   out <- list()
 
   # Check if nr and nc are vectors
@@ -350,7 +354,6 @@ spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 50
   clustering[isolated] <- which.min(rowsum(rowSums(X, na.rm = TRUE), cl))
   return(clustering)
 }
-
 
 
 #' Perform a spectral bi-clustering, clusters by row
@@ -542,7 +545,6 @@ merge_clust <- function(Z, Q) {
   )
   return(Z_merge)
 }
-
 
 
 #

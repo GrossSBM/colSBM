@@ -94,8 +94,9 @@ dist_bmpop_max <- function(pi, alpha, delta = c(1, 1), weight = "max",
 #' )
 #' dist_bisbmpop_max(pi, rho, alpha)
 dist_bisbmpop_max <- function(
-    pi,
-    rho, alpha, delta = c(1, 1), weight = "max", norm = "L2") {
+  pi,
+  rho, alpha, delta = c(1, 1), weight = "max", norm = "L2"
+) {
   if (missing(pi) || missing(rho)) {
     distance <- switch(norm,
       "L1" = sum(abs(alpha[[1]] - alpha[[2]])),
