@@ -38,7 +38,7 @@ collection of networks.
 Classifies networks in groups of networks with similar mesoscale structures.
 
 Mathematical details of the methods as well as simulation studies and
-applications can be find in @collection .
+applications can be found in @collection and @lacosteCommonStructureDiscovery2025.
 
 ## Installation
 
