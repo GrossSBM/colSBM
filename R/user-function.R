@@ -315,7 +315,7 @@ estimate_colBiSBM <-
            Z_init = NULL,
            sep_BiSBM = NULL) {
     # Sanity checks
-    check_networks_list(
+    netlist <- check_networks_list(
       networks_list = netlist,
       min_length = 1L
     )
@@ -351,6 +351,10 @@ estimate_colBiSBM <-
     }
 
     # Check if distribution is allowed
+    check_networks_list_match_emission_distribution(
+      networks_list = netlist,
+      emission_distribution = distribution
+    )
     stopifnot(
       "Distribution must be either 'bernoulli' or 'poisson'" =
         distribution %in% c("bernoulli", "poisson"),

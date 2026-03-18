@@ -73,7 +73,7 @@ clusterize_unipartite_networks <- function(netlist,
                                            temp_save_path = tempfile(fileext = ".Rds")) {
   check_unipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
-  check_networks_list(networks_list = netlist)
+  netlist <- check_networks_list(networks_list = netlist)
   net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
@@ -315,7 +315,7 @@ clusterize_bipartite_networks <- function(netlist,
                                           temp_save_path = tempfile(fileext = ".Rds")) {
   check_bipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
-  check_networks_list(networks_list = netlist)
+  netlist <- check_networks_list(networks_list = netlist)
   net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(

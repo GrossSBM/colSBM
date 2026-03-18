@@ -39,6 +39,17 @@ check_networks_list <- function(networks_list,
       call = call
     )
   }
+  if (any(sapply(networks_list, is.table))) {
+    cli::cli_inform("An element of {.arg {arg}} was detected as {.obj_type_friendly {table(0)}}, trying to cast it to matrices.",
+      arg = arg,
+      call = call
+    )
+    networks_list <- lapply(networks_list, function(table)
+    { 
+      attributes(table)$class <- "matrix"
+    return(table)
+    })
+  }
   if (length(networks_list) < min_length) {
     cli::cli_abort(
       c("{.arg {arg}} must be of length at least {min_length}.",
@@ -48,6 +59,7 @@ check_networks_list <- function(networks_list,
       call = call
     )
   }
+  return(networks_list)
 }
 
 #' Check net_id and eventually intialize it
