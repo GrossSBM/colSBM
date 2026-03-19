@@ -54,6 +54,11 @@ estimate_colSBM <-
            fit_opts = list(),
            Z_init = NULL,
            fit_init = NULL) {
+    netlist <- check_networks_list(
+      networks_list = netlist,
+      min_length = 1L
+    )
+
     switch(colsbm_model,
       "iid" = {
         free_density <- FALSE
