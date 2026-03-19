@@ -33,8 +33,7 @@ check_networks_list <- function(networks_list,
     call = call
   )
   if (!rlang::is_list(networks_list) |
-    rlang::is_empty(networks_list) |
-    !all(sapply(networks_list, is.matrix))) {
+    rlang::is_empty(networks_list)) {
     cli::cli_abort("{.arg {arg}} must be a list of matrices.",
       arg = arg,
       call = call
@@ -45,10 +44,18 @@ check_networks_list <- function(networks_list,
       arg = arg,
       call = call
     )
-    networks_list <- lapply(networks_list, function(table) {
-      attributes(table)$class <- "matrix"
-      return(table)
+    networks_list <- lapply(networks_list, function(network) {
+      if (is.table(network)) {
+        return(as.matrix(unclass(network)))
+      }
+      return(network)
     })
+  }
+  if (!all(sapply(networks_list, function(network) is.matrix(network) && !is.table(network)))) {
+    cli::cli_abort("{.arg {arg}} must be a list of matrices.",
+      arg = arg,
+      call = call
+    )
   }
   if (length(networks_list) < min_length) {
     cli::cli_abort(
