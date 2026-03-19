@@ -84,7 +84,6 @@ bisbmpop <- R6::R6Class(
     joint_modelisation_preferred = NULL,
 
 
-
     #' @description
     #' Create a new instance of the bisbmpop object
     #'

@@ -47,12 +47,13 @@
 #' plot(cl$best_fit)
 #' }
 plot.fitSimpleSBMPop <- function(
-    x,
-    type = "graphon",
-    ord = NULL,
-    mixture = FALSE,
-    net_id = 1L,
-    ...) {
+  x,
+  type = "graphon",
+  ord = NULL,
+  mixture = FALSE,
+  net_id = 1L,
+  ...
+) {
   if (is.null(ord)) ord <- order(diag(x$alpha), decreasing = TRUE)
   p <- switch(type,
     graphon = {
@@ -355,14 +356,15 @@ plot.bmpop <- function(x, type = "trace", ...) {
 #' plot(cl_joint$best_fit)
 #' }
 plot.fitBipartiteSBMPop <- function(
-    x, type = "graphon",
-    oRow = NULL,
-    oCol = NULL,
-    mixture = FALSE,
-    net_id = 1L,
-    values = FALSE,
-    values_min = 0.2,
-    ...) {
+  x, type = "graphon",
+  oRow = NULL,
+  oCol = NULL,
+  mixture = FALSE,
+  net_id = 1L,
+  values = FALSE,
+  values_min = 0.2,
+  ...
+) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
   p <- switch(type,
     graphon = {

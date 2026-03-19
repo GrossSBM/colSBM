@@ -54,6 +54,11 @@ estimate_colSBM <-
            fit_opts = list(),
            Z_init = NULL,
            fit_init = NULL) {
+    netlist <- check_networks_list(
+      networks_list = netlist,
+      min_length = 1L
+    )
+
     switch(colsbm_model,
       "iid" = {
         free_density <- FALSE
@@ -315,7 +320,7 @@ estimate_colBiSBM <-
            Z_init = NULL,
            sep_BiSBM = NULL) {
     # Sanity checks
-    check_networks_list(
+    netlist <- check_networks_list(
       networks_list = netlist,
       min_length = 1L
     )
@@ -351,21 +356,9 @@ estimate_colBiSBM <-
     }
 
     # Check if distribution is allowed
-    stopifnot(
-      "Distribution must be either 'bernoulli' or 'poisson'" =
-        distribution %in% c("bernoulli", "poisson"),
-      "Network list must be binary matrices if 'bernoulli' distribution is selected" =
-        (distribution == "poisson" | (distribution == "bernoulli" & all(sapply(
-          netlist,
-          function(net) {
-            setequal(unique(net), c(0, 1)) || setequal(unique(net), c(0, 1, NA))
-          }
-        )))),
-      "Network list must be positive integer matrices if 'poisson' is selected" =
-        (distribution == "bernoulli" | (distribution == "poisson" &
-          all(sapply(netlist, function(mat) {
-            rlang::is_integerish(mat) & all(mat >= 0)
-          }))))
+    check_networks_list_match_emission_distribution(
+      networks_list = netlist,
+      emission_distribution = distribution
     )
 
     # Fit options
@@ -521,10 +514,11 @@ estimate_colBiSBM <-
 #' @export
 #'
 adjust_colBiSBM <- function(
-    fitted_bisbmpop,
-    Q,
-    depth = 1L,
-    nb_pass = 1L) {
+  fitted_bisbmpop,
+  Q,
+  depth = 1L,
+  nb_pass = 1L
+) {
   # Sanity checks
   stopifnot(inherits(fitted_bisbmpop, "bisbmpop"))
   stopifnot(length(Q) == 2)

@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![](https://img.shields.io/badge/devel%20version-0.4.6-green.svg)](https://github.com/GrossSBM/colSBM)
+[![](https://img.shields.io/badge/devel%20version-0.4.7-green.svg)](https://github.com/GrossSBM/colSBM)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![](https://img.shields.io/github/last-commit/GrossSBM/colSBM.svg)](https://github.com/GrossSBM/colSBM/commits/main)
@@ -27,8 +27,8 @@ particular, it allows to:
   networks in groups of networks with similar mesoscale structures.
 
 Mathematical details of the methods as well as simulation studies and
-applications can be find in Chabert-Liddell, Barbillon, and Donnet
-(2024) .
+applications can be found in Chabert-Liddell, Barbillon, and Donnet
+(2024) and Lacoste, Barbillon, and Donnet (2025).
 
 ## Installation
 
@@ -42,8 +42,7 @@ devtools::install_github("GrossSBM/colSBM")
 
 # References
 
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
 <div id="ref-collection" class="csl-entry">
 
@@ -51,6 +50,15 @@ Chabert-Liddell, Saint-Clair, Pierre Barbillon, and Sophie Donnet. 2024.
 “Learning Common Structures in a Collection of Networks. An Application
 to Food Webs.” *The Annals of Applied Statistics* 18 (2): 1213–35.
 <https://doi.org/10.1214/23-AOAS1831>.
+
+</div>
+
+<div id="ref-lacosteCommonStructureDiscovery2025" class="csl-entry">
+
+Lacoste, Louis, Pierre Barbillon, and Sophie Donnet. 2025. “Common
+Structure Discovery in Collections of Bipartite Networks: Application to
+Pollination Systems.” arXiv.
+<https://doi.org/10.48550/arXiv.2512.01716>.
 
 </div>
 

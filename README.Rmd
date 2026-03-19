@@ -25,6 +25,7 @@ knitr::opts_chunk$set(
 [![](https://badgen.net/badge/DOI/10.1214%2F23-AOAS1831/yellow)](https://doi.org/10.1214/23-AOAS1831)
 [![](https://www.r-pkg.org/badges/version/colSBM)](https://CRAN.R-project.org/package=colSBM)
 [![Codecov test coverage](https://codecov.io/gh/GrossSBM/colSBM/graph/badge.svg)](https://app.codecov.io/gh/GrossSBM/colSBM)
+[![R-CMD-check](https://github.com/Chabert-Liddell/colSBM/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Chabert-Liddell/colSBM/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 colSBM is an R package which implements methods for clustering and inferring the
@@ -38,7 +39,7 @@ collection of networks.
 Classifies networks in groups of networks with similar mesoscale structures.
 
 Mathematical details of the methods as well as simulation studies and
-applications can be find in @collection .
+applications can be found in @collection and @lacosteCommonStructureDiscovery2025.
 
 ## Installation
 

@@ -25,6 +25,22 @@ test_that("Estimate colSBM runs without problems", {
   ))
 })
 
+test_that("Estimate colSBM accepts netlist of tables", {
+  set.seed(1234L)
+  expect_no_error(estimate_colSBM(
+    netlist = list(
+      as.table(matrix(as.numeric(runif(100) > 0.5), nrow = 10)),
+      as.table(matrix(as.numeric(runif(100) > 0.5), nrow = 10))
+    ),
+    colsbm_model = "iid",
+    global_opts = list(
+      nb_cores = 2L,
+      backend = "no_mc",
+      verbosity = 0L
+    )
+  ))
+})
+
 test_that("Wrong model raises an error", {
   set.seed(1234L)
   expect_error(estimate_colSBM(
@@ -149,6 +165,25 @@ test_that("Estimate colBiSBM runs without problems with verbosity", {
       nb_cores = 2L,
       backend = "no_mc",
       verbosity = 4L,
+      Q1_max = NULL,
+      Q2_max = NULL
+    ),
+    fit_opts = fit_opts
+  ))
+})
+
+test_that("Estimate colBiSBM accepts netlist of tables", {
+  set.seed(1234L)
+  expect_no_error(estimate_colBiSBM(
+    netlist = list(
+      as.table(matrix(as.numeric(runif(100) > 0.5), nrow = 10)),
+      as.table(matrix(as.numeric(runif(100) > 0.5), nrow = 10))
+    ),
+    colsbm_model = "iid",
+    global_opts = list(
+      nb_cores = 2L,
+      backend = "no_mc",
+      verbosity = 0L,
       Q1_max = NULL,
       Q2_max = NULL
     ),

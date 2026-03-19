@@ -20,8 +20,6 @@ food_webs <- lapply(
 )
 
 
-
-
 sub_fw <- purrr::map(food_webs, "net")[11:18]
 sub_id <- purrr::map_chr(food_webs, "id")[11:18]
 site_names <- c(

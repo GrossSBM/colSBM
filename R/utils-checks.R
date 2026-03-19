@@ -2,10 +2,11 @@
 #' @noRd
 #' @keywords internal
 check_is_integer_over_thresh <- function(
-    int,
-    thresh,
-    arg = rlang::caller_arg(int),
-    call = rlang::caller_env()) {
+  int,
+  thresh,
+  arg = rlang::caller_arg(int),
+  call = rlang::caller_env()
+) {
   rlang::check_required(int, arg = arg, call = call)
   if (!rlang::is_integerish(int, n = 1, finite = TRUE)) {
     cli::cli_abort(c("{.arg {arg}} must be {.obj_type_friendly {1L}}.",
@@ -32,8 +33,25 @@ check_networks_list <- function(networks_list,
     call = call
   )
   if (!rlang::is_list(networks_list) |
-    rlang::is_empty(networks_list) |
-    !all(sapply(networks_list, is.matrix))) {
+    rlang::is_empty(networks_list)) {
+    cli::cli_abort("{.arg {arg}} must be a list of matrices.",
+      arg = arg,
+      call = call
+    )
+  }
+  if (any(sapply(networks_list, is.table))) {
+    cli::cli_inform("An element of {.arg {arg}} was detected as {.obj_type_friendly {table(0)}}, trying to cast it to matrices.",
+      arg = arg,
+      call = call
+    )
+    networks_list <- lapply(networks_list, function(network) {
+      if (is.table(network)) {
+        return(as.matrix(unclass(network)))
+      }
+      return(network)
+    })
+  }
+  if (!all(sapply(networks_list, function(network) is.matrix(network) && !is.table(network)))) {
     cli::cli_abort("{.arg {arg}} must be a list of matrices.",
       arg = arg,
       call = call
@@ -48,6 +66,7 @@ check_networks_list <- function(networks_list,
       call = call
     )
   }
+  return(networks_list)
 }
 
 #' Check net_id and eventually intialize it
@@ -97,9 +116,10 @@ check_dissimilarity_matrix <- function(dissimilarity_matrix,
 #' @noRd
 #' @keywords internal
 check_bipartite_colsbm_models <- function(
-    colsbm_model,
-    arg = rlang::caller_arg(colsbm_model),
-    call = rlang::caller_env()) {
+  colsbm_model,
+  arg = rlang::caller_arg(colsbm_model),
+  call = rlang::caller_env()
+) {
   rlang::check_required(colsbm_model,
     arg = arg,
     call = call
@@ -139,9 +159,10 @@ check_bipartite_colsbm_models <- function(
 #' @noRd
 #' @keywords internal
 check_unipartite_colsbm_models <- function(
-    colsbm_model,
-    arg = rlang::caller_arg(colsbm_model),
-    call = rlang::caller_env()) {
+  colsbm_model,
+  arg = rlang::caller_arg(colsbm_model),
+  call = rlang::caller_env()
+) {
   rlang::check_required(colsbm_model,
     arg = arg,
     call = call
@@ -162,9 +183,10 @@ check_unipartite_colsbm_models <- function(
 #' @param call The environment where the function was called
 #' @return The emission distribution
 check_colsbm_emission_distribution <- function(
-    emission_distribution,
-    arg = rlang::caller_arg(emission_distribution),
-    call = rlang::caller_env()) {
+  emission_distribution,
+  arg = rlang::caller_arg(emission_distribution),
+  call = rlang::caller_env()
+) {
   rlang::check_required(emission_distribution,
     arg = arg,
     call = call
@@ -186,11 +208,12 @@ check_colsbm_emission_distribution <- function(
 #' @return The list of matrices
 #' @keywords internal
 check_networks_list_match_emission_distribution <- function(
-    networks_list,
-    emission_distribution,
-    arg = rlang::caller_arg(networks_list),
-    distrib_arg = rlang::caller_arg(emission_distribution),
-    call = rlang::caller_env()) {
+  networks_list,
+  emission_distribution,
+  arg = rlang::caller_arg(networks_list),
+  distrib_arg = rlang::caller_arg(emission_distribution),
+  call = rlang::caller_env()
+) {
   check_colsbm_emission_distribution(emission_distribution,
     arg = distrib_arg,
     call = call
@@ -281,9 +304,10 @@ check_net_id <- function(net_id, networks_list, arg = rlang::caller_arg(net_id),
 #' @return The backend
 #' @keywords internal
 check_backend <- function(
-    backend,
-    arg = rlang::caller_arg(backend),
-    call = rlang::caller_env()) {
+  backend,
+  arg = rlang::caller_arg(backend),
+  call = rlang::caller_env()
+) {
   rlang::check_required(backend,
     arg = arg,
     call = call
