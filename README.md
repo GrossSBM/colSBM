@@ -13,6 +13,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![](https://www.r-pkg.org/badges/version/colSBM)](https://CRAN.R-project.org/package=colSBM)
 [![Codecov test
 coverage](https://codecov.io/gh/GrossSBM/colSBM/graph/badge.svg)](https://app.codecov.io/gh/GrossSBM/colSBM)
+[![R-CMD-check](https://github.com/Chabert-Liddell/colSBM/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Chabert-Liddell/colSBM/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 colSBM is an R package which implements methods for clustering and
@@ -42,7 +43,8 @@ devtools::install_github("GrossSBM/colSBM")
 
 # References
 
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent"
+entry-spacing="0">
 
 <div id="ref-collection" class="csl-entry">
 
