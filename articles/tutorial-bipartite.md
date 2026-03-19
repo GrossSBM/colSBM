@@ -67,12 +67,12 @@ res_pp_iid <- estimate_colBiSBM(
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 2 networks. Computed in 0.458 secs ====
+#> ==== Best fits criterion for the 2 networks. Computed in 0.48 secs ====
 #> Sep BiSBM total BICL:  -640.6602
 #> colBiSBM BICL: -633.8671
 #> Joint modelisation preferred. With Q = ( 2, 2 ).
 #> 
-#> ==== Full computation performed in 11.1 secs ====
+#> ==== Full computation performed in 11.6 secs ====
 ```
 
 The output indicates that the collection benefits from a joint
@@ -277,12 +277,12 @@ res_pp_iid_sep <- estimate_colBiSBM(
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 4 networks. Computed in 1.18 secs ====
+#> ==== Best fits criterion for the 4 networks. Computed in 1.26 secs ====
 #> Sep BiSBM total BICL:  -813.0666
 #> colBiSBM BICL: -816.8325
 #> Separated modelisation preferred.
 #> 
-#> ==== Full computation performed in 21.3 secs ====
+#> ==== Full computation performed in 1 mins ====
 ```
 
 The output indicates that the collection does not benefit from a joint
@@ -338,7 +338,7 @@ net_clust <- clusterize_bipartite_networks(
     Q2_max = 9L
   )
 )
-#> ℹ A save file will be created at "/tmp/RtmpDnwPOx/file765259a00f1.Rds" and updated after each step
+#> ℹ A save file will be created at "/tmp/RtmpREBsqK/file75e5fe55e39.Rds" and updated after each step
 #> 
 #> ── Fitting the full collection ─────────────────────────────────────────────────
 #> 
@@ -423,7 +423,7 @@ net_clust <- clusterize_bipartite_networks(
 #> ✖ Splitting collections decreased the BIC-L criterion
 #> ✔ Finished clustering
 #> ℹ After clustering the partition has a BIC-L of -2041.5890661571
-#> ℹ The final results are saved at "/tmp/RtmpDnwPOx/file765259a00f1.Rds"
+#> ℹ The final results are saved at "/tmp/RtmpREBsqK/file75e5fe55e39.Rds"
 ```
 
 ``` r
