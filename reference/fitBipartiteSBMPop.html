@@ -13,7 +13,7 @@ once $optimize() is done"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">colSBM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -304,6 +304,8 @@ parameters</p></dd>
 <li><p><a href="#method-fitBipartiteSBMPop-compute_BICL"><code>fitBipartiteSBMPop$compute_BICL()</code></a></p></li>
 <li><p><a href="#method-fitBipartiteSBMPop-update_MAP_parameters"><code>fitBipartiteSBMPop$update_MAP_parameters()</code></a></p></li>
 <li><p><a href="#method-fitBipartiteSBMPop-fixed_point_tau"><code>fitBipartiteSBMPop$fixed_point_tau()</code></a></p></li>
+<li><p><a href="#method-fitBipartiteSBMPop-bernoulli_ve_step"><code>fitBipartiteSBMPop$bernoulli_ve_step()</code></a></p></li>
+<li><p><a href="#method-fitBipartiteSBMPop-bernoulli_sve_step"><code>fitBipartiteSBMPop$bernoulli_sve_step()</code></a></p></li>
 <li><p><a href="#method-fitBipartiteSBMPop-update_pim"><code>fitBipartiteSBMPop$update_pim()</code></a></p></li>
 <li><p><a href="#method-fitBipartiteSBMPop-update_pi"><code>fitBipartiteSBMPop$update_pi()</code></a></p></li>
 <li><p><a href="#method-fitBipartiteSBMPop-update_alpham"><code>fitBipartiteSBMPop$update_alpham()</code></a></p></li>
@@ -658,6 +660,71 @@ self$fit_opts$tolerance</p></dd>
 <div class="section">
 <h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
 <p>The new tau values
+Updates the tau values for the bernoulli emission distribution</p>
+</div>
+
+</div><p></p><hr><a id="method-fitBipartiteSBMPop-bernoulli_ve_step"></a><div class="section">
+<h3 id="method-bernoulli-ve-step-">Method <code>bernoulli_ve_step()</code><a class="anchor" aria-label="anchor" href="#method-bernoulli-ve-step-"></a></h3>
+
+<div class="section">
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">bernoulli_ve_step</span><span class="op">(</span><span class="va">m</span>, <span class="va">d</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>m</code></dt>
+<dd><p>The number of the network for which to update the taus</p></dd>
+
+
+<dt><code>d</code></dt>
+<dd><p>The dimension (1 or 2) for which to update the taus</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
+<p>The new tau values
+Stochastic VE update for the bernoulli emission distribution</p>
+</div>
+
+</div><p></p><hr><a id="method-fitBipartiteSBMPop-bernoulli_sve_step"></a><div class="section">
+<h3 id="method-bernoulli-sve-step-">Method <code>bernoulli_sve_step()</code><a class="anchor" aria-label="anchor" href="#method-bernoulli-sve-step-"></a></h3>
+
+<div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">bernoulli_sve_step</span><span class="op">(</span></span>
+<span>  <span class="va">m</span>,</span>
+<span>  <span class="va">d</span>,</span>
+<span>  prop_to_update <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">prop_to_update</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>m</code></dt>
+<dd><p>The number of the network for which to update the taus</p></dd>
+
+
+<dt><code>d</code></dt>
+<dd><p>The dimension (1 or 2) for which to update the taus</p></dd>
+
+
+<dt><code>prop_to_update</code></dt>
+<dd><p>The proportion of nodes to use for update</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h4>
+<p>This aims to reduce the cost of tau times Y</p>
+</div>
+
+<div class="section">
+<h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
+<p>The new tau values
 Computes the pi per network, known as the pim</p>
 </div>
 
@@ -665,58 +732,8 @@ Computes the pi per network, known as the pim</p>
 <h3 id="method-update-pim-">Method <code>update_pim()</code><a class="anchor" aria-label="anchor" href="#method-update-pim-"></a></h3>
 
 <div class="section">
-<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_pim</span><span class="op">(</span><span class="va">m</span>, MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>m</code></dt>
-<dd><p>The number of the network in the netlist</p></dd>
-
-
-<dt><code>MAP</code></dt>
-<dd><p>A boolean wether to use the MAP parameters or not, defaults to
-FALSE</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
-<p>nothing; stores the values
-Computes the pi for the whole model</p>
-</div>
-
-</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_pi"></a><div class="section">
-<h3 id="method-update-pi-">Method <code>update_pi()</code><a class="anchor" aria-label="anchor" href="#method-update-pi-"></a></h3>
-
-<div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_pi</span><span class="op">(</span>MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>MAP</code></dt>
-<dd><p>A boolean wether to use the MAP parameters or not, defaults to
-FALSE</p></dd>
-
-
-</dl><p></p></div>
-</div>
-<div class="section">
-<h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
-<p>the pi and stores the values
-Computes the alpha per network, known as the alpham</p>
-</div>
-
-</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_alpham"></a><div class="section">
-<h3 id="method-update-alpham-">Method <code>update_alpham()</code><a class="anchor" aria-label="anchor" href="#method-update-alpham-"></a></h3>
-
-<div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_alpham</span><span class="op">(</span><span class="va">m</span>, MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_pim</span><span class="op">(</span><span class="va">m</span>, MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -734,16 +751,16 @@ FALSE</p></dd>
 </div>
 <div class="section">
 <h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
-<p>the alpham and stores the values
-Computes the alpha for the whole model</p>
+<p>nothing; stores the values
+Computes the pi for the whole model</p>
 </div>
 
-</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_alpha"></a><div class="section">
-<h3 id="method-update-alpha-">Method <code>update_alpha()</code><a class="anchor" aria-label="anchor" href="#method-update-alpha-"></a></h3>
+</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_pi"></a><div class="section">
+<h3 id="method-update-pi-">Method <code>update_pi()</code><a class="anchor" aria-label="anchor" href="#method-update-pi-"></a></h3>
 
 <div class="section">
 <h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_alpha</span><span class="op">(</span>MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_pi</span><span class="op">(</span>MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -757,6 +774,56 @@ FALSE</p></dd>
 </div>
 <div class="section">
 <h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
+<p>the pi and stores the values
+Computes the alpha per network, known as the alpham</p>
+</div>
+
+</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_alpham"></a><div class="section">
+<h3 id="method-update-alpham-">Method <code>update_alpham()</code><a class="anchor" aria-label="anchor" href="#method-update-alpham-"></a></h3>
+
+<div class="section">
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_alpham</span><span class="op">(</span><span class="va">m</span>, MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>m</code></dt>
+<dd><p>The number of the network in the netlist</p></dd>
+
+
+<dt><code>MAP</code></dt>
+<dd><p>A boolean wether to use the MAP parameters or not, defaults to
+FALSE</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
+<p>the alpham and stores the values
+Computes the alpha for the whole model</p>
+</div>
+
+</div><p></p><hr><a id="method-fitBipartiteSBMPop-update_alpha"></a><div class="section">
+<h3 id="method-update-alpha-">Method <code>update_alpha()</code><a class="anchor" aria-label="anchor" href="#method-update-alpha-"></a></h3>
+
+<div class="section">
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_alpha</span><span class="op">(</span>MAP <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>MAP</code></dt>
+<dd><p>A boolean wether to use the MAP parameters or not, defaults to
+FALSE</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
 <p>the alpha and stores the values</p>
 </div>
 
@@ -764,12 +831,12 @@ FALSE</p></dd>
 <h3 id="method-taus-order-">Method <code>taus_order()</code><a class="anchor" aria-label="anchor" href="#method-taus-order-"></a></h3>
 <p>The goal of this function is to test different values of tau
 and select the best one in the sense of the BICL (or vbound) ?</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">taus_order</span><span class="op">(</span><span class="va">taus_list</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
+<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>taus_list</code></dt>
 <dd><p>List of possible taus for which to provide a ranking</p></dd>
 
@@ -777,19 +844,19 @@ and select the best one in the sense of the BICL (or vbound) ?</p><div class="se
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-15">Returns<a class="anchor" aria-label="anchor" href="#returns-15"></a></h4>
+<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
 <p>A vector with the order of the taus in regard of vbound</p>
 </div>
 
 </div><p></p><hr><a id="method-fitBipartiteSBMPop-init_clust"></a><div class="section">
 <h3 id="method-init-clust-">Method <code>init_clust()</code><a class="anchor" aria-label="anchor" href="#method-init-clust-"></a></h3>
 <p>Initialize clusters</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">init_clust</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-16">Returns<a class="anchor" aria-label="anchor" href="#returns-16"></a></h4>
+<h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
 <p>nothing; stores
 The M step of the VEM</p>
 </div>
@@ -798,12 +865,12 @@ The M step of the VEM</p>
 <h3 id="method-m-step-">Method <code>m_step()</code><a class="anchor" aria-label="anchor" href="#method-m-step-"></a></h3>
 
 <div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">m_step</span><span class="op">(</span>MAP <span class="op">=</span> <span class="cn">FALSE</span>, tol <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">tolerance</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-13">Arguments<a class="anchor" aria-label="anchor" href="#arguments-13"></a></h4>
+<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>MAP</code></dt>
 <dd><p>A boolean wether to use the MAP parameters or not, defaults to
 FALSE</p></dd>
@@ -821,7 +888,7 @@ self$fit_opts$tolerance</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-17">Returns<a class="anchor" aria-label="anchor" href="#returns-17"></a></h4>
+<h4 id="returns-19">Returns<a class="anchor" aria-label="anchor" href="#returns-19"></a></h4>
 <p>nothing; stores values
 An optimization version for the VE step of the VEM but currently a
 placeholder</p>
@@ -831,12 +898,12 @@ placeholder</p>
 <h3 id="method-ve-step-">Method <code>ve_step()</code><a class="anchor" aria-label="anchor" href="#method-ve-step-"></a></h3>
 
 <div class="section">
-<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
+<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">ve_step</span><span class="op">(</span><span class="va">m</span>, max_iter <span class="op">=</span> <span class="fl">2</span>, tol <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">tolerance</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-14">Arguments<a class="anchor" aria-label="anchor" href="#arguments-14"></a></h4>
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>m</code></dt>
 <dd><p>The number of the network in the netlist</p></dd>
 
@@ -857,7 +924,7 @@ self$fit_opts$tolerance</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-18">Returns<a class="anchor" aria-label="anchor" href="#returns-18"></a></h4>
+<h4 id="returns-20">Returns<a class="anchor" aria-label="anchor" href="#returns-20"></a></h4>
 <p>nothing; stores values
 Updates the mqr quantities</p>
 </div>
@@ -865,12 +932,12 @@ Updates the mqr quantities</p>
 </div><p></p><hr><a id="method-fitBipartiteSBMPop-update_mqr"></a><div class="section">
 <h3 id="method-update-mqr-">Method <code>update_mqr()</code><a class="anchor" aria-label="anchor" href="#method-update-mqr-"></a></h3>
 <p>Namely, it updates the emqr and nmqr.</p><div class="section">
-<h4 id="usage-20">Usage<a class="anchor" aria-label="anchor" href="#usage-20"></a></h4>
+<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">update_mqr</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-15">Arguments<a class="anchor" aria-label="anchor" href="#arguments-15"></a></h4>
+<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>m</code></dt>
 <dd><p>The number of the network in the netlist
 TODO Investigate what its supposed to do</p></dd>
@@ -883,12 +950,12 @@ TODO Investigate what its supposed to do</p></dd>
 <h3 id="method-make-permutation-">Method <code>make_permutation()</code><a class="anchor" aria-label="anchor" href="#method-make-permutation-"></a></h3>
 
 <div class="section">
-<h4 id="usage-21">Usage<a class="anchor" aria-label="anchor" href="#usage-21"></a></h4>
+<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">make_permutation</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-19">Returns<a class="anchor" aria-label="anchor" href="#returns-19"></a></h4>
+<h4 id="returns-21">Returns<a class="anchor" aria-label="anchor" href="#returns-21"></a></h4>
 <p>nothing
 Computes the number of blocks that are effectively populated</p>
 </div>
@@ -897,12 +964,12 @@ Computes the number of blocks that are effectively populated</p>
 <h3 id="method-compute-effective-clustering-">Method <code>compute_effective_clustering()</code><a class="anchor" aria-label="anchor" href="#method-compute-effective-clustering-"></a></h3>
 
 <div class="section">
-<h4 id="usage-22">Usage<a class="anchor" aria-label="anchor" href="#usage-22"></a></h4>
+<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">compute_effective_clustering</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-20">Returns<a class="anchor" aria-label="anchor" href="#returns-20"></a></h4>
+<h4 id="returns-22">Returns<a class="anchor" aria-label="anchor" href="#returns-22"></a></h4>
 <p>nothing; but stores the value
 Perform the whole initialization and VEM algorithm</p>
 </div>
@@ -911,7 +978,7 @@ Perform the whole initialization and VEM algorithm</p>
 <h3 id="method-optimize-">Method <code><a href="https://rdrr.io/r/stats/optimize.html" class="external-link">optimize()</a></code><a class="anchor" aria-label="anchor" href="#method-optimize-"></a></h3>
 
 <div class="section">
-<h4 id="usage-23">Usage<a class="anchor" aria-label="anchor" href="#usage-23"></a></h4>
+<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">optimize</span><span class="op">(</span></span>
 <span>  max_step <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">max_vem_steps</span>,</span>
 <span>  tol <span class="op">=</span> <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">tolerance</span>,</span>
@@ -920,7 +987,7 @@ Perform the whole initialization and VEM algorithm</p>
 </div>
 
 <div class="section">
-<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>max_step</code></dt>
 <dd><p>The maximum number of steps to perform optimization</p></dd>
 
@@ -937,7 +1004,7 @@ self$fit_opts$tolerance</p></dd>
 </dl><p></p></div>
 </div>
 <div class="section">
-<h4 id="returns-21">Returns<a class="anchor" aria-label="anchor" href="#returns-21"></a></h4>
+<h4 id="returns-23">Returns<a class="anchor" aria-label="anchor" href="#returns-23"></a></h4>
 <p>nothing
 Reorder the blocks putting the "strongest" ones first in order to have
 a coherent ordering of blocks with SBM and LBM for visualisation.</p>
@@ -947,12 +1014,12 @@ a coherent ordering of blocks with SBM and LBM for visualisation.</p>
 <h3 id="method-reorder-parameters-">Method <code>reorder_parameters()</code><a class="anchor" aria-label="anchor" href="#method-reorder-parameters-"></a></h3>
 
 <div class="section">
-<h4 id="usage-24">Usage<a class="anchor" aria-label="anchor" href="#usage-24"></a></h4>
+<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">reorder_parameters</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-22">Returns<a class="anchor" aria-label="anchor" href="#returns-22"></a></h4>
+<h4 id="returns-24">Returns<a class="anchor" aria-label="anchor" href="#returns-24"></a></h4>
 <p>nothing; stores the new ordering
 The message printed when one prints the object</p>
 </div>
@@ -961,12 +1028,12 @@ The message printed when one prints the object</p>
 <h3 id="method-show-">Method <code>show()</code><a class="anchor" aria-label="anchor" href="#method-show-"></a></h3>
 
 <div class="section">
-<h4 id="usage-25">Usage<a class="anchor" aria-label="anchor" href="#usage-25"></a></h4>
+<h4 id="usage-27">Usage<a class="anchor" aria-label="anchor" href="#usage-27"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"Fitted Collection of Bipartite SBM"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
+<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>type</code></dt>
 <dd><p>The title above the message.
 The print method</p></dd>
@@ -979,24 +1046,24 @@ The print method</p></dd>
 <h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
 
 <div class="section">
-<h4 id="usage-26">Usage<a class="anchor" aria-label="anchor" href="#usage-26"></a></h4>
+<h4 id="usage-28">Usage<a class="anchor" aria-label="anchor" href="#usage-28"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="returns-23">Returns<a class="anchor" aria-label="anchor" href="#returns-23"></a></h4>
+<h4 id="returns-25">Returns<a class="anchor" aria-label="anchor" href="#returns-25"></a></h4>
 <p>nothing; print to console</p>
 </div>
 
 </div><p></p><hr><a id="method-fitBipartiteSBMPop-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-27">Usage<a class="anchor" aria-label="anchor" href="#usage-27"></a></h4>
+<h4 id="usage-29">Usage<a class="anchor" aria-label="anchor" href="#usage-29"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">fitBipartiteSBMPop</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
+<h4 id="arguments-20">Arguments<a class="anchor" aria-label="anchor" href="#arguments-20"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

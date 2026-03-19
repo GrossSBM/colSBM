@@ -260,6 +260,10 @@ An R6 Class object, a fitted population of netowrks sbm once
 
 - [`fitBipartiteSBMPop$fixed_point_tau()`](#method-fitBipartiteSBMPop-fixed_point_tau)
 
+- [`fitBipartiteSBMPop$bernoulli_ve_step()`](#method-fitBipartiteSBMPop-bernoulli_ve_step)
+
+- [`fitBipartiteSBMPop$bernoulli_sve_step()`](#method-fitBipartiteSBMPop-bernoulli_sve_step)
+
 - [`fitBipartiteSBMPop$update_pim()`](#method-fitBipartiteSBMPop-update_pim)
 
 - [`fitBipartiteSBMPop$update_pi()`](#method-fitBipartiteSBMPop-update_pi)
@@ -590,6 +594,64 @@ Not really a fixed point as tau^1 depends only tau^2.
 
   The tolerance for which to stop iterating. Defaults to
   self\$fit_opts\$tolerance
+
+#### Returns
+
+The new tau values Updates the tau values for the bernoulli emission
+distribution
+
+------------------------------------------------------------------------
+
+### Method `bernoulli_ve_step()`
+
+#### Usage
+
+    fitBipartiteSBMPop$bernoulli_ve_step(m, d)
+
+#### Arguments
+
+- `m`:
+
+  The number of the network for which to update the taus
+
+- `d`:
+
+  The dimension (1 or 2) for which to update the taus
+
+#### Returns
+
+The new tau values Stochastic VE update for the bernoulli emission
+distribution
+
+------------------------------------------------------------------------
+
+### Method `bernoulli_sve_step()`
+
+#### Usage
+
+    fitBipartiteSBMPop$bernoulli_sve_step(
+      m,
+      d,
+      prop_to_update = self$fit_opts$prop_to_update
+    )
+
+#### Arguments
+
+- `m`:
+
+  The number of the network for which to update the taus
+
+- `d`:
+
+  The dimension (1 or 2) for which to update the taus
+
+- `prop_to_update`:
+
+  The proportion of nodes to use for update
+
+#### Details
+
+This aims to reduce the cost of tau times Y
 
 #### Returns
 
