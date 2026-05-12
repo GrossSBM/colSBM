@@ -28,8 +28,8 @@ particular, it allows to:
   networks in groups of networks with similar mesoscale structures.
 
 Mathematical details of the methods as well as simulation studies and
-applications can be found in Chabert-Liddell et al. (2024) and Lacoste
-et al. (2025).
+applications can be found in Chabert-Liddell, Barbillon, and Donnet
+(2024) and Lacoste, Barbillon, and Donnet (2025).
 
 ## Installation
 
@@ -55,9 +55,9 @@ to Food Webs.” *The Annals of Applied Statistics* 18 (2): 1213–35.
 
 <div id="ref-lacosteCommonStructureDiscovery2025" class="csl-entry">
 
-Lacoste, Louis, Pierre Barbillon, and Sophie Donnet. 2025. *Common
+Lacoste, Louis, Pierre Barbillon, and Sophie Donnet. 2025. “Common
 Structure Discovery in Collections of Bipartite Networks: Application to
-Pollination Systems*. arXiv:2512.01716. arXiv.
+Pollination Systems.” arXiv.
 <https://doi.org/10.48550/arXiv.2512.01716>.
 
 </div>
