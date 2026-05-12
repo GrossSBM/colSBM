@@ -12,8 +12,8 @@ particular, it allows to:
   networks in groups of networks with similar mesoscale structures.
 
 Mathematical details of the methods as well as simulation studies and
-applications can be found in @collection and
-@lacosteCommonStructureDiscovery2025.
+applications can be found in Chabert-Liddell, Barbillon, and Donnet
+(2024) and Lacoste, Barbillon, and Donnet (2025).
 
 ## Installation
 
@@ -26,3 +26,13 @@ pak::pak("GrossSBM/colSBM")
 ```
 
 # References
+
+Chabert-Liddell, Saint-Clair, Pierre Barbillon, and Sophie Donnet. 2024.
+“Learning Common Structures in a Collection of Networks. An Application
+to Food Webs.” *The Annals of Applied Statistics* 18 (2): 1213–35.
+<https://doi.org/10.1214/23-AOAS1831>.
+
+Lacoste, Louis, Pierre Barbillon, and Sophie Donnet. 2025. “Common
+Structure Discovery in Collections of Bipartite Networks: Application to
+Pollination Systems.” arXiv.
+<https://doi.org/10.48550/arXiv.2512.01716>.
