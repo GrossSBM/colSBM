@@ -1,6 +1,7 @@
 # Tutorial on food webs
 
 ``` r
+
 library(colSBM)
 library(patchwork)
 data("foodwebs")
@@ -10,9 +11,10 @@ data("foodwebs")
 
 We load a list of 8 foodwebs. They are binary directed networks with
 different number of species. First, we are going to model jointly the
-first $3$ networks, using the iid-colSBM model.
+first $`3`$ networks, using the iid-colSBM model.
 
 ``` r
+
 # global_opts = list(nb_cores = 1L,
 #                    nb_models = 5L,
 #                    nb_init = 10L,
@@ -42,12 +44,14 @@ criteria evolve with the number of clusters. Here, the BICL criterion
 selects Q = 6 blocks.
 
 ``` r
+
 plot(res_fw_iid)
 ```
 
 ![](tutorial_files/figure-html/unnamed-chunk-3-1.png)
 
 ``` r
+
 best_fit <- res_fw_iid$best_fit
 ```
 
@@ -56,6 +60,7 @@ best_fit <- res_fw_iid$best_fit
 Here are some useful fields to analyze the results.
 
 ``` r
+
 best_fit
 #> Fitted Collection of Simple SBM -- bernoulli variant for 3 networks 
 #> =====================================================================
@@ -72,6 +77,7 @@ We can get:
 - the estimation of the model parameters
 
 ``` r
+
 best_fit$parameters
 #> $alpha
 #>              [,1]         [,2]         [,3]         [,4]         [,5]
@@ -107,6 +113,7 @@ best_fit$parameters
 - The block memberships:
 
 ``` r
+
 best_fit$Z
 #> [[1]]
 #>      Unidentified sp1 FW_009   Terrestrial plant material 
@@ -356,6 +363,7 @@ best_fit$Z
   `colsbm_model = "delta"`, instead of `colsbm_model = "iid"`.
 
 ``` r
+
 best_fit$pred_dyads[[3]][1:10, 1:5]
 #>                               Unidentified sp1 FW_012_02 Terrestrial plants
 #> Unidentified sp1 FW_012_02                  0.000000e+00       3.203932e-08
@@ -396,6 +404,7 @@ We can also plot the networks individually, with the groups reordered by
 trophic levels:
 
 ``` r
+
 p <- gtools::permutations(best_fit$Q, best_fit$Q)
 ind <- which.min(
   sapply(
@@ -418,12 +427,14 @@ plot(res_fw_iid$best_fit, type = "block", net_id = 1, ord = ord) +
 Or make different plots to exhibit the mesoscale structure:
 
 ``` r
+
 plot(res_fw_iid$best_fit, type = "graphon", ord = ord)
 ```
 
 ![](tutorial_files/figure-html/unnamed-chunk-8-1.png)
 
 ``` r
+
 plot(res_fw_iid$best_fit, type = "meso", mixture = TRUE, ord = ord)
 ```
 
@@ -435,6 +446,7 @@ Let simulate some directed networks with a lower triangular structure
 that looks alike foodwebs.
 
 ``` r
+
 set.seed(1234)
 alpha <- matrix(c(
   .05, .01, .01, .01,
@@ -459,6 +471,7 @@ sim_net <-
 ```
 
 ``` r
+
 set.seed(1234)
 
 net_clust <- clusterize_unipartite_networks(
@@ -481,6 +494,7 @@ net_clust <- clusterize_unipartite_networks(
 We can extract the best partition:
 
 ``` r
+
 best_partition <- net_clust$partition
 ```
 
@@ -488,6 +502,7 @@ The plot of the mesoscale structure of the whole collection is the
 following:
 
 ``` r
+
 plot(best_partition[[1]])
 ```
 
@@ -496,6 +511,7 @@ plot(best_partition[[1]])
 but then we can compare the mesoscale structures of the 2 groups:
 
 ``` r
+
 plot(best_partition[[1]],
   type = "graphon",
   ord = order(best_partition[[1]]$alpha %*% best_partition[[1]]$pi[[1]])

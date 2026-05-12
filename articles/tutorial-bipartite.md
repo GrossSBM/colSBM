@@ -1,6 +1,7 @@
 # Tutorial on plant pollinator data
 
 ``` r
+
 library(colSBM)
 library(patchwork)
 library(parallel)
@@ -19,6 +20,7 @@ First, we are going to model jointly the medan2002ld, medan2002rb
 networks, using the *iid-colBiSBM* model.
 
 ``` r
+
 set.seed(1234, "L'Ecuyer-CMRG")
 res_pp_iid <- estimate_colBiSBM(
   netlist = dorebipartite[7L:8L], # A list of networks
@@ -67,12 +69,12 @@ res_pp_iid <- estimate_colBiSBM(
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 2 networks. Computed in 0.464 secs ====
+#> ==== Best fits criterion for the 2 networks. Computed in 0.476 secs ====
 #> Sep BiSBM total BICL:  -640.6602
 #> colBiSBM BICL: -633.8671
 #> Joint modelisation preferred. With Q = ( 2, 2 ).
 #> 
-#> ==== Full computation performed in 11.4 secs ====
+#> ==== Full computation performed in 11.2 secs ====
 ```
 
 The output indicates that the collection benefits from a joint
@@ -87,6 +89,7 @@ criteria evolve with the number of clusters. Here, the BICL criterion
 selects Q = 2, 2 blocks.
 
 ``` r
+
 plot(res_pp_iid)
 ```
 
@@ -96,6 +99,7 @@ exploration](tutorial-bipartite_files/figure-html/unnamed-chunk-3-1.png)
 State-space exploration
 
 ``` r
+
 best_fit <- res_pp_iid$best_fit
 ```
 
@@ -104,6 +108,7 @@ best_fit <- res_pp_iid$best_fit
 Here are some useful fields to analyze the results.
 
 ``` r
+
 best_fit
 #> Fitted Collection of Bipartite SBM -- bernoulli variant for 2 networks 
 #> =====================================================================
@@ -122,6 +127,7 @@ We can retrieve:
 - the estimation of the model parameters
 
 ``` r
+
 best_fit$parameters
 #> $alpha
 #>           [,1]       [,2]
@@ -147,6 +153,7 @@ best_fit$parameters
 - The block memberships:
 
 ``` r
+
 best_fit$memberships[[2]]$row[1:10]
 #>        Birds Trochilidae Sappho sparganura 
 #>                                          2 
@@ -173,6 +180,7 @@ best_fit$memberships[[2]]$row[1:10]
 And their probabilities:
 
 ``` r
+
 best_fit$prob_memberships[[2]][[1]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
 #>                               0.1369510749 
@@ -199,6 +207,7 @@ best_fit$prob_memberships[[2]][[1]][1:10, 1]
 - The prediction for each dyads in the networks
 
 ``` r
+
 best_fit$pred_dyads[[2]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
 #>                                 0.05504518 
@@ -225,6 +234,7 @@ best_fit$pred_dyads[[2]][1:10, 1]
 We can also plot the networks individually:
 
 ``` r
+
 plot(res_pp_iid$best_fit, type = "block", net_id = 1) +
   plot(res_pp_iid$best_fit, type = "block", net_id = 2)
 ```
@@ -237,6 +247,7 @@ Networks after fitting the model and reordering the nodes and blocks
 Or make different plots to exhibit the mesoscale structure:
 
 ``` r
+
 plot(res_pp_iid$best_fit, type = "graphon", values = TRUE)
 ```
 
@@ -246,6 +257,7 @@ plot](tutorial-bipartite_files/figure-html/unnamed-chunk-9-1.png)
 Graphon type plot
 
 ``` r
+
 plot(res_pp_iid$best_fit, type = "meso", mixture = TRUE, values = TRUE)
 ```
 
@@ -260,6 +272,7 @@ Next, we model jointly the medan2002ld, medan2002rb, olensen2002aig,
 olensen2002flo networks, using the *iid-colBiSBM* model.
 
 ``` r
+
 res_pp_iid_sep <- estimate_colBiSBM(
   netlist = dorebipartite[7L:10L], # A list of networks
   colsbm_model = "iid", # The name of the model
@@ -277,12 +290,12 @@ res_pp_iid_sep <- estimate_colBiSBM(
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 4 networks. Computed in 1.27 secs ====
+#> ==== Best fits criterion for the 4 networks. Computed in 1.26 secs ====
 #> Sep BiSBM total BICL:  -813.0666
 #> colBiSBM BICL: -816.8325
 #> Separated modelisation preferred.
 #> 
-#> ==== Full computation performed in 22.3 secs ====
+#> ==== Full computation performed in 22.7 secs ====
 ```
 
 The output indicates that the collection does not benefit from a joint
@@ -301,6 +314,7 @@ We will simulate networks and add them to the 4 networks we used
 previously.
 
 ``` r
+
 alpha <- matrix(c(
   0.9, 0.55,
   0.6, 0.1
@@ -320,6 +334,7 @@ sim_net <-
 ```
 
 ``` r
+
 set.seed(1234L)
 net_clust <- clusterize_bipartite_networks(
   netlist = c(dorebipartite[7L:10L], sim_net), # A list of networks
@@ -338,7 +353,7 @@ net_clust <- clusterize_bipartite_networks(
     Q2_max = 9L
   )
 )
-#> ℹ A save file will be created at "/tmp/RtmpJFNC0R/file75fd7d2798d1.Rds" and updated after each step
+#> ℹ A save file will be created at "/tmp/RtmpOpyyQ2/file652f10b491e9.Rds" and updated after each step
 #> 
 #> ── Fitting the full collection ─────────────────────────────────────────────────
 #> 
@@ -423,10 +438,11 @@ net_clust <- clusterize_bipartite_networks(
 #> ✖ Splitting collections decreased the BIC-L criterion
 #> ✔ Finished clustering
 #> ℹ After clustering the partition has a BIC-L of -2041.5890661571
-#> ℹ The final results are saved at "/tmp/RtmpJFNC0R/file75fd7d2798d1.Rds"
+#> ℹ The final results are saved at "/tmp/RtmpOpyyQ2/file652f10b491e9.Rds"
 ```
 
 ``` r
+
 best_partition <- net_clust$partition
 ```
 
@@ -438,6 +454,7 @@ collections that contains networks from the same authors.
 The plot of the mesoscale structures of the 3 groups shows:
 
 ``` r
+
 wrap_plots(
   lapply(best_partition, function(collection) {
     plot(collection, type = "graphon") +
