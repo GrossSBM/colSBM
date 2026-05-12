@@ -45,9 +45,8 @@ applications can be found in @collection and @lacosteCommonStructureDiscovery202
 
 You can install the development version of colSBM from [GitHub](https://github.com/) with:
 
-``` r
-# install.packages("devtools")
-devtools::install_github("GrossSBM/colSBM")
+```{r, eval = FALSE}
+pak::pak("GrossSBM/colSBM")
 ```
 
 # References
