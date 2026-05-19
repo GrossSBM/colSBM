@@ -181,6 +181,8 @@ generate_bipartite_network <- function(
 #' @param return_memberships a boolean which choose whether the function returns
 #' a list containing the memberships and the incidence matrices or just the
 #' incidence matrices. Defaults to FALSE, only the matrices are returned.
+#' @param return_blockProps a boolean indicating if the pis and rhos parameters 
+#' will be returned.
 #'
 #' @details the model parameters if set to any other than iid will shuffle the
 #' provided pi and rho
@@ -192,7 +194,8 @@ generate_bipartite_collection <- function(
   nr, nc, pi, rho, alpha, M,
   model = "iid",
   distribution = "bernoulli",
-  return_memberships = FALSE
+  return_memberships = FALSE,
+  return_blockProps = FALSE
 ) {
   out <- list()
 
@@ -218,14 +221,28 @@ generate_bipartite_collection <- function(
     )
   }
 
+  probsParams <- switch(model,
+  "iid" = {
+    list(pi = rep(list(pi), M), rho = rep(list(rho), M))
+  }, 
+  "pi" = {
+    list(pi = lapply(seq(M), function(m) sample(pi)), rho = rep(list(rho), M))
+  },
+  "rho" = {
+    list(pi = rep(list(pi), M), rho = lapply(seq(M), function(m) sample(rho)))
+  }, 
+  "pirho" = {
+    list(pi = lapply(seq(M), function(m) sample(pi)),rho = lapply(seq(M), function(m) sample(rho)))
+  })
+
   switch(model,
     "iid" = {
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = pi,
-          rho = rho,
+          pi = probsParams[["pi"]][[m]],
+          rho = probsParams[["rho"]][[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
@@ -237,8 +254,8 @@ generate_bipartite_collection <- function(
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = sample(pi),
-          rho = rho,
+          pi = probsParams[["pi"]][[m]],
+          rho = probsParams[["rho"]][[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
@@ -250,8 +267,8 @@ generate_bipartite_collection <- function(
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = pi,
-          rho = sample(rho),
+          pi = probsParams[["pi"]][[m]],
+          rho = probsParams[["rho"]][[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
@@ -263,8 +280,8 @@ generate_bipartite_collection <- function(
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = sample(pi),
-          rho = sample(rho),
+          pi = probsParams[["pi"]][[m]],
+          rho = probsParams[["rho"]][[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
@@ -274,6 +291,10 @@ generate_bipartite_collection <- function(
     stop("Error unknown model. Must be one of : iid, pi, rho, pirho.")
   )
 
+  if (return_blockProps){
+    out <- list(collection = out, blockProps = probsParams)
+  }
+  
   return(out)
 }
 
