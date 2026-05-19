@@ -41,17 +41,17 @@ res_pp_iid <- estimate_colBiSBM(
 #> vbound : 
 #>       [,1] [,2] [,3] [,4] [,5]
 #> [1,] -725 -625 -620 -620 -Inf
-#> [2,] -729 -614 -604 -603 -Inf
-#> [3,] -720 -608 -592 -586 -Inf
+#> [2,] -720 -614 -606 -Inf -Inf
+#> [3,] -720 -607 -596 -Inf -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
 #> [6,] -Inf -Inf -Inf -Inf -Inf 
 #> 
 #> ICL    : 
 #>       [,1] [,2] [,3] [,4] [,5]
-#> [1,] -729 -635 -642 -652 -Inf
-#> [2,] -815 -648 -667 -690 -Inf
-#> [3,] -770 -685 -659 -667 -Inf
+#> [1,] -729 -635 -642 -653 -Inf
+#> [2,] -733 -651 -668 -Inf -Inf
+#> [3,] -740 -686 -667 -Inf -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
 #> [6,] -Inf -Inf -Inf -Inf -Inf 
@@ -59,22 +59,22 @@ res_pp_iid <- estimate_colBiSBM(
 #> BICL   : 
 #>       [,1] [,2] [,3] [,4] [,5]
 #> [1,] -729 -635 -636 -642 -Inf
-#> [2,] -740 -634 -634 -643 -Inf
-#> [3,] -736 -638 -636 -644 -Inf
+#> [2,] -730 -634 -636 -Inf -Inf
+#> [3,] -736 -638 -640 -Inf -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
 #> [6,] -Inf -Inf -Inf -Inf -Inf 
 #> 
-#> Best fit at Q=( 2, 3 )
+#> Best fit at Q=( 2, 2 )
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 2 networks. Computed in 0.401 secs ====
+#> ==== Best fits criterion for the 2 networks. Computed in 0.429 secs ====
 #> Sep BiSBM total BICL:  -640.6602
-#> colBiSBM BICL: -633.793
-#> Joint modelisation preferred. With Q = ( 2, 3 ).
+#> colBiSBM BICL: -633.8671
+#> Joint modelisation preferred. With Q = ( 2, 2 ).
 #> 
-#> ==== Full computation performed in 12 secs ====
+#> ==== Full computation performed in 10.6 secs ====
 ```
 
 The output indicates that the collection benefits from a joint
@@ -86,7 +86,7 @@ This is based on the BICL criterion.
 
 We can look at how the variational bound and the model selection
 criteria evolve with the number of clusters. Here, the BICL criterion
-selects Q = 2, 3 blocks.
+selects Q = 2, 2 blocks.
 
 ``` r
 
@@ -113,8 +113,8 @@ best_fit
 #> Fitted Collection of Bipartite SBM -- bernoulli variant for 2 networks 
 #> =====================================================================
 #> net_id = ( medan2002ld medan2002rb )
-#> Dimensions = ( c(45, 21), c(72, 23) ) - ( 2, 3 ) blocks.
-#> BICL =  -633.793 penalty factor =  0.5 
+#> Dimensions = ( c(45, 21), c(72, 23) ) - ( 2, 2 ) blocks.
+#> BICL =  -633.8671 penalty factor =  0.5 
 #> #Empty row blocks on all networks:  0  -- #Empty columns blocks on all networks:  0  
 #> * Useful fields 
 #>   $distribution, $nb_nodes, $nb_blocks, $support, $prob_memberships 
@@ -130,24 +130,24 @@ We can retrieve:
 
 best_fit$parameters
 #> $alpha
-#>           [,1]       [,2]        [,3]
-#> [1,] 0.5163350 0.17559012 0.007013446
-#> [2,] 0.2256061 0.07806944 0.100620584
+#>           [,1]       [,2]
+#> [1,] 0.2499130 0.18198053
+#> [2,] 0.4218242 0.03428153
 #> 
 #> $pi
 #> $pi[[1]]
-#> [1] 0.5198281 0.4801719
+#> [1] 0.06654147 0.93345853
 #> 
 #> $pi[[2]]
-#> [1] 0.5198281 0.4801719
+#> [1] 0.06654147 0.93345853
 #> 
 #> 
 #> $rho
 #> $rho[[1]]
-#> [1] 0.08760477 0.07312403 0.83927121
+#> [1] 0.08387959 0.91612041
 #> 
 #> $rho[[2]]
-#> [1] 0.08760477 0.07312403 0.83927121
+#> [1] 0.08387959 0.91612041
 ```
 
 - The block memberships:
@@ -160,21 +160,21 @@ best_fit$memberships[[2]]$row[1:10]
 #>     Coleoptera Buprestidae Buprestidae sp. 
 #>                                          2 
 #>     Coleoptera Cantharidae Cantharidae sp. 
-#>                                          1 
+#>                                          2 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
-#>                                          1 
+#>                                          2 
 #>  Coleoptera Coccinellidae Coccinelidae sp2 
-#>                                          1 
+#>                                          2 
 #>  Coleoptera Coccinellidae Coccinelidae sp3 
-#>                                          1 
+#>                                          2 
 #> Coleoptera Curculionidae Curculionidae sp. 
-#>                                          1 
+#>                                          2 
 #>           Coleoptera Meloidae Epicauta sp. 
 #>                                          2 
 #>     Coleoptera Mordellidae Mordellidae sp. 
-#>                                          1 
+#>                                          2 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
-#>                                          1
+#>                                          2
 ```
 
 And their probabilities:
@@ -183,25 +183,25 @@ And their probabilities:
 
 best_fit$prob_memberships[[2]][[1]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
-#>                                 0.01374514 
+#>                               0.1369510749 
 #>     Coleoptera Buprestidae Buprestidae sp. 
-#>                                 0.43349968 
+#>                               0.0117576955 
 #>     Coleoptera Cantharidae Cantharidae sp. 
-#>                                 0.91784856 
+#>                               0.0019309149 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
-#>                                 0.97666560 
+#>                               0.0008912515 
 #>  Coleoptera Coccinellidae Coccinelidae sp2 
-#>                                 0.91784855 
+#>                               0.0019309149 
 #>  Coleoptera Coccinellidae Coccinelidae sp3 
-#>                                 0.91784855 
+#>                               0.0019309149 
 #> Coleoptera Curculionidae Curculionidae sp. 
-#>                                 0.91784856 
+#>                               0.0019309149 
 #>           Coleoptera Meloidae Epicauta sp. 
-#>                                 0.16978144 
+#>                               0.0251541553 
 #>     Coleoptera Mordellidae Mordellidae sp. 
-#>                                 0.97666560 
+#>                               0.0008912515 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
-#>                                 0.91784855
+#>                               0.0019309149
 ```
 
 - The prediction for each dyads in the networks
@@ -210,25 +210,25 @@ best_fit$prob_memberships[[2]][[1]][1:10, 1]
 
 best_fit$pred_dyads[[2]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
-#>                                 0.07941097 
+#>                                 0.05504518 
 #>     Coleoptera Buprestidae Buprestidae sp. 
-#>                                 0.12034631 
+#>                                 0.03661664 
 #>     Coleoptera Cantharidae Cantharidae sp. 
-#>                                 0.16758103 
+#>                                 0.03517014 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
-#>                                 0.17331699 
+#>                                 0.03501710 
 #>  Coleoptera Coccinellidae Coccinelidae sp2 
-#>                                 0.16758102 
+#>                                 0.03517014 
 #>  Coleoptera Coccinellidae Coccinelidae sp3 
-#>                                 0.16758102 
+#>                                 0.03517014 
 #> Coleoptera Curculionidae Curculionidae sp. 
-#>                                 0.16758103 
+#>                                 0.03517014 
 #>           Coleoptera Meloidae Epicauta sp. 
-#>                                 0.09462796 
+#>                                 0.03858861 
 #>     Coleoptera Mordellidae Mordellidae sp. 
-#>                                 0.17331699 
+#>                                 0.03501710 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
-#>                                 0.16758102
+#>                                 0.03517014
 ```
 
 We can also plot the networks individually:
@@ -290,12 +290,12 @@ res_pp_iid_sep <- estimate_colBiSBM(
 #> 
 #> 
 #> 
-#> ==== Best fits criterion for the 4 networks. Computed in 0.955 secs ====
+#> ==== Best fits criterion for the 4 networks. Computed in 1.21 secs ====
 #> Sep BiSBM total BICL:  -813.0666
-#> colBiSBM BICL: -817.5148
+#> colBiSBM BICL: -816.8325
 #> Separated modelisation preferred.
 #> 
-#> ==== Full computation performed in 8.79 secs ====
+#> ==== Full computation performed in 20.4 secs ====
 ```
 
 The output indicates that the collection does not benefit from a joint
@@ -353,7 +353,7 @@ net_clust <- clusterize_bipartite_networks(
     Q2_max = 9L
   )
 )
-#> ℹ A save file will be created at "/tmp/RtmpMXYkuX/file654148038921.Rds" and updated after each step
+#> ℹ A save file will be created at "/tmp/Rtmppvoowy/file64e516a42493.Rds" and updated after each step
 #> 
 #> ── Fitting the full collection ─────────────────────────────────────────────────
 #> 
@@ -369,6 +369,22 @@ net_clust <- clusterize_bipartite_networks(
 #> 
 #> ℹ Fitting a sub collection with : "medan2002ld" and "medan2002rb"
 #> ℹ Fitting a sub collection with : "olensen2002aig" and "olensen2002flo"
+#> 
+#> The window is (partially) out of domain !
+#> Trying to go from (1, 0) to (3, 2).
+#> Max window should be :
+#> (1, 9)---(9, 9)
+#>   ||       || 
+#> (1, 1)---(9, 1)
+#> The window will work best on valid configurations
+#> 
+#> The window is (partially) out of domain !
+#> Trying to go from (1, 0) to (3, 2).
+#> Max window should be :
+#> (1, 9)---(9, 9)
+#>   ||       || 
+#> (1, 1)---(9, 1)
+#> The window will work best on valid configurations
 #> 
 #> The window is (partially) out of domain !
 #> Trying to go from (1, 0) to (3, 2).
@@ -421,8 +437,8 @@ net_clust <- clusterize_bipartite_networks(
 #> The window will work best on valid configurations
 #> ✖ Splitting collections decreased the BIC-L criterion
 #> ✔ Finished clustering
-#> ℹ After clustering the partition has a BIC-L of -1996.64962380348
-#> ℹ The final results are saved at "/tmp/RtmpMXYkuX/file654148038921.Rds"
+#> ℹ After clustering the partition has a BIC-L of -2041.5890661571
+#> ℹ The final results are saved at "/tmp/Rtmppvoowy/file64e516a42493.Rds"
 ```
 
 ``` r
