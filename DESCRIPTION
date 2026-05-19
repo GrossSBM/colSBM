@@ -54,4 +54,4 @@ Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-URL: https://chabert-liddel.github.io/colSBM
+URL: https://grosssbm.github.io/colSBM
