@@ -7,178 +7,176 @@ once $optimize() is done}
 \description{
 An R6 Class object, a fitted population of netowrks sbm
 once $optimize() is done
-
-An R6 Class object, a fitted population of netowrks sbm
-once $optimize() is done
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{n}}{A list of size M with the number of nodes per network}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{n}}{A list of size M with the number of nodes per network}
 
-\item{\code{M}}{Number of networks}
+    \item{\code{M}}{Number of networks}
 
-\item{\code{A}}{List of incidence matrices of size \verb{n \\times n}}
+    \item{\code{A}}{List of incidence matrices of size \verb{n \\times n}}
 
-\item{\code{mask}}{List of M masks, indicating NAs in the matrices. 1 for NA, 0 else}
+    \item{\code{mask}}{List of M masks, indicating NAs in the matrices. 1 for NA, 0 else}
 
-\item{\code{nb_inter}}{A vector of length M the number of unique non NA entries}
+    \item{\code{nb_inter}}{A vector of length M the number of unique non NA entries}
 
-\item{\code{directed}}{A boolean indicating if the networks are directed or not}
+    \item{\code{directed}}{A boolean indicating if the networks are directed or not}
 
-\item{\code{Q}}{An integer indicating the number of blocks}
+    \item{\code{Q}}{An integer indicating the number of blocks}
 
-\item{\code{tau}}{List of length M, variational parameters \verb{n[m]xQ[m]} matrices}
+    \item{\code{tau}}{List of length M, variational parameters \verb{n[m]xQ[m]} matrices}
 
-\item{\code{alpha}}{Matrix of size QxQ, connection parameters}
+    \item{\code{alpha}}{Matrix of size QxQ, connection parameters}
 
-\item{\code{delta}}{Vector of M,  density parameters with \code{delta[1] = 1}}
+    \item{\code{delta}}{Vector of M,  density parameters with \code{delta[1] = 1}}
 
-\item{\code{pi}}{List of M vectors of size Q, the mixture parameters}
+    \item{\code{pi}}{List of M vectors of size Q, the mixture parameters}
 
-\item{\code{e}}{Vector of size M, the sum of unique entries}
+    \item{\code{e}}{Vector of size M, the sum of unique entries}
 
-\item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
+    \item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
 
-\item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r in m}
+    \item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r in m}
 
-\item{\code{pim}}{List of M vectors of size Q, the mixture parameters (pi_tilde)}
+    \item{\code{pim}}{List of M vectors of size Q, the mixture parameters (pi_tilde)}
 
-\item{\code{alpham}}{list of M QxQ matrix, the classic sbm parameters (alpha_tilde)}
+    \item{\code{alpham}}{list of M QxQ matrix, the classic sbm parameters (alpha_tilde)}
 
-\item{\code{free_mixture}}{A boolean indicating if the model is with free
+    \item{\code{free_mixture}}{A boolean indicating if the model is with free
 mixture}
 
-\item{\code{free_density}}{A boolean indicating if the model is with free
+    \item{\code{free_density}}{A boolean indicating if the model is with free
 density}
 
-\item{\code{weight}}{A vector of size M for weighted likelihood}
+    \item{\code{weight}}{A vector of size M for weighted likelihood}
 
-\item{\code{distribution}}{The emission distribution, either bernoulli or
+    \item{\code{distribution}}{The emission distribution, either bernoulli or
 poisson}
 
-\item{\code{Cpi}}{A list of matrices of size Q x M containing TRUE (1)
+    \item{\code{Cpi}}{A list of matrices of size Q x M containing TRUE (1)
 or FALSE (0) if the cluster is represented in the network m}
 
-\item{\code{Calpha}}{The corresponding support on the connectivity parameters
+    \item{\code{Calpha}}{The corresponding support on the connectivity parameters
 computed with Cpi.}
 
-\item{\code{mloss}}{Loss on the M step of the VEM}
+    \item{\code{mloss}}{Loss on the M step of the VEM}
 
-\item{\code{vloss}}{Loss on the VE step of the VEM}
+    \item{\code{vloss}}{Loss on the VE step of the VEM}
 
-\item{\code{vbound}}{The variational bound}
+    \item{\code{vbound}}{The variational bound}
 
-\item{\code{net_id}}{A vector containing the "ids" or names of the networks
+    \item{\code{net_id}}{A vector containing the "ids" or names of the networks
 (if none given, they are set to their number in A list)}
 
-\item{\code{df_mixture}}{The degrees of freedom for mixture parameters pi,used
+    \item{\code{df_mixture}}{The degrees of freedom for mixture parameters pi,used
 to compute penalty}
 
-\item{\code{df_connect}}{The degrees of freedom for connection parameters
+    \item{\code{df_connect}}{The degrees of freedom for connection parameters
 alpha,used to compute penalty}
 
-\item{\code{df_density}}{The degrees of freedom for density parameters delta,
+    \item{\code{df_density}}{The degrees of freedom for density parameters delta,
 used to compute penalty}
 
-\item{\code{logfactA}}{A quantity used with the Poisson probability distribution}
+    \item{\code{logfactA}}{A quantity used with the Poisson probability distribution}
 
-\item{\code{init_method}}{The initialization method used for the first clustering}
+    \item{\code{init_method}}{The initialization method used for the first clustering}
 
-\item{\code{penalty}}{The penalty computed based on the number of parameters}
+    \item{\code{penalty}}{The penalty computed based on the number of parameters}
 
-\item{\code{Z}}{The clusters memberships, a list of size M of two matrices : 1
+    \item{\code{Z}}{The clusters memberships, a list of size M of two matrices : 1
 for rows clusters memberships and 2 for columns clusters memberships}
 
-\item{\code{map}}{Maximum a posteriori}
+    \item{\code{map}}{Maximum a posteriori}
 
-\item{\code{map_parameters}}{MAP params}
+    \item{\code{map_parameters}}{MAP params}
 
-\item{\code{ICL}}{Stores the ICL of the model}
+    \item{\code{ICL}}{Stores the ICL of the model}
 
-\item{\code{penalty_clustering}}{Unused attribute}
+    \item{\code{penalty_clustering}}{Unused attribute}
 
-\item{\code{BICL}}{Stores the BICL of the model}
+    \item{\code{BICL}}{Stores the BICL of the model}
 
-\item{\code{net_clustering}}{Unused parameter}
+    \item{\code{net_clustering}}{Unused parameter}
 
-\item{\code{counter_merge}}{A counter for the merge (backward) steps}
+    \item{\code{counter_merge}}{A counter for the merge (backward) steps}
 
-\item{\code{counter_split}}{A counter for the splitting (forward) steps}
+    \item{\code{counter_split}}{A counter for the splitting (forward) steps}
 
-\item{\code{fit_opts}}{Fit parameters, used to determine the fitting method/}
-}
-\if{html}{\out{</div>}}
+    \item{\code{fit_opts}}{Fit parameters, used to determine the fitting method/}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{dircoef}}{The coefficients used change if the network is directed
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{dircoef}}{The coefficients used change if the network is directed
 or not}
 
-\item{\code{nb_nodes}}{Returns n a list of the number of nodes per network}
+    \item{\code{nb_nodes}}{Returns n a list of the number of nodes per network}
 
-\item{\code{nb_clusters}}{Returns Q an integer with the number of blocks}
+    \item{\code{nb_clusters}}{Returns Q an integer with the number of blocks}
 
-\item{\code{support}}{Returns the Cpi, a list of M boolean matrices indicating
+    \item{\code{support}}{Returns the Cpi, a list of M boolean matrices indicating
 which blocks are populated}
 
-\item{\code{memberships}}{Returns the tau, the probabilities of memberships
+    \item{\code{memberships}}{Returns the tau, the probabilities of memberships
 "a posteriori", after seeing the data}
 
-\item{\code{parameters}}{Returns the list of parameters of the model, alpha, pi
+    \item{\code{parameters}}{Returns the list of parameters of the model, alpha, pi
 and delta}
 
-\item{\code{pred_dyads}}{Predicted dyads from the estimated probabilities and
+    \item{\code{pred_dyads}}{Predicted dyads from the estimated probabilities and
 parameters}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-fitSimpleSBMPop-new}{\code{fitSimpleSBMPop$new()}}
-\item \href{#method-fitSimpleSBMPop-compute_map}{\code{fitSimpleSBMPop$compute_map()}}
-\item \href{#method-fitSimpleSBMPop-objective}{\code{fitSimpleSBMPop$objective()}}
-\item \href{#method-fitSimpleSBMPop-vb_tau_alpha}{\code{fitSimpleSBMPop$vb_tau_alpha()}}
-\item \href{#method-fitSimpleSBMPop-vb_tau_pi}{\code{fitSimpleSBMPop$vb_tau_pi()}}
-\item \href{#method-fitSimpleSBMPop-entropy_tau}{\code{fitSimpleSBMPop$entropy_tau()}}
-\item \href{#method-fitSimpleSBMPop-fn_vb_alpha_delta}{\code{fitSimpleSBMPop$fn_vb_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-gr_vb_alpha_delta}{\code{fitSimpleSBMPop$gr_vb_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-eval_g0_vb_alpha_delta}{\code{fitSimpleSBMPop$eval_g0_vb_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-eval_jac_g0_vb_alpha_delta}{\code{fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-update_alpha_delta}{\code{fitSimpleSBMPop$update_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-compute_vbound}{\code{fitSimpleSBMPop$compute_vbound()}}
-\item \href{#method-fitSimpleSBMPop-compute_penalty}{\code{fitSimpleSBMPop$compute_penalty()}}
-\item \href{#method-fitSimpleSBMPop-compute_icl}{\code{fitSimpleSBMPop$compute_icl()}}
-\item \href{#method-fitSimpleSBMPop-compute_BICL}{\code{fitSimpleSBMPop$compute_BICL()}}
-\item \href{#method-fitSimpleSBMPop-compute_exact_icl}{\code{fitSimpleSBMPop$compute_exact_icl()}}
-\item \href{#method-fitSimpleSBMPop-compute_exact_icl_iid}{\code{fitSimpleSBMPop$compute_exact_icl_iid()}}
-\item \href{#method-fitSimpleSBMPop-update_map_parameters}{\code{fitSimpleSBMPop$update_map_parameters()}}
-\item \href{#method-fitSimpleSBMPop-fixed_point_tau}{\code{fitSimpleSBMPop$fixed_point_tau()}}
-\item \href{#method-fitSimpleSBMPop-fixed_point_alpha_delta}{\code{fitSimpleSBMPop$fixed_point_alpha_delta()}}
-\item \href{#method-fitSimpleSBMPop-update_pi}{\code{fitSimpleSBMPop$update_pi()}}
-\item \href{#method-fitSimpleSBMPop-update_pim}{\code{fitSimpleSBMPop$update_pim()}}
-\item \href{#method-fitSimpleSBMPop-update_alpham}{\code{fitSimpleSBMPop$update_alpham()}}
-\item \href{#method-fitSimpleSBMPop-update_alpha}{\code{fitSimpleSBMPop$update_alpha()}}
-\item \href{#method-fitSimpleSBMPop-init_clust}{\code{fitSimpleSBMPop$init_clust()}}
-\item \href{#method-fitSimpleSBMPop-make_permutation}{\code{fitSimpleSBMPop$make_permutation()}}
-\item \href{#method-fitSimpleSBMPop-m_step}{\code{fitSimpleSBMPop$m_step()}}
-\item \href{#method-fitSimpleSBMPop-ve_step}{\code{fitSimpleSBMPop$ve_step()}}
-\item \href{#method-fitSimpleSBMPop-update_mqr}{\code{fitSimpleSBMPop$update_mqr()}}
-\item \href{#method-fitSimpleSBMPop-optimize}{\code{fitSimpleSBMPop$optimize()}}
-\item \href{#method-fitSimpleSBMPop-show}{\code{fitSimpleSBMPop$show()}}
-\item \href{#method-fitSimpleSBMPop-print}{\code{fitSimpleSBMPop$print()}}
-\item \href{#method-fitSimpleSBMPop-clone}{\code{fitSimpleSBMPop$clone()}}
-}
+  \itemize{
+    \item \href{#method-fitSimpleSBMPop-initialize}{\code{fitSimpleSBMPop$new()}}
+    \item \href{#method-fitSimpleSBMPop-compute_map}{\code{fitSimpleSBMPop$compute_map()}}
+    \item \href{#method-fitSimpleSBMPop-objective}{\code{fitSimpleSBMPop$objective()}}
+    \item \href{#method-fitSimpleSBMPop-vb_tau_alpha}{\code{fitSimpleSBMPop$vb_tau_alpha()}}
+    \item \href{#method-fitSimpleSBMPop-vb_tau_pi}{\code{fitSimpleSBMPop$vb_tau_pi()}}
+    \item \href{#method-fitSimpleSBMPop-entropy_tau}{\code{fitSimpleSBMPop$entropy_tau()}}
+    \item \href{#method-fitSimpleSBMPop-fn_vb_alpha_delta}{\code{fitSimpleSBMPop$fn_vb_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-gr_vb_alpha_delta}{\code{fitSimpleSBMPop$gr_vb_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-eval_g0_vb_alpha_delta}{\code{fitSimpleSBMPop$eval_g0_vb_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-eval_jac_g0_vb_alpha_delta}{\code{fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-update_alpha_delta}{\code{fitSimpleSBMPop$update_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-compute_vbound}{\code{fitSimpleSBMPop$compute_vbound()}}
+    \item \href{#method-fitSimpleSBMPop-compute_penalty}{\code{fitSimpleSBMPop$compute_penalty()}}
+    \item \href{#method-fitSimpleSBMPop-compute_icl}{\code{fitSimpleSBMPop$compute_icl()}}
+    \item \href{#method-fitSimpleSBMPop-compute_BICL}{\code{fitSimpleSBMPop$compute_BICL()}}
+    \item \href{#method-fitSimpleSBMPop-compute_exact_icl}{\code{fitSimpleSBMPop$compute_exact_icl()}}
+    \item \href{#method-fitSimpleSBMPop-compute_exact_icl_iid}{\code{fitSimpleSBMPop$compute_exact_icl_iid()}}
+    \item \href{#method-fitSimpleSBMPop-update_map_parameters}{\code{fitSimpleSBMPop$update_map_parameters()}}
+    \item \href{#method-fitSimpleSBMPop-fixed_point_tau}{\code{fitSimpleSBMPop$fixed_point_tau()}}
+    \item \href{#method-fitSimpleSBMPop-fixed_point_alpha_delta}{\code{fitSimpleSBMPop$fixed_point_alpha_delta()}}
+    \item \href{#method-fitSimpleSBMPop-update_pi}{\code{fitSimpleSBMPop$update_pi()}}
+    \item \href{#method-fitSimpleSBMPop-update_pim}{\code{fitSimpleSBMPop$update_pim()}}
+    \item \href{#method-fitSimpleSBMPop-update_alpham}{\code{fitSimpleSBMPop$update_alpham()}}
+    \item \href{#method-fitSimpleSBMPop-update_alpha}{\code{fitSimpleSBMPop$update_alpha()}}
+    \item \href{#method-fitSimpleSBMPop-init_clust}{\code{fitSimpleSBMPop$init_clust()}}
+    \item \href{#method-fitSimpleSBMPop-make_permutation}{\code{fitSimpleSBMPop$make_permutation()}}
+    \item \href{#method-fitSimpleSBMPop-m_step}{\code{fitSimpleSBMPop$m_step()}}
+    \item \href{#method-fitSimpleSBMPop-ve_step}{\code{fitSimpleSBMPop$ve_step()}}
+    \item \href{#method-fitSimpleSBMPop-update_mqr}{\code{fitSimpleSBMPop$update_mqr()}}
+    \item \href{#method-fitSimpleSBMPop-optimize}{\code{fitSimpleSBMPop$optimize()}}
+    \item \href{#method-fitSimpleSBMPop-show}{\code{fitSimpleSBMPop$show()}}
+    \item \href{#method-fitSimpleSBMPop-print}{\code{fitSimpleSBMPop$print()}}
+    \item \href{#method-fitSimpleSBMPop-clone}{\code{fitSimpleSBMPop$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-fitSimpleSBMPop-new"></a>}}
-\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-new}{}}}
-\subsection{Method \code{new()}}{
-Initializes the fitBipartiteSBMPop object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$new(
+\if{html}{\out{<a id="method-fitSimpleSBMPop-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-initialize}{}}}
+\subsection{\code{fitSimpleSBMPop$new()}}{
+  Initializes the fitBipartiteSBMPop object
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$new(
   A = NULL,
   Q = NULL,
   Z = NULL,
@@ -194,680 +192,705 @@ Initializes the fitBipartiteSBMPop object
   Calpha = NULL,
   logfactA = NULL,
   fit_opts = list(algo_ve = "fp", approx_pois = FALSE, minibatch = TRUE, verbosity = 1)
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{A}}{List of incidence Matrix of size \verb{n[[2]][m]xn[[2]][m]}}
-
-\item{\code{Q}}{The number of blocks}
-
-\item{\code{Z}}{The block memberships, a list of size M of two matrices : 1
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{A}}{List of incidence Matrix of size \verb{n[[2]][m]xn[[2]][m]}}
+      \item{\code{Q}}{The number of blocks}
+      \item{\code{Z}}{The block memberships, a list of size M of two matrices : 1
 for rows clusters memberships and 2 for columns clusters memberships}
-
-\item{\code{mask}}{List of M masks, indicating NAs in the matrices. 1 for NA, 0 else}
-
-\item{\code{net_id}}{A vector containing the "ids" or names of the networks
+      \item{\code{mask}}{List of M masks, indicating NAs in the matrices. 1 for NA, 0 else}
+      \item{\code{net_id}}{A vector containing the "ids" or names of the networks
 (if none given, they are set to their number in A list)}
-
-\item{\code{distribution}}{Emission distribution either : "poisson" or
+      \item{\code{distribution}}{Emission distribution either : "poisson" or
 "bernoulli"}
-
-\item{\code{free_mixture}}{A boolean indicating if there is a free mixture}
-
-\item{\code{free_density}}{A boolean indicating if there is a free_density}
-
-\item{\code{directed}}{A boolean specifying if the networks are directed or not}
-
-\item{\code{init_method}}{The initialization method used for the first clustering}
-
-\item{\code{weight}}{A vector of size M for weighted likelihood}
-
-\item{\code{Cpi}}{A list of matrices of size Qd x M containing TRUE (1)
+      \item{\code{free_mixture}}{A boolean indicating if there is a free mixture}
+      \item{\code{free_density}}{A boolean indicating if there is a free_density}
+      \item{\code{directed}}{A boolean specifying if the networks are directed or not}
+      \item{\code{init_method}}{The initialization method used for the first clustering}
+      \item{\code{weight}}{A vector of size M for weighted likelihood}
+      \item{\code{Cpi}}{A list of matrices of size Qd x M containing TRUE (1)
 or FALSE (0) if the d-th dimension cluster is represented
 in the network m}
-
-\item{\code{Calpha}}{The corresponding support on the connectivity parameters
+      \item{\code{Calpha}}{The corresponding support on the connectivity parameters
 computed with Cpi.}
-
-\item{\code{logfactA}}{A quantity used with the Poisson probability distribution}
-
-\item{\code{fit_opts}}{Fit parameters, used to determine the fitting method/
+      \item{\code{logfactA}}{A quantity used with the Poisson probability distribution}
+      \item{\code{fit_opts}}{Fit parameters, used to determine the fitting method/
 Method to compute the maximum a posteriori for Z clustering}
-
-\item{\code{greedy_exploration_starting_point}}{Stores the coordinates Q1 & Q2
+      \item{\code{greedy_exploration_starting_point}}{Stores the coordinates Q1 & Q2
 from the greedy exploration to  keep track of the starting_point}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_map"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_map}{}}}
-\subsection{Method \code{compute_map()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_map()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_map()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_map()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores the values
+Objective function
+  }
 }
 
-\subsection{Returns}{
-nothing; stores the values
-Objective function
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-objective"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-objective}{}}}
-\subsection{Method \code{objective()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$objective()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$objective()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$objective()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The evaluation of the function
+Computes the portion of the vbound with tau and alpha
+  }
 }
 
-\subsection{Returns}{
-The evaluation of the function
-Computes the portion of the vbound with tau and alpha
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-vb_tau_alpha"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-vb_tau_alpha}{}}}
-\subsection{Method \code{vb_tau_alpha()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$vb_tau_alpha(m, map = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The id of the network for which to compute}
-
-\item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
+\subsection{\code{fitSimpleSBMPop$vb_tau_alpha()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$vb_tau_alpha(m, map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The id of the network for which to compute}
+      \item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
 to FALSE.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The computed quantity.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The computed quantity.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-vb_tau_pi"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-vb_tau_pi}{}}}
-\subsection{Method \code{vb_tau_pi()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$vb_tau_pi(m, map = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The id of the network for which to compute}
-
-\item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
+\subsection{\code{fitSimpleSBMPop$vb_tau_pi()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$vb_tau_pi(m, map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The id of the network for which to compute}
+      \item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
 to FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The computed quantity.
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The computed quantity.
 Computes the entropy of the model
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-entropy_tau"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-entropy_tau}{}}}
-\subsection{Method \code{entropy_tau()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$entropy_tau(m)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The id of the network for which to compute}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The computed quantity.
+\subsection{\code{fitSimpleSBMPop$entropy_tau()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$entropy_tau(m)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The id of the network for which to compute}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The computed quantity.
 Objective function for the variational bound regarding
 the alpha and delta parameters.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-fn_vb_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-fn_vb_alpha_delta}{}}}
-\subsection{Method \code{fn_vb_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$fn_vb_alpha_delta(par, emqr, nmqr)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
-
-\item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
-
-\item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
+\subsection{\code{fitSimpleSBMPop$fn_vb_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$fn_vb_alpha_delta(par, emqr, nmqr)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
+      \item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
+      \item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
 in m}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The evaluation of the function
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The evaluation of the function
 Gradient of the objective function for the variational bound regarding
 the alpha and delta parameters.
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-gr_vb_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-gr_vb_alpha_delta}{}}}
-\subsection{Method \code{gr_vb_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$gr_vb_alpha_delta(par, emqr, nmqr)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
-
-\item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
-
-\item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
+\subsection{\code{fitSimpleSBMPop$gr_vb_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$gr_vb_alpha_delta(par, emqr, nmqr)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
+      \item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
+      \item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
 in m}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The evaluation of the function
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The evaluation of the function
 Constraint
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-eval_g0_vb_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-eval_g0_vb_alpha_delta}{}}}
-\subsection{Method \code{eval_g0_vb_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$eval_g0_vb_alpha_delta(par, emqr, nmqr)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
-
-\item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
-
-\item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
+\subsection{\code{fitSimpleSBMPop$eval_g0_vb_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$eval_g0_vb_alpha_delta(par, emqr, nmqr)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
+      \item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
+      \item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
 in m}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The evaluation of the function
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The evaluation of the function
 Jacobian of the constraint
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-eval_jac_g0_vb_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-eval_jac_g0_vb_alpha_delta}{}}}
-\subsection{Method \code{eval_jac_g0_vb_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta(par, emqr, nmqr)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
-
-\item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
-
-\item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
+\subsection{\code{fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta(par, emqr, nmqr)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{par}}{The parameters, alpha and delta combined in one big vector.}
+      \item{\code{emqr}}{List of M QxQ matrix, the sum of edges between q and r in m}
+      \item{\code{nmqr}}{List of M QxQ matrix, the number of entries between q and r
 in m}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The evaluation of the function
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The evaluation of the function
 Updates the alpha and delta parameters
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_alpha_delta}{}}}
-\subsection{Method \code{update_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_alpha_delta(map = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$update_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_alpha_delta(map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
+to FALSE.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; but stores the values
+Computes the variational bound (vbound)
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
-to FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; but stores the values
-Computes the variational bound (vbound)
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_vbound"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_vbound}{}}}
-\subsection{Method \code{compute_vbound()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_vbound()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_vbound()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_vbound()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The variational bound for the model.
+Computes the penalty for the model
+  }
 }
 
-\subsection{Returns}{
-The variational bound for the model.
-Computes the penalty for the model
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_penalty"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_penalty}{}}}
-\subsection{Method \code{compute_penalty()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_penalty()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_penalty()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_penalty()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    the computed penalty using the formulae.
+Computes the ICL criterion
+  }
 }
 
-\subsection{Returns}{
-the computed penalty using the formulae.
-Computes the ICL criterion
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_icl"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_icl}{}}}
-\subsection{Method \code{compute_icl()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_icl(map = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_icl()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_icl(map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
+to FALSE.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The ICL for the model.
+Computes the BICL criterion
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
-to FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The ICL for the model.
-Computes the BICL criterion
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_BICL"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_BICL}{}}}
-\subsection{Method \code{compute_BICL()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_BICL()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
+to FALSE.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The ICL for the model.
+Computes the exact ICL criterion
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{Wether to use the MAP parameters or not, a boolean, defaults
-to FALSE.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The ICL for the model.
-Computes the exact ICL criterion
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_exact_icl"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_exact_icl}{}}}
-\subsection{Method \code{compute_exact_icl()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_exact_icl()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_exact_icl()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_exact_icl()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The exact ICL for the model.
+Computes the exact ICL criterion for iid
+  }
 }
 
-\subsection{Returns}{
-The exact ICL for the model.
-Computes the exact ICL criterion for iid
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-compute_exact_icl_iid"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-compute_exact_icl_iid}{}}}
-\subsection{Method \code{compute_exact_icl_iid()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$compute_exact_icl_iid()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$compute_exact_icl_iid()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$compute_exact_icl_iid()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The exact ICL for the iid model.
+Updates the MAP parameters
+  }
 }
 
-\subsection{Returns}{
-The exact ICL for the iid model.
-Updates the MAP parameters
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_map_parameters"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_map_parameters}{}}}
-\subsection{Method \code{update_map_parameters()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_map_parameters()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$update_map_parameters()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_map_parameters()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; but stores the values
+Method to update tau values with a fixed-point algorithm
+  }
 }
 
-\subsection{Returns}{
-nothing; but stores the values
-Method to update tau values with a fixed-point algorithm
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-fixed_point_tau"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-fixed_point_tau}{}}}
-\subsection{Method \code{fixed_point_tau()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$fixed_point_tau(m, max_iter = 1, tol = 0.01)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist}
-
-\item{\code{max_iter}}{The maximum number of iterations to perform, defaults
+\subsection{\code{fitSimpleSBMPop$fixed_point_tau()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$fixed_point_tau(m, max_iter = 1, tol = 0.01)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist}
+      \item{\code{max_iter}}{The maximum number of iterations to perform, defaults
 to 1}
-
-\item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-2}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The new tau values
+      \item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-2}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The new tau values
 Fixed point to update alpha and delta
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-fixed_point_alpha_delta"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-fixed_point_alpha_delta}{}}}
-\subsection{Method \code{fixed_point_alpha_delta()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$fixed_point_alpha_delta(
+\subsection{\code{fitSimpleSBMPop$fixed_point_alpha_delta()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$fixed_point_alpha_delta(
   map = FALSE,
   max_iter = 50,
   tol = 1e-06
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{A boolean wether to use MAP parameters or not, defaults to
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{A boolean wether to use MAP parameters or not, defaults to
 FALSE}
-
-\item{\code{max_iter}}{The maximum number of iterations, default to 50}
-
-\item{\code{tol}}{The tolerance for which to stop iterating}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; stores the values
+      \item{\code{max_iter}}{The maximum number of iterations, default to 50}
+      \item{\code{tol}}{The tolerance for which to stop iterating}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores the values
 Computes the pi for the whole model
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_pi"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_pi}{}}}
-\subsection{Method \code{update_pi()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_pi(m, map = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist}
-
-\item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
+\subsection{\code{fitSimpleSBMPop$update_pi()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_pi(m, map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist}
+      \item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
 FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-the pi and stores the values
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    the pi and stores the values
 Computes the pi per network, known as the pim
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_pim"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_pim}{}}}
-\subsection{Method \code{update_pim()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_pim(m, map = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist}
-
-\item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
+\subsection{\code{fitSimpleSBMPop$update_pim()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_pim(m, map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist}
+      \item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
 FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; stores the values
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores the values
 Computes the alpha per network, known as the alpham
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_alpham"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_alpham}{}}}
-\subsection{Method \code{update_alpham()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_alpham(m, map = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist}
-
-\item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
+\subsection{\code{fitSimpleSBMPop$update_alpham()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_alpham(m, map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist}
+      \item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
 FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-the alpham and stores the values
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    the alpham and stores the values
 Computes the alpha for the whole model
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_alpha"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_alpha}{}}}
-\subsection{Method \code{update_alpha()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_alpha(map = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$update_alpha()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_alpha(map = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
+FALSE}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    the alpha and stores the values
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
-FALSE}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-the alpha and stores the values
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-init_clust"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-init_clust}{}}}
-\subsection{Method \code{init_clust()}}{
-Initialize clusters
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$init_clust()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$init_clust()}}{
+  Initialize clusters
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$init_clust()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-make_permutation"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-make_permutation}{}}}
-\subsection{Method \code{make_permutation()}}{
-TODO Remove
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$make_permutation()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$make_permutation()}}{
+  TODO Remove
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$make_permutation()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-m_step"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-m_step}{}}}
-\subsection{Method \code{m_step()}}{
-The M step of the VEM
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$m_step(map = FALSE, max_iter = 100, tol = 0.001, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
+\subsection{\code{fitSimpleSBMPop$m_step()}}{
+  The M step of the VEM
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$m_step(map = FALSE, max_iter = 100, tol = 0.001, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{map}}{A boolean wether to use the MAP parameters or not, defaults to
 FALSE}
-
-\item{\code{max_iter}}{The maximum number of iterations, default to 2}
-
-\item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-3}
-
-\item{\code{...}}{Other parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; stores values
+      \item{\code{max_iter}}{The maximum number of iterations, default to 2}
+      \item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-3}
+      \item{\code{...}}{Other parameters}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores values
 An optimization version for the VE step of the VEM but currently a
 placeholder
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-ve_step"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-ve_step}{}}}
-\subsection{Method \code{ve_step()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$ve_step(m, max_iter = 20, tol = 0.001, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist}
-
-\item{\code{max_iter}}{The maximum number of iterations, default to 2}
-
-\item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-3}
-
-\item{\code{...}}{Other parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; stores values
+\subsection{\code{fitSimpleSBMPop$ve_step()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$ve_step(m, max_iter = 20, tol = 0.001, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist}
+      \item{\code{max_iter}}{The maximum number of iterations, default to 2}
+      \item{\code{tol}}{The tolerance for which to stop iterating defaults to 1e-3}
+      \item{\code{...}}{Other parameters}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores values
 Updates the mqr quantities
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-update_mqr"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-update_mqr}{}}}
-\subsection{Method \code{update_mqr()}}{
-Namely, it updates the emqr and nmqr.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$update_mqr(m)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$update_mqr()}}{
+  Namely, it updates the emqr and nmqr.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$update_mqr(m)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{m}}{The number of the network in the netlist
+Perform the whole initialization and VEM algorithm}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{m}}{The number of the network in the netlist
-Perform the whole initialization and VEM algorithm}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-optimize"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-optimize}{}}}
-\subsection{Method \code{optimize()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$optimize(max_step = self$fit_opts$max_step, tol = 0.001, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{max_step}}{The maximum number of steps to perform optimization}
-
-\item{\code{tol}}{The tolerance for which to stop iterating, default to 1e-3}
-
-\item{\code{...}}{Other parameters}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-nothing; stores values
+\subsection{\code{fitSimpleSBMPop$optimize()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$optimize(max_step = self$fit_opts$max_step, tol = 0.001, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{max_step}}{The maximum number of steps to perform optimization}
+      \item{\code{tol}}{The tolerance for which to stop iterating, default to 1e-3}
+      \item{\code{...}}{Other parameters}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; stores values
 The message printed when one prints the object
+  }
 }
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-show"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-show}{}}}
-\subsection{Method \code{show()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$show(type = "Fitted Collection of Simple SBM")}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$show()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$show(type = "Fitted Collection of Simple SBM")}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{The title above the message.
+The print method}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{The title above the message.
-The print method}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-print"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-print}{}}}
-\subsection{Method \code{print()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$print()}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$print()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$print()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing; print to console
+  }
 }
 
-\subsection{Returns}{
-nothing; print to console
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fitSimpleSBMPop-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{fitSimpleSBMPop$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{fitSimpleSBMPop$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

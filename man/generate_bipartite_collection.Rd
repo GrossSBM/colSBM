@@ -23,9 +23,13 @@ number of row nodes for each of the M networks}
 \item{nc}{the number of column nodes  or a vector specifying the
 number of column nodes for each of the M networks}
 
-\item{pi}{a vector of probability to belong to the row clusters}
+\item{pi}{either a vector of probability to belong to the row clusters or a
+list of vectors of probabilites, one per network to generate for pi and pirho
+models}
 
-\item{rho}{a vector of probability to belong to the columns clusters}
+\item{rho}{either a vector of probability to belong to the column clusters or
+a list of vectors of probabilites, one per network to generate for rho and
+pirho models}
 
 \item{alpha}{the matrix of connectivity between two clusters}
 

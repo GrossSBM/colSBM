@@ -11,7 +11,7 @@ Finds a common mesoscale structure in a collection of networks by using a Stocha
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://chabert-liddel.github.io/colSBM}
+  \item \url{https://grosssbm.github.io/colSBM}
 }
 
 }
@@ -20,6 +20,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Saint-Clair Chabert-Liddell \email{academic@chabert-liddell.com} (\href{https://orcid.org/0000-0001-5604-7308}{ORCID})
   \item Louis Lacoste \email{louis.lacoste@agroparistech.fr} (\href{https://orcid.org/0009-0004-0178-9821}{ORCID})
 }
 
