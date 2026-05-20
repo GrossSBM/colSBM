@@ -15,11 +15,14 @@ alpha <- matrix(c(
 
 M <- 5
 
+pir_list <- lapply(seq(M), function(m) sample(pir))
+pic_list <- rep(list(pic), M)
+
 # With one nr and one nc
 nr <- 120
 nc <- 240
 
-firstCol <- colSBM::generate_bipartite_collection(nr, nc, pir, pic, alpha, M)
+firstCol <- generate_bipartite_collection(nr, nc, pir, pic, alpha, M)
 
 test_that("nc and nr are extended to match M", {
   expect_equal(length(firstCol), M)
@@ -31,22 +34,22 @@ test_that("nc and nr are extended to match M", {
 nr <- c(5, 10, 20, 40, 80)
 nc <- 2 * nr
 
-increasingCol <- colSBM::generate_bipartite_collection(nr, nc, pir, pic, alpha, M)
+increasingCol <- generate_bipartite_collection(nr, nc, pir, pic, alpha, M)
 
 test_that("Generate bipartite collection with vectors for nc and nr", {
   expect_equal(length(increasingCol), M)
   expect_equal(lapply(increasingCol, nrow), as.list(nr))
   expect_equal(lapply(increasingCol, ncol), as.list(nc))
   #  Wrong M
-  expect_error(colSBM::generate_bipartite_collection(
+  expect_error(generate_bipartite_collection(
     nr, nc, pir, pic, alpha,
     M + 1
   ))
-  expect_error(colSBM::generate_bipartite_collection(
+  expect_error(generate_bipartite_collection(
     c(nr, 1), nc, pir, pic, alpha,
     M
   ))
-  expect_error(colSBM::generate_bipartite_collection(
+  expect_error(generate_bipartite_collection(
     nr, c(nc, 1), pir, pic, alpha,
     M
   ))
@@ -54,40 +57,99 @@ test_that("Generate bipartite collection with vectors for nc and nr", {
 
 test_that("Testing the different models for generating bipartite networks", {
   expect_error(
-    colSBM::generate_bipartite_collection(
+    generate_bipartite_collection(
       nr, nc, pir, pic, alpha,
       M,
       model = "iidi"
     )
   )
   expect_no_error(
-    colSBM::generate_bipartite_collection(
+    generate_bipartite_collection(
       nr, nc, pir, pic, alpha,
       M,
       model = "iid"
     )
   )
   expect_no_error(
-    colSBM::generate_bipartite_collection(
-      nr, nc, pir, pic, alpha,
+    generate_bipartite_collection(
+      nr, nc, pir_list, pic, alpha,
       M,
       model = "pi"
     )
   )
   expect_no_error(
-    colSBM::generate_bipartite_collection(
-      nr, nc, pir, pic, alpha,
+    generate_bipartite_collection(
+      nr, nc, pir, pic_list, alpha,
       M,
       model = "rho"
     )
   )
   expect_no_error(
-    colSBM::generate_bipartite_collection(
-      nr, nc, pir, pic, alpha,
+    generate_bipartite_collection(
+      nr, nc, pir_list, pic_list, alpha,
       M,
       model = "pirho"
     )
   )
+})
+
+test_that("Wrong block proportions for generating collections", {
+    # pi model, pi is not a list
+
+  expect_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir, rho = pic, alpha = alpha,
+    model = "pi",
+    M = M,
+    distribution = "bernoulli"
+  ))
+  expect_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir, rho = pic, alpha = alpha,
+    model = "rho",
+    M = M,
+    distribution = "bernoulli"
+  ))
+  expect_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir, rho = pic_list, alpha = alpha,
+    model = "pirho",
+    M = M,
+    distribution = "bernoulli"
+  ))
+  expect_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir_list, rho = pic, alpha = alpha,
+    model = "pirho",
+    M = M,
+    distribution = "bernoulli"
+  ))
+})
+
+test_that("Correct block proportions for generating collections", {
+    # pi model, pi is not a list
+
+  expect_no_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir_list, rho = pic, alpha = alpha,
+    model = "pi",
+    M = M,
+    distribution = "bernoulli"
+  ))
+  expect_no_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir, rho = pic_list, alpha = alpha,
+    model = "rho",
+    M = M,
+    distribution = "bernoulli"
+  ))
+  expect_no_error(generate_bipartite_collection(
+    nr = nr, nc = nc,
+    pi = pir_list, rho = pic_list, alpha = alpha,
+    model = "pirho",
+    M = M,
+    distribution = "bernoulli"
+  ))
 })
 
 test_that("Testing various wrong arguments for generating bipartite networks", {
@@ -269,7 +331,7 @@ test_that("Testing that all arguments work for generating unipartite networks", 
   pi <- c(0.5, 0.5)
 
   # Wrong M error
-  expect_error(colSBM::generate_unipartite_collection(
+  expect_error(generate_unipartite_collection(
     n = c(50, 50, 40),
     pi = pi, alpha = alpha,
     distribution = "bernoulli",
@@ -279,7 +341,7 @@ test_that("Testing that all arguments work for generating unipartite networks", 
 
   expect_false(
     isNested(
-      colSBM::generate_unipartite_collection(
+      generate_unipartite_collection(
         n = n,
         pi = pi,
         alpha = alpha,
@@ -290,7 +352,7 @@ test_that("Testing that all arguments work for generating unipartite networks", 
 
   expect_true(
     isNested(
-      colSBM::generate_unipartite_collection(
+      generate_unipartite_collection(
         n = n,
         pi = pi,
         alpha = alpha,
@@ -300,7 +362,7 @@ test_that("Testing that all arguments work for generating unipartite networks", 
     )
   )
 
-  expect_no_error(colSBM::generate_unipartite_collection(
+  expect_no_error(generate_unipartite_collection(
     n = c(50, 50, 40),
     pi = pi, alpha = alpha,
     distribution = "bernoulli",

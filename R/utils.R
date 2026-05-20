@@ -171,8 +171,12 @@ generate_bipartite_network <- function(
 #' number of row nodes for each of the M networks
 #' @param nc the number of column nodes  or a vector specifying the
 #' number of column nodes for each of the M networks
-#' @param pi a vector of probability to belong to the row clusters
-#' @param rho a vector of probability to belong to the columns clusters
+#' @param pi either a vector of probability to belong to the row clusters or a
+#' list of vectors of probabilites, one per network to generate for pi and pirho
+#' models
+#' @param rho either a vector of probability to belong to the column clusters or
+#' a list of vectors of probabilites, one per network to generate for rho and
+#' pirho models
 #' @param alpha the matrix of connectivity between two clusters
 #' @param M the number of networks to generate
 #' @param model the colBiSBM model to use. Available: "iid", "pi", "rho",
@@ -220,6 +224,12 @@ generate_bipartite_collection <- function(
 
   switch(model,
     "iid" = {
+      if (rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {pi}}")
+      }
+      if (rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {rho}}")
+      }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
@@ -233,11 +243,17 @@ generate_bipartite_collection <- function(
       })
     },
     "pi" = {
+      if (!rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} for the pi model but you provided {.obj_type_friendly {pi}}")
+      }
+      if (rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a vector of block proportions for the pi model but you provided {.obj_type_friendly {rho}}")
+      }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = sample(pi),
+          pi = pi[[m]],
           rho = rho,
           alpha = alpha,
           distribution = distribution,
@@ -246,12 +262,18 @@ generate_bipartite_collection <- function(
       })
     },
     "rho" = {
+      if (rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a vector of block proportions for the rho model but you provided {.obj_type_friendly {pi}}")
+      }
+      if (!rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} for the rho model but you provided {.obj_type_friendly {rho}}")
+      }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
           pi = pi,
-          rho = sample(rho),
+          rho = rho[[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
@@ -259,12 +281,18 @@ generate_bipartite_collection <- function(
       })
     },
     "pirho" = {
+      if (!rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {pi}}")
+      }
+      if (!rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {rho}}")
+      }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
           nc = nc[[m]],
-          pi = sample(pi),
-          rho = sample(rho),
+          pi = pi[[m]],
+          rho = rho[[m]],
           alpha = alpha,
           distribution = distribution,
           return_memberships = return_memberships
