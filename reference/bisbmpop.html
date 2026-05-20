@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">colSBM</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,121 +48,121 @@
 <dd><p>A list with two dimensions, each of size M for the rows and cols</p></dd>
 
 
-<dt><code>A</code></dt>
+    <dt><code>A</code></dt>
 <dd><p>List of incidence Matrix of size <code>n[[1]][m]xn[[2]][m]</code></p></dd>
 
 
-<dt><code>M</code></dt>
+    <dt><code>M</code></dt>
 <dd><p>Number of networks</p></dd>
 
 
-<dt><code>mask</code></dt>
+    <dt><code>mask</code></dt>
 <dd><p>List of M masks, indicating NAs in the matrices. 1 for NA, 0 else</p></dd>
 
 
-<dt><code>distribution</code></dt>
+    <dt><code>distribution</code></dt>
 <dd><p>Emission distribution either : "poisson" or
 "bernoulli"</p></dd>
 
 
-<dt><code>net_id</code></dt>
+    <dt><code>net_id</code></dt>
 <dd><p>A vector containing the "ids" or names of the networks
 (if none given, they are set to their number in A list)</p></dd>
 
 
-<dt><code>model_list</code></dt>
+    <dt><code>model_list</code></dt>
 <dd><p>A list of size Q1max * Q2max containing the best models</p></dd>
 
 
-<dt><code>discarded_model_list</code></dt>
+    <dt><code>discarded_model_list</code></dt>
 <dd><p>A list of size
 Q1max * Q2max * (nb_models - 1) containing
 the discarded models.</p></dd>
 
 
-<dt><code>global_opts</code></dt>
+    <dt><code>global_opts</code></dt>
 <dd><p>A list of options for the model space exploration.
 See details for more information on which options are available.</p></dd>
 
 
-<dt><code>fit_opts</code></dt>
+    <dt><code>fit_opts</code></dt>
 <dd><p>A list of options specifically for fitting the models.</p></dd>
 
 
-<dt><code>separated_inits</code></dt>
+    <dt><code>separated_inits</code></dt>
 <dd><p>A nested list : Q1 init containing Q2 init
 with each entry containing list of size M
 storing the separated inits for the class.</p></dd>
 
 
-<dt><code>exploration_order_list</code></dt>
+    <dt><code>exploration_order_list</code></dt>
 <dd><p>A list used to store the path taken
 in the state space.</p></dd>
 
 
-<dt><code>Z_init</code></dt>
+    <dt><code>Z_init</code></dt>
 <dd><p>A list of initializations for the Z memberships.</p></dd>
 
 
-<dt><code>free_mixture_row</code></dt>
+    <dt><code>free_mixture_row</code></dt>
 <dd><p>A boolean signaling if there is free mixture on
 the row blocks</p></dd>
 
 
-<dt><code>free_mixture_col</code></dt>
+    <dt><code>free_mixture_col</code></dt>
 <dd><p>A boolean signaling if there is free mixture on
 the columns blocks</p></dd>
 
 
-<dt><code>ICL</code></dt>
+    <dt><code>ICL</code></dt>
 <dd><p>A matrix of size Q1*Q2 storing the best ICL found for each
 value of Q1, Q2.</p></dd>
 
 
-<dt><code>sep_BiSBM</code></dt>
+    <dt><code>sep_BiSBM</code></dt>
 <dd><p>A named list containing attributes for each sep BiSBM.</p></dd>
 
 
-<dt><code>BICL</code></dt>
+    <dt><code>BICL</code></dt>
 <dd><p>A matrix of size Q1*Q2 storing the best BICL found for each
 value of Q1, Q2.</p></dd>
 
 
-<dt><code>vbound</code></dt>
+    <dt><code>vbound</code></dt>
 <dd><p>A matrix of size Q1*Q2 storing the best vbound found for each
 value of Q1, Q2.</p></dd>
 
 
-<dt><code>best_fit</code></dt>
+    <dt><code>best_fit</code></dt>
 <dd><p>A fitBipartiteSBMPop object changing regularly to store
 the current best fit.</p></dd>
 
 
-<dt><code>adjusted_fit</code></dt>
+    <dt><code>adjusted_fit</code></dt>
 <dd><p>Defining a field in case the user wants to adjust a
 prefitted bisbmpop.</p></dd>
 
 
-<dt><code>logfactA</code></dt>
+    <dt><code>logfactA</code></dt>
 <dd><p>A quantity used with the Poisson probability distribution</p></dd>
 
 
-<dt><code>improved</code></dt>
+    <dt><code>improved</code></dt>
 <dd><p>A field use at each step to check if it has improved.</p></dd>
 
 
-<dt><code>moving_window_coordinates</code></dt>
+    <dt><code>moving_window_coordinates</code></dt>
 <dd><p>A list of size two containing the
 coordinates of the bottom left and top
 right points of the square</p></dd>
 
 
-<dt><code>old_moving_window_coordinates</code></dt>
+    <dt><code>old_moving_window_coordinates</code></dt>
 <dd><p>A list containing the previous
 coordinates of the moving window.</p></dd>
 
 
-<dt><code>joint_modelisation_preferred</code></dt>
+    <dt><code>joint_modelisation_preferred</code></dt>
 <dd><p>A boolean to store the preferred
 modelisation.</p></dd>
 
@@ -174,8 +174,7 @@ modelisation.</p></dd>
 
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
-
-<ul><li><p><a href="#method-bisbmpop-new"><code>bisbmpop$new()</code></a></p></li>
+<p></p><ul><li><p><a href="#method-bisbmpop-initialize"><code>bisbmpop$new()</code></a></p></li>
 <li><p><a href="#method-bisbmpop-split_clustering"><code>bisbmpop$split_clustering()</code></a></p></li>
 <li><p><a href="#method-bisbmpop-merge_clustering"><code>bisbmpop$merge_clustering()</code></a></p></li>
 <li><p><a href="#method-bisbmpop-greedy_exploration"><code>bisbmpop$greedy_exploration()</code></a></p></li>
@@ -192,8 +191,8 @@ modelisation.</p></dd>
 <li><p><a href="#method-bisbmpop-show"><code>bisbmpop$show()</code></a></p></li>
 <li><p><a href="#method-bisbmpop-print"><code>bisbmpop$print()</code></a></p></li>
 <li><p><a href="#method-bisbmpop-clone"><code>bisbmpop$clone()</code></a></p></li>
-</ul></div><p></p><hr><a id="method-bisbmpop-new"></a><div class="section">
-<h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
+</ul></div><p></p><hr><a id="method-bisbmpop-initialize"></a><div class="section">
+<h3 id="bisbmpop-new-"><code>bisbmpop$new()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-new-"></a></h3>
 <p>Create a new instance of the bisbmpop object</p>
 <p>This class is generally called via the user function <code>estimate_colBiSBM</code></p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
@@ -207,116 +206,101 @@ modelisation.</p></dd>
 <span>  global_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  fit_opts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>netlist</code></dt>
 <dd><p>The list of M networks</p></dd>
 
-
-<dt><code>net_id</code></dt>
+      <dt><code>net_id</code></dt>
 <dd><p>A list of name for the networks, defaults to 1 to M if not
 provided</p></dd>
 
-
-<dt><code>distribution</code></dt>
+      <dt><code>distribution</code></dt>
 <dd><p>The emission distribution either "bernoulli" or
 "poisson"</p></dd>
 
-
-<dt><code>free_mixture_row</code></dt>
+      <dt><code>free_mixture_row</code></dt>
 <dd><p>A boolean indicating if there is free mixture on
 the row blocks</p></dd>
 
-
-<dt><code>free_mixture_col</code></dt>
+      <dt><code>free_mixture_col</code></dt>
 <dd><p>A boolean indicating if there is free mixture on
 the column blocks</p></dd>
 
-
-<dt><code>Z_init</code></dt>
+      <dt><code>Z_init</code></dt>
 <dd><p>A bidimensional list providing a clustering of the row and
 column nodes</p></dd>
 
-
-<dt><code>global_opts</code></dt>
+      <dt><code>global_opts</code></dt>
 <dd><p>A list of global options used by the algorithm. See
 details of the user function for more information.</p></dd>
 
-
-<dt><code>fit_opts</code></dt>
+      <dt><code>fit_opts</code></dt>
 <dd><p>A list of fit options used by the algorithm. See
 details of the user function for more information.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
 <p>A new 'bisbmpop' object.
 A method to perform the splitting of the clusters</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-split_clustering"></a><div class="section">
-<h3 id="method-split-clustering-">Method <code>split_clustering()</code><a class="anchor" aria-label="anchor" href="#method-split-clustering-"></a></h3>
-
-<div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">split_clustering</span><span class="op">(</span><span class="va">origin_model</span>, axis <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-split_clustering"></a><div class="section">
+<h3 id="bisbmpop-split-clustering-"><code>bisbmpop$split_clustering()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-split-clustering-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">split_clustering</span><span class="op">(</span><span class="va">origin_model</span>, axis <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-1">Arguments<a class="anchor" aria-label="anchor" href="#arguments-1"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>origin_model</code></dt>
 <dd><p>a model (fitBipartite object) to split from.</p></dd>
 
-
-<dt><code>axis</code></dt>
+      <dt><code>axis</code></dt>
 <dd><p>a string to indicate if this is a
 column split or a row split. "row" or "col".</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
 <p>best of the possible models tested
 A method to perform the merging of the clusters</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-merge_clustering"></a><div class="section">
-<h3 id="method-merge-clustering-">Method <code>merge_clustering()</code><a class="anchor" aria-label="anchor" href="#method-merge-clustering-"></a></h3>
-
-<div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">merge_clustering</span><span class="op">(</span><span class="va">origin_model</span>, axis <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-merge_clustering"></a><div class="section">
+<h3 id="bisbmpop-merge-clustering-"><code>bisbmpop$merge_clustering()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-merge-clustering-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">merge_clustering</span><span class="op">(</span><span class="va">origin_model</span>, axis <span class="op">=</span> <span class="st">"row"</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>origin_model</code></dt>
 <dd><p>a model (fitBipartite object) to merge from.</p></dd>
 
-
-<dt><code>axis</code></dt>
+      <dt><code>axis</code></dt>
 <dd><p>a string to indicate if this is a "row", "col"
 or "both" merge</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
 <p>best of the possible models tested
 Method to greedily explore state of space looking for the mode
 and storing the models discovered along the way</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-greedy_exploration"></a><div class="section">
-<h3 id="method-greedy-exploration-">Method <code>greedy_exploration()</code><a class="anchor" aria-label="anchor" href="#method-greedy-exploration-"></a></h3>
+</div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-greedy_exploration"></a><div class="section">
+<h3 id="bisbmpop-greedy-exploration-"><code>bisbmpop$greedy_exploration()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-greedy-exploration-"></a></h3>
+<p></p><div class="section">
 <h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">greedy_exploration</span><span class="op">(</span></span>
 <span>  <span class="va">starting_point</span>,</span>
@@ -324,28 +308,23 @@ and storing the models discovered along the way</p>
 <span>  max_step_without_improvement <span class="op">=</span></span>
 <span>    <span class="va">self</span><span class="op">$</span><span class="va">fit_opts</span><span class="op">$</span><span class="va">greedy_exploration_max_steps_without_improvement</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>starting_point</code></dt>
 <dd><p>A vector of the two coordinates
 c(Q1,Q2) which are the starting point.</p></dd>
 
-
-<dt><code>max_iter</code></dt>
+      <dt><code>max_iter</code></dt>
 <dd><p>The maximum number of iteration of greedy exploration to
 perform, defaults to 12.</p></dd>
 
-
-<dt><code>max_step_without_improvement</code></dt>
+      <dt><code>max_step_without_improvement</code></dt>
 <dd><p>defaults to 2, the
 number of steps to try improving before stopping the search.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
 <p>c(Q1_mode, Q2_mode) which indicates the Q1 and Q2
 for which the BICL was maximal.
@@ -353,100 +332,95 @@ Optimization from a given Z_init</p>
 <p>The method takes no parameters</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-optimize_from_zinit"></a><div class="section">
-<h3 id="method-optimize-from-zinit-">Method <code>optimize_from_zinit()</code><a class="anchor" aria-label="anchor" href="#method-optimize-from-zinit-"></a></h3>
-
-<div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">optimize_from_zinit</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-optimize_from_zinit"></a><div class="section">
+<h3 id="bisbmpop-optimize-from-zinit-"><code>bisbmpop$optimize_from_zinit()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-optimize-from-zinit-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">optimize_from_zinit</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="returns-4">Returns<a class="anchor" aria-label="anchor" href="#returns-4"></a></h4>
 <p>nothing but stores the models in the model list
 Burn-in method to start exploring the state of space</p>
 <p>The method takes no parameters but modify the object</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-burn_in"></a><div class="section">
-<h3 id="method-burn-in-">Method <code>burn_in()</code><a class="anchor" aria-label="anchor" href="#method-burn-in-"></a></h3>
-
-<div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">burn_in</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-burn_in"></a><div class="section">
+<h3 id="bisbmpop-burn-in-"><code>bisbmpop$burn_in()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-burn-in-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">burn_in</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
 <p>nothing; but stores the values
 The optimization method</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-optimize"></a><div class="section">
-<h3 id="method-optimize-">Method <code><a href="https://rdrr.io/r/stats/optimize.html" class="external-link">optimize()</a></code><a class="anchor" aria-label="anchor" href="#method-optimize-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-optimize"></a><div class="section">
+<h3 id="bisbmpop-optimize-"><code>bisbmpop$optimize()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-optimize-"></a></h3>
 <p>This method performs the burn in (ie initialization + greedy
 exploration) and the steps of moving window with cluster splitting and
 merging around the mode found.</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">optimize</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
 <p>nothing; but stores the values
 The moving window application</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-moving_window"></a><div class="section">
-<h3 id="method-moving-window-">Method <code>moving_window()</code><a class="anchor" aria-label="anchor" href="#method-moving-window-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-moving_window"></a><div class="section">
+<h3 id="bisbmpop-moving-window-"><code>bisbmpop$moving_window()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-moving-window-"></a></h3>
 <p>This method is a moving windows
 over the Q1xQ2 space for the number of clusters</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">moving_window</span><span class="op">(</span><span class="va">center</span>, depth <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>center</code></dt>
 <dd><p>is the coordinates (Q1, Q2) in the model list of the mode</p></dd>
 
-
-<dt><code>depth</code></dt>
+      <dt><code>depth</code></dt>
 <dd><p>is how far away from the center
 the method should be applied in a grid style
 going from center - (depth,depth) to center + (depth, depth)</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-7">Returns<a class="anchor" aria-label="anchor" href="#returns-7"></a></h4>
 <p>nothing; but updates the object by adding new models
 To truncate the discarder model list</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-truncate_discarded_model_list"></a><div class="section">
-<h3 id="method-truncate-discarded-model-list-">Method <code>truncate_discarded_model_list()</code><a class="anchor" aria-label="anchor" href="#method-truncate-discarded-model-list-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-truncate_discarded_model_list"></a><div class="section">
+<h3 id="bisbmpop-truncate-discarded-model-list-"><code>bisbmpop$truncate_discarded_model_list()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-truncate-discarded-model-list-"></a></h3>
 <p>This method remove the worst models regarding the BICL criterion.</p><div class="section">
 <h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">truncate_discarded_model_list</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-8">Returns<a class="anchor" aria-label="anchor" href="#returns-8"></a></h4>
 <p>nothing
 Check if the point is in the limits</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-point_is_in_limits"></a><div class="section">
-<h3 id="method-point-is-in-limits-">Method <code>point_is_in_limits()</code><a class="anchor" aria-label="anchor" href="#method-point-is-in-limits-"></a></h3>
-
-<div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">point_is_in_limits</span><span class="op">(</span><span class="va">point</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-point_is_in_limits"></a><div class="section">
+<h3 id="bisbmpop-point-is-in-limits-"><code>bisbmpop$point_is_in_limits()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-point-is-in-limits-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">point_is_in_limits</span><span class="op">(</span><span class="va">point</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>point</code></dt>
 <dd><p>A vector of size 2, containing the first coordinate Q1, the
@@ -454,82 +428,79 @@ number of row blocks and Q2 the number of column blocks.</p></dd>
 
 
 </dl><p></p></div>
-</div>
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-9">Returns<a class="anchor" aria-label="anchor" href="#returns-9"></a></h4>
 <p>A boolean if the point if in the limits of <code>[0,Q1_max]x[0,Q2_max]</code>
 Store the criteria and best fit</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-store_criteria_and_best_fit"></a><div class="section">
-<h3 id="method-store-criteria-and-best-fit-">Method <code>store_criteria_and_best_fit()</code><a class="anchor" aria-label="anchor" href="#method-store-criteria-and-best-fit-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-store_criteria_and_best_fit"></a><div class="section">
+<h3 id="bisbmpop-store-criteria-and-best-fit-"><code>bisbmpop$store_criteria_and_best_fit()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-store-criteria-and-best-fit-"></a></h3>
 <p>This method stores the criteria (vbound, ICL, BICL) of the models
 in model_list attribute and at the end choose the best model using the
 BICL criterion.</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">store_criteria_and_best_fit</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-10">Returns<a class="anchor" aria-label="anchor" href="#returns-10"></a></h4>
 <p>nothing; modifies the object
 Computation of the separated Bi SBM</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-compute_sep_BiSBM_BICL"></a><div class="section">
-<h3 id="method-compute-sep-bisbm-bicl-">Method <code>compute_sep_BiSBM_BICL()</code><a class="anchor" aria-label="anchor" href="#method-compute-sep-bisbm-bicl-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-compute_sep_BiSBM_BICL"></a><div class="section">
+<h3 id="bisbmpop-compute-sep-bisbm-bicl-"><code>bisbmpop$compute_sep_BiSBM_BICL()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-compute-sep-bisbm-bicl-"></a></h3>
 <p>This method performs the computation of BiSBM for each of the
 network in the netlist.</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">compute_sep_BiSBM_BICL</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-11">Returns<a class="anchor" aria-label="anchor" href="#returns-11"></a></h4>
 <p>nothing; stores the values
 Method to choose the collection modelisation or a separated one</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-choose_joint_or_separated"></a><div class="section">
-<h3 id="method-choose-joint-or-separated-">Method <code>choose_joint_or_separated()</code><a class="anchor" aria-label="anchor" href="#method-choose-joint-or-separated-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-choose_joint_or_separated"></a><div class="section">
+<h3 id="bisbmpop-choose-joint-or-separated-"><code>bisbmpop$choose_joint_or_separated()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-choose-joint-or-separated-"></a></h3>
 <p>Using the BICL criterion, the best model fitted after the procedure
 and the separated Bi SBM this method choose the one that maximizes the
 BICL criterion.</p><div class="section">
 <h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">choose_joint_or_separated</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="returns-12">Returns<a class="anchor" aria-label="anchor" href="#returns-12"></a></h4>
 <p>nothing; stores a boolean
 Print the vbound, the ICL and the BICL</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-print_metrics"></a><div class="section">
-<h3 id="method-print-metrics-">Method <code>print_metrics()</code><a class="anchor" aria-label="anchor" href="#method-print-metrics-"></a></h3>
-
-<div class="section">
-<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">print_metrics</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-print_metrics"></a><div class="section">
+<h3 id="bisbmpop-print-metrics-"><code>bisbmpop$print_metrics()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-print-metrics-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-13">Usage<a class="anchor" aria-label="anchor" href="#usage-13"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">print_metrics</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
 <p>nothing
 The message printed when one prints the object</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-show"></a><div class="section">
-<h3 id="method-show-">Method <code>show()</code><a class="anchor" aria-label="anchor" href="#method-show-"></a></h3>
+</div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-show"></a><div class="section">
+<h3 id="bisbmpop-show-"><code>bisbmpop$show()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-show-"></a></h3>
+<p></p><div class="section">
 <h4 id="usage-14">Usage<a class="anchor" aria-label="anchor" href="#usage-14"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">show</span><span class="op">(</span></span>
 <span>  type <span class="op">=</span> <span class="st">"Fitted Collection of Bipartite SBM\nwith all fitted models"</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>type</code></dt>
 <dd><p>The title above the message.
@@ -539,27 +510,26 @@ The print method</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-print"></a><div class="section">
-<h3 id="method-print-">Method <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code><a class="anchor" aria-label="anchor" href="#method-print-"></a></h3>
-
-<div class="section">
-<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
-<div class="section">
+<p></p><hr><a id="method-bisbmpop-print"></a><div class="section">
+<h3 id="bisbmpop-print-"><code>bisbmpop$print()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-print-"></a></h3>
+<p></p><div class="section">
+<h4 id="usage-15">Usage<a class="anchor" aria-label="anchor" href="#usage-15"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">print</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
 <h4 id="returns-14">Returns<a class="anchor" aria-label="anchor" href="#returns-14"></a></h4>
 <p>nothing; prints to console</p>
 </div>
 
-</div><p></p><hr><a id="method-bisbmpop-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+</div>
+
+<p></p><hr><a id="method-bisbmpop-clone"></a><div class="section">
+<h3 id="bisbmpop-clone-"><code>bisbmpop$clone()</code><a class="anchor" aria-label="anchor" href="#bisbmpop-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
 <h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">bisbmpop</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
+</div><p></p><div class="section">
 <h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
@@ -569,6 +539,7 @@ The print method</p></dd>
 </div>
 
 </div>
+
 
     </div>
 

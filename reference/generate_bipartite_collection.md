@@ -32,11 +32,15 @@ generate_bipartite_collection(
 
 - pi:
 
-  a vector of probability to belong to the row clusters
+  either a vector of probability to belong to the row clusters or a list
+  of vectors of probabilites, one per network to generate for pi and
+  pirho models
 
 - rho:
 
-  a vector of probability to belong to the columns clusters
+  either a vector of probability to belong to the column clusters or a
+  list of vectors of probabilites, one per network to generate for rho
+  and pirho models
 
 - alpha:
 

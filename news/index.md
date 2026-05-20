@@ -1,5 +1,10 @@
 # Changelog
 
+## colSBM 0.4.8
+
+- Improving the way to pass block proportions to
+  `generate_bipartite_collections`
+
 ## colSBM 0.4.7
 
 - Fixing a bug in which `table` won’t be automatically converted to a

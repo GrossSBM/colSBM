@@ -3,9 +3,6 @@
 An R6 Class object, a fitted population of netowrks sbm once
 \$optimize() is done
 
-An R6 Class object, a fitted population of netowrks sbm once
-\$optimize() is done
-
 ## Public fields
 
 - `n`:
@@ -219,7 +216,7 @@ An R6 Class object, a fitted population of netowrks sbm once
 
 ### Public methods
 
-- [`fitSimpleSBMPop$new()`](#method-fitSimpleSBMPop-new)
+- [`fitSimpleSBMPop$new()`](#method-fitSimpleSBMPop-initialize)
 
 - [`fitSimpleSBMPop$compute_map()`](#method-fitSimpleSBMPop-compute_map)
 
@@ -287,7 +284,7 @@ An R6 Class object, a fitted population of netowrks sbm once
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `fitSimpleSBMPop$new()`
 
 Initializes the fitBipartiteSBMPop object
 
@@ -385,7 +382,7 @@ Initializes the fitBipartiteSBMPop object
 
 ------------------------------------------------------------------------
 
-### Method `compute_map()`
+### `fitSimpleSBMPop$compute_map()`
 
 #### Usage
 
@@ -397,7 +394,7 @@ nothing; stores the values Objective function
 
 ------------------------------------------------------------------------
 
-### Method `objective()`
+### `fitSimpleSBMPop$objective()`
 
 #### Usage
 
@@ -410,7 +407,7 @@ tau and alpha
 
 ------------------------------------------------------------------------
 
-### Method `vb_tau_alpha()`
+### `fitSimpleSBMPop$vb_tau_alpha()`
 
 #### Usage
 
@@ -432,7 +429,7 @@ The computed quantity.
 
 ------------------------------------------------------------------------
 
-### Method `vb_tau_pi()`
+### `fitSimpleSBMPop$vb_tau_pi()`
 
 #### Usage
 
@@ -454,7 +451,7 @@ The computed quantity. Computes the entropy of the model
 
 ------------------------------------------------------------------------
 
-### Method `entropy_tau()`
+### `fitSimpleSBMPop$entropy_tau()`
 
 #### Usage
 
@@ -473,7 +470,7 @@ regarding the alpha and delta parameters.
 
 ------------------------------------------------------------------------
 
-### Method `fn_vb_alpha_delta()`
+### `fitSimpleSBMPop$fn_vb_alpha_delta()`
 
 #### Usage
 
@@ -500,7 +497,7 @@ the variational bound regarding the alpha and delta parameters.
 
 ------------------------------------------------------------------------
 
-### Method `gr_vb_alpha_delta()`
+### `fitSimpleSBMPop$gr_vb_alpha_delta()`
 
 #### Usage
 
@@ -526,7 +523,7 @@ The evaluation of the function Constraint
 
 ------------------------------------------------------------------------
 
-### Method `eval_g0_vb_alpha_delta()`
+### `fitSimpleSBMPop$eval_g0_vb_alpha_delta()`
 
 #### Usage
 
@@ -552,7 +549,7 @@ The evaluation of the function Jacobian of the constraint
 
 ------------------------------------------------------------------------
 
-### Method `eval_jac_g0_vb_alpha_delta()`
+### `fitSimpleSBMPop$eval_jac_g0_vb_alpha_delta()`
 
 #### Usage
 
@@ -578,7 +575,7 @@ The evaluation of the function Updates the alpha and delta parameters
 
 ------------------------------------------------------------------------
 
-### Method `update_alpha_delta()`
+### `fitSimpleSBMPop$update_alpha_delta()`
 
 #### Usage
 
@@ -596,7 +593,7 @@ nothing; but stores the values Computes the variational bound (vbound)
 
 ------------------------------------------------------------------------
 
-### Method `compute_vbound()`
+### `fitSimpleSBMPop$compute_vbound()`
 
 #### Usage
 
@@ -608,7 +605,7 @@ The variational bound for the model. Computes the penalty for the model
 
 ------------------------------------------------------------------------
 
-### Method `compute_penalty()`
+### `fitSimpleSBMPop$compute_penalty()`
 
 #### Usage
 
@@ -620,7 +617,7 @@ the computed penalty using the formulae. Computes the ICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `compute_icl()`
+### `fitSimpleSBMPop$compute_icl()`
 
 #### Usage
 
@@ -638,7 +635,7 @@ The ICL for the model. Computes the BICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `compute_BICL()`
+### `fitSimpleSBMPop$compute_BICL()`
 
 #### Usage
 
@@ -656,7 +653,7 @@ The ICL for the model. Computes the exact ICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `compute_exact_icl()`
+### `fitSimpleSBMPop$compute_exact_icl()`
 
 #### Usage
 
@@ -668,7 +665,7 @@ The exact ICL for the model. Computes the exact ICL criterion for iid
 
 ------------------------------------------------------------------------
 
-### Method `compute_exact_icl_iid()`
+### `fitSimpleSBMPop$compute_exact_icl_iid()`
 
 #### Usage
 
@@ -680,7 +677,7 @@ The exact ICL for the iid model. Updates the MAP parameters
 
 ------------------------------------------------------------------------
 
-### Method `update_map_parameters()`
+### `fitSimpleSBMPop$update_map_parameters()`
 
 #### Usage
 
@@ -693,7 +690,7 @@ fixed-point algorithm
 
 ------------------------------------------------------------------------
 
-### Method `fixed_point_tau()`
+### `fitSimpleSBMPop$fixed_point_tau()`
 
 #### Usage
 
@@ -719,7 +716,7 @@ The new tau values Fixed point to update alpha and delta
 
 ------------------------------------------------------------------------
 
-### Method `fixed_point_alpha_delta()`
+### `fitSimpleSBMPop$fixed_point_alpha_delta()`
 
 #### Usage
 
@@ -749,7 +746,7 @@ nothing; stores the values Computes the pi for the whole model
 
 ------------------------------------------------------------------------
 
-### Method `update_pi()`
+### `fitSimpleSBMPop$update_pi()`
 
 #### Usage
 
@@ -772,7 +769,7 @@ pim
 
 ------------------------------------------------------------------------
 
-### Method `update_pim()`
+### `fitSimpleSBMPop$update_pim()`
 
 #### Usage
 
@@ -795,7 +792,7 @@ alpham
 
 ------------------------------------------------------------------------
 
-### Method `update_alpham()`
+### `fitSimpleSBMPop$update_alpham()`
 
 #### Usage
 
@@ -817,7 +814,7 @@ the alpham and stores the values Computes the alpha for the whole model
 
 ------------------------------------------------------------------------
 
-### Method `update_alpha()`
+### `fitSimpleSBMPop$update_alpha()`
 
 #### Usage
 
@@ -835,7 +832,7 @@ the alpha and stores the values
 
 ------------------------------------------------------------------------
 
-### Method `init_clust()`
+### `fitSimpleSBMPop$init_clust()`
 
 Initialize clusters
 
@@ -845,7 +842,7 @@ Initialize clusters
 
 ------------------------------------------------------------------------
 
-### Method `make_permutation()`
+### `fitSimpleSBMPop$make_permutation()`
 
 TODO Remove
 
@@ -855,7 +852,7 @@ TODO Remove
 
 ------------------------------------------------------------------------
 
-### Method `m_step()`
+### `fitSimpleSBMPop$m_step()`
 
 The M step of the VEM
 
@@ -888,7 +885,7 @@ VEM but currently a placeholder
 
 ------------------------------------------------------------------------
 
-### Method `ve_step()`
+### `fitSimpleSBMPop$ve_step()`
 
 #### Usage
 
@@ -918,7 +915,7 @@ nothing; stores values Updates the mqr quantities
 
 ------------------------------------------------------------------------
 
-### Method `update_mqr()`
+### `fitSimpleSBMPop$update_mqr()`
 
 Namely, it updates the emqr and nmqr.
 
@@ -935,7 +932,7 @@ Namely, it updates the emqr and nmqr.
 
 ------------------------------------------------------------------------
 
-### Method [`optimize()`](https://rdrr.io/r/stats/optimize.html)
+### `fitSimpleSBMPop$optimize()`
 
 #### Usage
 
@@ -961,7 +958,7 @@ nothing; stores values The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method `show()`
+### `fitSimpleSBMPop$show()`
 
 #### Usage
 
@@ -975,7 +972,7 @@ nothing; stores values The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `fitSimpleSBMPop$print()`
 
 #### Usage
 
@@ -987,7 +984,7 @@ nothing; print to console
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `fitSimpleSBMPop$clone()`
 
 The objects of this class are cloneable with this method.
 

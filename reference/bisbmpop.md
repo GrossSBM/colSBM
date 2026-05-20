@@ -123,7 +123,7 @@ model
 
 ### Public methods
 
-- [`bisbmpop$new()`](#method-bisbmpop-new)
+- [`bisbmpop$new()`](#method-bisbmpop-initialize)
 
 - [`bisbmpop$split_clustering()`](#method-bisbmpop-split_clustering)
 
@@ -159,7 +159,7 @@ model
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `bisbmpop$new()`
 
 Create a new instance of the bisbmpop object
 
@@ -222,7 +222,7 @@ clusters
 
 ------------------------------------------------------------------------
 
-### Method `split_clustering()`
+### `bisbmpop$split_clustering()`
 
 #### Usage
 
@@ -246,7 +246,7 @@ the clusters
 
 ------------------------------------------------------------------------
 
-### Method `merge_clustering()`
+### `bisbmpop$merge_clustering()`
 
 #### Usage
 
@@ -270,7 +270,7 @@ way
 
 ------------------------------------------------------------------------
 
-### Method `greedy_exploration()`
+### `bisbmpop$greedy_exploration()`
 
 #### Usage
 
@@ -306,7 +306,7 @@ The method takes no parameters
 
 ------------------------------------------------------------------------
 
-### Method `optimize_from_zinit()`
+### `bisbmpop$optimize_from_zinit()`
 
 #### Usage
 
@@ -321,7 +321,7 @@ The method takes no parameters but modify the object
 
 ------------------------------------------------------------------------
 
-### Method `burn_in()`
+### `bisbmpop$burn_in()`
 
 #### Usage
 
@@ -333,7 +333,7 @@ nothing; but stores the values The optimization method
 
 ------------------------------------------------------------------------
 
-### Method [`optimize()`](https://rdrr.io/r/stats/optimize.html)
+### `bisbmpop$optimize()`
 
 This method performs the burn in (ie initialization + greedy
 exploration) and the steps of moving window with cluster splitting and
@@ -349,7 +349,7 @@ nothing; but stores the values The moving window application
 
 ------------------------------------------------------------------------
 
-### Method `moving_window()`
+### `bisbmpop$moving_window()`
 
 This method is a moving windows over the Q1xQ2 space for the number of
 clusters
@@ -376,7 +376,7 @@ discarder model list
 
 ------------------------------------------------------------------------
 
-### Method `truncate_discarded_model_list()`
+### `bisbmpop$truncate_discarded_model_list()`
 
 This method remove the worst models regarding the BICL criterion.
 
@@ -390,7 +390,7 @@ nothing Check if the point is in the limits
 
 ------------------------------------------------------------------------
 
-### Method `point_is_in_limits()`
+### `bisbmpop$point_is_in_limits()`
 
 #### Usage
 
@@ -410,7 +410,7 @@ the criteria and best fit
 
 ------------------------------------------------------------------------
 
-### Method `store_criteria_and_best_fit()`
+### `bisbmpop$store_criteria_and_best_fit()`
 
 This method stores the criteria (vbound, ICL, BICL) of the models in
 model_list attribute and at the end choose the best model using the BICL
@@ -426,7 +426,7 @@ nothing; modifies the object Computation of the separated Bi SBM
 
 ------------------------------------------------------------------------
 
-### Method `compute_sep_BiSBM_BICL()`
+### `bisbmpop$compute_sep_BiSBM_BICL()`
 
 This method performs the computation of BiSBM for each of the network in
 the netlist.
@@ -442,7 +442,7 @@ or a separated one
 
 ------------------------------------------------------------------------
 
-### Method `choose_joint_or_separated()`
+### `bisbmpop$choose_joint_or_separated()`
 
 Using the BICL criterion, the best model fitted after the procedure and
 the separated Bi SBM this method choose the one that maximizes the BICL
@@ -458,7 +458,7 @@ nothing; stores a boolean Print the vbound, the ICL and the BICL
 
 ------------------------------------------------------------------------
 
-### Method `print_metrics()`
+### `bisbmpop$print_metrics()`
 
 #### Usage
 
@@ -470,7 +470,7 @@ nothing The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method `show()`
+### `bisbmpop$show()`
 
 #### Usage
 
@@ -486,7 +486,7 @@ nothing The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `bisbmpop$print()`
 
 #### Usage
 
@@ -498,7 +498,7 @@ nothing; prints to console
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `bisbmpop$clone()`
 
 The objects of this class are cloneable with this method.
 

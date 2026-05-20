@@ -3,9 +3,6 @@
 An R6 Class object, a fitted population of netowrks sbm once
 \$optimize() is done
 
-An R6 Class object, a fitted population of netowrks sbm once
-\$optimize() is done
-
 ## Public fields
 
 - `n`:
@@ -236,7 +233,7 @@ An R6 Class object, a fitted population of netowrks sbm once
 
 ### Public methods
 
-- [`fitBipartiteSBMPop$new()`](#method-fitBipartiteSBMPop-new)
+- [`fitBipartiteSBMPop$new()`](#method-fitBipartiteSBMPop-initialize)
 
 - [`fitBipartiteSBMPop$compute_MAP()`](#method-fitBipartiteSBMPop-compute_MAP)
 
@@ -298,7 +295,7 @@ An R6 Class object, a fitted population of netowrks sbm once
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `fitBipartiteSBMPop$new()`
 
 Initializes the fitBipartiteSBMPop object
 
@@ -387,7 +384,7 @@ Initializes the fitBipartiteSBMPop object
 
 ------------------------------------------------------------------------
 
-### Method `compute_MAP()`
+### `fitBipartiteSBMPop$compute_MAP()`
 
 #### Usage
 
@@ -400,7 +397,7 @@ and alpha
 
 ------------------------------------------------------------------------
 
-### Method `vb_tau_alpha()`
+### `fitBipartiteSBMPop$vb_tau_alpha()`
 
 #### Usage
 
@@ -423,7 +420,7 @@ and rho
 
 ------------------------------------------------------------------------
 
-### Method `vb_tau_pi()`
+### `fitBipartiteSBMPop$vb_tau_pi()`
 
 #### Usage
 
@@ -445,7 +442,7 @@ The computed quantity. Computes the entropy of the model
 
 ------------------------------------------------------------------------
 
-### Method `entropy_tau()`
+### `fitBipartiteSBMPop$entropy_tau()`
 
 #### Usage
 
@@ -463,7 +460,7 @@ The computed quantity. Computes the variational bound (vbound)
 
 ------------------------------------------------------------------------
 
-### Method `compute_vbound()`
+### `fitBipartiteSBMPop$compute_vbound()`
 
 #### Usage
 
@@ -475,7 +472,7 @@ The variational bound for the model. Computes the penalty for the model
 
 ------------------------------------------------------------------------
 
-### Method `compute_penalty()`
+### `fitBipartiteSBMPop$compute_penalty()`
 
 #### Usage
 
@@ -496,7 +493,7 @@ the computed penalty using the formulae. Computes the ICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `compute_icl()`
+### `fitBipartiteSBMPop$compute_icl()`
 
 #### Usage
 
@@ -515,7 +512,7 @@ distribution
 
 ------------------------------------------------------------------------
 
-### Method `compute_entropy()`
+### `fitBipartiteSBMPop$compute_entropy()`
 
 #### Usage
 
@@ -528,7 +525,7 @@ the BICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `compute_BICL()`
+### `fitBipartiteSBMPop$compute_BICL()`
 
 #### Usage
 
@@ -560,7 +557,7 @@ The BICL for the model. Updates the MAP parameters
 
 ------------------------------------------------------------------------
 
-### Method `update_MAP_parameters()`
+### `fitBipartiteSBMPop$update_MAP_parameters()`
 
 #### Usage
 
@@ -572,7 +569,7 @@ nothing; but stores the values Method to update tau values
 
 ------------------------------------------------------------------------
 
-### Method `fixed_point_tau()`
+### `fitBipartiteSBMPop$fixed_point_tau()`
 
 Not really a fixed point as tau^1 depends only tau^2.
 
@@ -602,7 +599,7 @@ distribution
 
 ------------------------------------------------------------------------
 
-### Method `bernoulli_ve_step()`
+### `fitBipartiteSBMPop$bernoulli_ve_step()`
 
 #### Usage
 
@@ -625,7 +622,7 @@ distribution
 
 ------------------------------------------------------------------------
 
-### Method `bernoulli_sve_step()`
+### `fitBipartiteSBMPop$bernoulli_sve_step()`
 
 #### Usage
 
@@ -659,7 +656,7 @@ The new tau values Computes the pi per network, known as the pim
 
 ------------------------------------------------------------------------
 
-### Method `update_pim()`
+### `fitBipartiteSBMPop$update_pim()`
 
 #### Usage
 
@@ -681,7 +678,7 @@ nothing; stores the values Computes the pi for the whole model
 
 ------------------------------------------------------------------------
 
-### Method `update_pi()`
+### `fitBipartiteSBMPop$update_pi()`
 
 #### Usage
 
@@ -700,7 +697,7 @@ the alpham
 
 ------------------------------------------------------------------------
 
-### Method `update_alpham()`
+### `fitBipartiteSBMPop$update_alpham()`
 
 #### Usage
 
@@ -722,7 +719,7 @@ the alpham and stores the values Computes the alpha for the whole model
 
 ------------------------------------------------------------------------
 
-### Method `update_alpha()`
+### `fitBipartiteSBMPop$update_alpha()`
 
 #### Usage
 
@@ -740,7 +737,7 @@ the alpha and stores the values
 
 ------------------------------------------------------------------------
 
-### Method `taus_order()`
+### `fitBipartiteSBMPop$taus_order()`
 
 The goal of this function is to test different values of tau and select
 the best one in the sense of the BICL (or vbound) ?
@@ -761,7 +758,7 @@ A vector with the order of the taus in regard of vbound
 
 ------------------------------------------------------------------------
 
-### Method `init_clust()`
+### `fitBipartiteSBMPop$init_clust()`
 
 Initialize clusters
 
@@ -775,7 +772,7 @@ nothing; stores The M step of the VEM
 
 ------------------------------------------------------------------------
 
-### Method `m_step()`
+### `fitBipartiteSBMPop$m_step()`
 
 #### Usage
 
@@ -803,7 +800,7 @@ VEM but currently a placeholder
 
 ------------------------------------------------------------------------
 
-### Method `ve_step()`
+### `fitBipartiteSBMPop$ve_step()`
 
 #### Usage
 
@@ -834,7 +831,7 @@ nothing; stores values Updates the mqr quantities
 
 ------------------------------------------------------------------------
 
-### Method `update_mqr()`
+### `fitBipartiteSBMPop$update_mqr()`
 
 Namely, it updates the emqr and nmqr.
 
@@ -851,7 +848,7 @@ Namely, it updates the emqr and nmqr.
 
 ------------------------------------------------------------------------
 
-### Method `make_permutation()`
+### `fitBipartiteSBMPop$make_permutation()`
 
 #### Usage
 
@@ -863,7 +860,7 @@ nothing Computes the number of blocks that are effectively populated
 
 ------------------------------------------------------------------------
 
-### Method `compute_effective_clustering()`
+### `fitBipartiteSBMPop$compute_effective_clustering()`
 
 #### Usage
 
@@ -876,7 +873,7 @@ algorithm
 
 ------------------------------------------------------------------------
 
-### Method [`optimize()`](https://rdrr.io/r/stats/optimize.html)
+### `fitBipartiteSBMPop$optimize()`
 
 #### Usage
 
@@ -909,7 +906,7 @@ visualisation.
 
 ------------------------------------------------------------------------
 
-### Method `reorder_parameters()`
+### `fitBipartiteSBMPop$reorder_parameters()`
 
 #### Usage
 
@@ -922,7 +919,7 @@ object
 
 ------------------------------------------------------------------------
 
-### Method `show()`
+### `fitBipartiteSBMPop$show()`
 
 #### Usage
 
@@ -936,7 +933,7 @@ object
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `fitBipartiteSBMPop$print()`
 
 #### Usage
 
@@ -948,7 +945,7 @@ nothing; print to console
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `fitBipartiteSBMPop$clone()`
 
 The objects of this class are cloneable with this method.
 

@@ -2,8 +2,6 @@
 
 An R6 Class object, a collection of model for population of sbm netowrks
 
-An R6 Class object, a collection of model for population of sbm netowrks
-
 ## Public fields
 
 - `n`:
@@ -98,7 +96,7 @@ An R6 Class object, a collection of model for population of sbm netowrks
 
 ### Public methods
 
-- [`bmpop$new()`](#method-bmpop-new)
+- [`bmpop$new()`](#method-bmpop-initialize)
 
 - [`bmpop$optimize_sbm()`](#method-bmpop-optimize_sbm)
 
@@ -128,7 +126,7 @@ An R6 Class object, a collection of model for population of sbm netowrks
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `bmpop$new()`
 
 Create a new instance of the bisbmpop object
 
@@ -199,7 +197,7 @@ A new 'sbmpop' object. Fit a list of SBM if fit_sbm == TRUE
 
 ------------------------------------------------------------------------
 
-### Method `optimize_sbm()`
+### `bmpop$optimize_sbm()`
 
 #### Usage
 
@@ -212,7 +210,7 @@ initializations
 
 ------------------------------------------------------------------------
 
-### Method `optimize_from_sbm()`
+### `bmpop$optimize_from_sbm()`
 
 #### Usage
 
@@ -239,7 +237,7 @@ initializations
 
 ------------------------------------------------------------------------
 
-### Method `optimize_spectral()`
+### `bmpop$optimize_spectral()`
 
 #### Usage
 
@@ -266,7 +264,7 @@ with Z for a specific network
 
 ------------------------------------------------------------------------
 
-### Method `optimize_init()`
+### `bmpop$optimize_init()`
 
 #### Usage
 
@@ -307,7 +305,7 @@ provided with a given Z_init
 
 ------------------------------------------------------------------------
 
-### Method `optimize_from_zinit()`
+### `bmpop$optimize_from_zinit()`
 
 #### Usage
 
@@ -334,7 +332,7 @@ to next begin the search and model selection
 
 ------------------------------------------------------------------------
 
-### Method `burn_in()`
+### `bmpop$burn_in()`
 
 #### Usage
 
@@ -347,7 +345,7 @@ found previously and reallocate the nodes to the new clusters
 
 ------------------------------------------------------------------------
 
-### Method `forward_pass()`
+### `bmpop$forward_pass()`
 
 #### Usage
 
@@ -384,7 +382,7 @@ Q - 1 This backward pass merges the clusters found previously
 
 ------------------------------------------------------------------------
 
-### Method `backward_pass()`
+### `bmpop$backward_pass()`
 
 #### Usage
 
@@ -421,7 +419,7 @@ Q + 1 The optimization method
 
 ------------------------------------------------------------------------
 
-### Method [`optimize()`](https://rdrr.io/r/stats/optimize.html)
+### `bmpop$optimize()`
 
 This method performs the burn in and the steps of moving window with
 cluster splitting (forward pass) and merging (backward pass) around the
@@ -438,7 +436,7 @@ BICL criterion
 
 ------------------------------------------------------------------------
 
-### Method `choose_models()`
+### `bmpop$choose_models()`
 
 #### Usage
 
@@ -468,7 +466,7 @@ The best models The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method `show()`
+### `bmpop$show()`
 
 #### Usage
 
@@ -482,7 +480,7 @@ The best models The message printed when one prints the object
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `bmpop$print()`
 
 #### Usage
 
@@ -494,7 +492,7 @@ nothing; print to console
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `bmpop$clone()`
 
 The objects of this class are cloneable with this method.
 
