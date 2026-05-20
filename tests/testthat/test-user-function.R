@@ -193,11 +193,15 @@ test_that("Estimate colBiSBM accepts netlist of tables", {
 
 test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", {
   set.seed(1234L)
+
+  pi_list <- lapply(seq(3), function(m) sample(c(0.1, 0.3, 0.6)))
+  rho_list <- lapply(seq(3), function(m) sample(c(0.8, 0.2)))
+
   pirho_collection <- generate_bipartite_collection(
     nr = 50,
     nc = 50,
-    pi = c(0.1, 0.3, 0.6),
-    rho = c(0.8, 0.2),
+    pi = pi_list,
+    rho = rho_list,
     alpha = matrix(
       c(
         0.2, 0.9,
