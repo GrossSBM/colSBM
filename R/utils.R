@@ -224,6 +224,12 @@ generate_bipartite_collection <- function(
 
   switch(model,
     "iid" = {
+      if (rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {pi}}")
+      }
+      if (rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {rho}}")
+      }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
           nr = nr[[m]],
@@ -238,7 +244,10 @@ generate_bipartite_collection <- function(
     },
     "pi" = {
       if (!rlang::is_list(pi)) {
-        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {pi}}")
+        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} for the pi model but you provided {.obj_type_friendly {pi}}")
+      }
+      if (rlang::is_list(rho)) {
+        cli::cli_abort("{.var rho} must be a vector of block proportions for the pi model but you provided {.obj_type_friendly {rho}}")
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -253,8 +262,11 @@ generate_bipartite_collection <- function(
       })
     },
     "rho" = {
+      if (rlang::is_list(pi)) {
+        cli::cli_abort("{.var pi} must be a vector of block proportions for the rho model but you provided {.obj_type_friendly {pi}}")
+      }
       if (!rlang::is_list(rho)) {
-        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {rho}}")
+        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} for the rho model but you provided {.obj_type_friendly {rho}}")
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -289,7 +301,7 @@ generate_bipartite_collection <- function(
     },
     stop("Error unknown model. Must be one of : iid, pi, rho, pirho.")
   )
-  
+
   return(out)
 }
 
