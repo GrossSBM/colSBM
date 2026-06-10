@@ -449,7 +449,7 @@ estimate_colBiSBM <-
             if (any(length_compared_models_bicl == 0)) {
               temp_file <- tempfile(fileext = ".Rds")
               message("Saving erroring models to ", temp_file)
-              saveRDS(models_comparison,  file = temp_file)
+              saveRDS(models_comparison, file = temp_file)
             }
             # compared_models_bicl <- vapply(models_comparison, function(model) model$BICL,
             #     FUN.VALUE = .1
