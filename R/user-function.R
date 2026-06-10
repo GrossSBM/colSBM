@@ -446,7 +446,7 @@ estimate_colBiSBM <-
             # TODO REMOVE For debug purpose
             compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
             length_compared_models_bicl <- sapply(models_comparison, function(model) length(model$BICL))
-            if (any(length_compared_models_bicl == 0)) {
+            if (is.list(compared_models_bicl)) {
               temp_file <- tempfile(fileext = ".Rds")
               message("Saving erroring models to ", temp_file)
               saveRDS(models_comparison, file = temp_file)
