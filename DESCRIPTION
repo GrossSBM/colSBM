@@ -26,7 +26,6 @@ Imports:
     gtools,
     magrittr,
     matrixStats,
-    nloptr,
     parallel,
     patchwork,
     progressr,
@@ -42,6 +41,7 @@ Imports:
 Suggests:
     covr,
     knitr,
+    nloptr,
     rmarkdown,
     spelling,
     testthat (>= 3.0.0)
