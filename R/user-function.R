@@ -443,12 +443,21 @@ estimate_colBiSBM <-
                 tmp_fits,
                 function(fit) fit$model_list[[q1, q2]]
               ))
+            # TODO REMOVE For debug purpose
+            compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
+            length_compared_models_bicl <- sapply(models_comparison, function(model) length(model$BICL))
+            if (any(length_compared_models_bicl == 0)) {
+              temp_file <- tempfile(fileext = ".Rds")
+              message("Saving erroring models to ", temp_file)
+              saveRDS(models_comparison,  file = temp_file)
+            }
+            # compared_models_bicl <- vapply(models_comparison, function(model) model$BICL,
+            #     FUN.VALUE = .1
+            #   )
             # The best in the sense of the BICL is chosen
             bisbmpop$model_list[[q1, q2]] <-
               models_comparison[which.max(
-                vapply(models_comparison, function(model) model$BICL,
-                  FUN.VALUE = .1
-                )
+                compared_models_bicl
               )]
 
             # The same procedure is applied for the
