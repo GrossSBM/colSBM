@@ -441,9 +441,17 @@ estimate_colBiSBM <-
             models_comparison <- # Note : this object is a list
               c(bisbmpop$model_list[[q1, q2]], lapply(
                 tmp_fits,
-                function(fit) fit$model_list[[q1, q2]]
+                function(fit) {
+                  if (!is.null(fit$model_list[[q1, q2]])) {
+                    fit$model_list[[q1, q2]]
+                  }
+                }
               ))
+
             # TODO REMOVE For debug purpose
+            # Here we filter out the eventual NULL elements of the list
+            cat(paste0("DEBUG TO REMOVE: ", sum(sapply(models_comparison, is.null)), " NULL models in comparison!\n"))
+            models_comparison <- models_comparison[!sapply(models_comparison, is.null)]
             compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
             length_compared_models_bicl <- sapply(models_comparison, function(model) length(model$BICL))
             if (is.list(compared_models_bicl)) {
