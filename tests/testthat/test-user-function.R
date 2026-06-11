@@ -217,9 +217,10 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
   pirho_collection_na <- pirho_collection
   NA_index <- sample.int(length(pirho_collection_na[[1]]), size = 20)
   pirho_collection_na[[1]][NA_index] <- NA
+
   expect_no_error(
     fit_iid <- estimate_colBiSBM(
-      netlist = pirho_collection_na,
+      netlist = pirho_collection,
       colsbm_model = "iid",
       nb_run = 2L,
       global_opts = list(
@@ -234,7 +235,7 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
   )
   expect_no_error(
     fit_iid <- estimate_colBiSBM(
-      netlist = pirho_collection,
+      netlist = pirho_collection_na,
       colsbm_model = "iid",
       nb_run = 2L,
       global_opts = list(
@@ -262,6 +263,20 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
     )
   )
   expect_no_error(
+    fit_pi <- estimate_colBiSBM(
+      netlist = pirho_collection_na,
+      colsbm_model = "pi",
+      global_opts = list(
+        nb_cores = 2L,
+        backend = "no_mc",
+        verbosity = 0L,
+        Q1_max = 10L,
+        Q2_max = 10L
+      ),
+      fit_opts = fit_opts
+    )
+  )
+  expect_no_error(
     fit_rho <- estimate_colBiSBM(
       netlist = pirho_collection,
       colsbm_model = "rho",
@@ -276,8 +291,36 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
     )
   )
   expect_no_error(
+    fit_rho <- estimate_colBiSBM(
+      netlist = pirho_collection_na,
+      colsbm_model = "rho",
+      global_opts = list(
+        nb_cores = 2L,
+        backend = "no_mc",
+        verbosity = 0L,
+        Q1_max = 10L,
+        Q2_max = 10L
+      ),
+      fit_opts = fit_opts
+    )
+  )
+  expect_no_error(
     fit_pirho <- estimate_colBiSBM(
       netlist = pirho_collection,
+      colsbm_model = "pirho",
+      global_opts = list(
+        nb_cores = 2L,
+        backend = "no_mc",
+        verbosity = 0L,
+        Q1_max = 10L,
+        Q2_max = 10L
+      ),
+      fit_opts = fit_opts
+    )
+  )
+  expect_no_error(
+    fit_pirho <- estimate_colBiSBM(
+      netlist = pirho_collection_na,
       colsbm_model = "pirho",
       global_opts = list(
         nb_cores = 2L,
