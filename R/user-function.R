@@ -233,15 +233,15 @@ merge_multiple_runs_bipartite <- function(bisbmpop, tmp_fits) {
     current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
     message(q1, ",", q2, ": ", toString(current_populated_runs))
 
-      # There are multiple, we must merge them
-      models_comparison <- lapply(current_populated_runs, function(run) {
-        all_fits[[run]][["model_list"]][[q1,q2]]
-      })
-      compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
-      out_bisbmpop$model_list[[q1, q2]] <-
-          models_comparison[[which.max(
-            compared_models_bicl
-          )]]
+    # There are multiple, we must merge them
+    models_comparison <- lapply(current_populated_runs, function(run) {
+      all_fits[[run]][["model_list"]][[q1, q2]]
+    })
+    compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
+    out_bisbmpop$model_list[[q1, q2]] <-
+      models_comparison[[which.max(
+        compared_models_bicl
+      )]]
     if (length(current_populated_runs) > 1) {
       # If there are multiple candidates we store the discarded others
       discarded_models_comparison <- models_comparison[-which.max(compared_models_bicl)]
@@ -262,7 +262,7 @@ merge_multiple_runs_bipartite <- function(bisbmpop, tmp_fits) {
 #' @param tmp_fits A list containing the nb_run fitted bisbmpop to merge
 #'
 #' @importFrom rlang hash
-#' 
+#'
 #' @return The modified bisbmpop object containing the new merged models
 merge_multiple_runs_bipartite_hash <- function(bisbmpop, tmp_fits) {
   # We find the number of different Q1, Q2 that are populated
@@ -286,15 +286,15 @@ merge_multiple_runs_bipartite_hash <- function(bisbmpop, tmp_fits) {
     current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
     message(q1, ",", q2, ": ", toString(current_populated_runs))
 
-      # There are multiple, we must merge them
-      models_comparison <- lapply(current_populated_runs, function(run) {
-        all_fits[[run]][["model_list"]][[q1,q2]]
-      })
-      compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
-      out_bisbmpop$model_list[[q1, q2]] <-
-          models_comparison[[which.max(
-            compared_models_bicl
-          )]]
+    # There are multiple, we must merge them
+    models_comparison <- lapply(current_populated_runs, function(run) {
+      all_fits[[run]][["model_list"]][[q1, q2]]
+    })
+    compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
+    out_bisbmpop$model_list[[q1, q2]] <-
+      models_comparison[[which.max(
+        compared_models_bicl
+      )]]
     if (length(current_populated_runs) > 1) {
       # If there are multiple candidates we store the discarded others
       discarded_models_comparison <- models_comparison[-which.max(compared_models_bicl)]
