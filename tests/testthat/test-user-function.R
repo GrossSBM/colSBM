@@ -386,3 +386,56 @@ test_that("Check that LBM and colBiSBM with one network return the same", {
   expect_identical(unname(lbm[["penalty"]]), collbm[["penalty"]])
   expect_equal(unname(lbm[["BICL"]]), collbm[["BICL"]], tolerance = 1e-3)
 })
+
+test_that("Test that merging works with pirho", {
+  set.seed(1234L)
+
+  pi_list <- lapply(seq(3), function(m) sample(c(0.1, 0.3, 0.6)))
+  rho_list <- lapply(seq(3), function(m) sample(c(0.8, 0.2)))
+
+  pirho_collection <- generate_bipartite_collection(
+    nr = 50,
+    nc = 50,
+    pi = pi_list,
+    rho = rho_list,
+    alpha = matrix(
+      c(
+        0.2, 0.9,
+        0.05, 0.5,
+        0.05, 0.05
+      ),
+      nrow = 3L
+    ),
+    M = 3L,
+    model = "pirho"
+  )
+
+  fit_pirho <- estimate_colBiSBM(
+    netlist = pirho_collection,
+    colsbm_model = "pirho",
+    nb_run = 1L,
+    global_opts = list(
+      nb_cores = 2L,
+      backend = "no_mc",
+      verbosity = 0L,
+      Q1_max = 10L,
+      Q2_max = 10L
+    ),
+    fit_opts = fit_opts
+  )
+
+  main_bisbmpop <- fit_pirho$clone()
+  far_bisbmpop <- adjust_colBiSBM(fitted_bisbmpop = main_bisbmpop, Q = c(8, 8), depth = 0)
+  holes_bisbmpop <- main_bisbmpop$clone()
+  for (q in list(c(1, 2), c(2, 1), c(2, 2), c(4, 2), c(4, 3))) {
+    # Here we erase the position to create a model list with 'holes'
+    holes_bisbmpop[["model_list"]][q[1], q[2]] <- list(NULL)
+    holes_bisbmpop[["vbound"]][q[1], q[2]] <- -Inf
+    holes_bisbmpop[["ICL"]][q[1], q[2]] <- -Inf
+    holes_bisbmpop[["BICL"]][q[1], q[2]] <- -Inf
+  }
+
+  merged_bisbmpop <- merge_multiple_runs_bipartite(bisbmpop = main_bisbmpop, tmp_fits = list(far_bisbmpop, holes_bisbmpop))
+  merged_other_bisbmpop <- merge_multiple_runs_bipartite(bisbmpop = holes_bisbmpop, tmp_fits = list(far_bisbmpop, main_bisbmpop))
+  expect_equal(merged_bisbmpop[["model_list"]], merged_other_bisbmpop[["model_list"]])
+})
