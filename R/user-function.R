@@ -284,7 +284,6 @@ merge_multiple_runs_bipartite_hash <- function(bisbmpop, tmp_fits) {
     q1 <- unique_populated_models[q_idx, "q1"]
     q2 <- unique_populated_models[q_idx, "q2"]
     current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
-    message(q1, ",", q2, ": ", toString(current_populated_runs))
 
     # There are multiple, we must merge them
     models_comparison <- lapply(current_populated_runs, function(run) {
