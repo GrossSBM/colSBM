@@ -435,7 +435,7 @@ test_that("Test that merging works with pirho", {
     holes_bisbmpop[["BICL"]][q[1], q[2]] <- -Inf
   }
 
-  merged_bisbmpop <- merge_multiple_runs_bipartite(bisbmpop = main_bisbmpop, tmp_fits = list(far_bisbmpop, holes_bisbmpop))
-  merged_other_bisbmpop <- merge_multiple_runs_bipartite(bisbmpop = holes_bisbmpop, tmp_fits = list(far_bisbmpop, main_bisbmpop))
+  merged_bisbmpop <- merge_multiple_runs_bipartite(fits = list(main_bisbmpop, far_bisbmpop, holes_bisbmpop))
+  merged_other_bisbmpop <- merge_multiple_runs_bipartite(fits = list(holes_bisbmpop,far_bisbmpop, main_bisbmpop))
   expect_equal(merged_bisbmpop[["model_list"]], merged_other_bisbmpop[["model_list"]])
 })

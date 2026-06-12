@@ -207,18 +207,17 @@ estimate_colSBM <-
 
 #' Function to merge multiple runs of the colBiSBM algorithm
 #'
-#' @param bisbmpop A bisbmpop object that will contain the merged elements
-#' @param tmp_fits A list containing the nb_run fitted bisbmpop to merge
-#'
+#' @param fits A list containing the nb_run fitted bisbmpop to merge
+#' 
 #' @return The modified bisbmpop object containing the new merged models
-merge_multiple_runs_bipartite <- function(bisbmpop, tmp_fits) {
+#' @keywords internal
+merge_multiple_runs_bipartite <- function(fits) {
   # We find the number of different Q1, Q2 that are populated
   is_populated <- function(q1, q2, current_bisbmpop) {
     inherits(current_bisbmpop[["model_list"]][[q1, q2]], "fitBipartiteSBMPop")
   }
 
-  all_fits <- c(bisbmpop, tmp_fits)
-  populated_models <- lapply(all_fits, function(fitbisbmpop) {
+  populated_models <- lapply(fits, function(fitbisbmpop) {
     outer(seq(fitbisbmpop$global_opts$Q1_max), seq(fitbisbmpop$global_opts$Q2_max), Vectorize(is_populated, vectorize.args = c("q1", "q2")), current_bisbmpop = fitbisbmpop)
   })
   populated_models <- which(simplify2array(populated_models), arr.ind = TRUE)
@@ -226,16 +225,15 @@ merge_multiple_runs_bipartite <- function(bisbmpop, tmp_fits) {
 
   unique_populated_models <- unique(populated_models[, c("q1", "q2")])
 
-  out_bisbmpop <- bisbmpop$clone()
+  out_bisbmpop <- fits[[1]]$clone()
   for (q_idx in seq_len(nrow(unique_populated_models))) {
     q1 <- unique_populated_models[q_idx, "q1"]
     q2 <- unique_populated_models[q_idx, "q2"]
     current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
-    message(q1, ",", q2, ": ", toString(current_populated_runs))
 
     # There are multiple, we must merge them
     models_comparison <- lapply(current_populated_runs, function(run) {
-      all_fits[[run]][["model_list"]][[q1, q2]]
+      fits[[run]][["model_list"]][[q1, q2]]
     })
     compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
     out_bisbmpop$model_list[[q1, q2]] <-
@@ -256,112 +254,7 @@ merge_multiple_runs_bipartite <- function(bisbmpop, tmp_fits) {
   out_bisbmpop$truncate_discarded_model_list()
   return(out_bisbmpop)
 }
-#' Function to merge multiple runs of the colBiSBM algorithm
-#'
-#' @param bisbmpop A bisbmpop object that will contain the merged elements
-#' @param tmp_fits A list containing the nb_run fitted bisbmpop to merge
-#'
-#' @importFrom rlang hash
-#'
-#' @return The modified bisbmpop object containing the new merged models
-merge_multiple_runs_bipartite_hash <- function(bisbmpop, tmp_fits) {
-  # We find the number of different Q1, Q2 that are populated
-  is_populated <- function(q1, q2, current_bisbmpop) {
-    inherits(current_bisbmpop[["model_list"]][[q1, q2]], "fitBipartiteSBMPop")
-  }
 
-  all_fits <- c(bisbmpop, tmp_fits)
-  populated_models <- lapply(all_fits, function(fitbisbmpop) {
-    outer(seq(fitbisbmpop$global_opts$Q1_max), seq(fitbisbmpop$global_opts$Q2_max), Vectorize(is_populated, vectorize.args = c("q1", "q2")), current_bisbmpop = fitbisbmpop)
-  })
-  populated_models <- which(simplify2array(populated_models), arr.ind = TRUE)
-  colnames(populated_models) <- c("q1", "q2", "run")
-
-  unique_populated_models <- unique(populated_models[, c("q1", "q2")])
-
-  out_bisbmpop <- bisbmpop$clone()
-  for (q_idx in seq_len(nrow(unique_populated_models))) {
-    q1 <- unique_populated_models[q_idx, "q1"]
-    q2 <- unique_populated_models[q_idx, "q2"]
-    current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
-
-    # There are multiple, we must merge them
-    models_comparison <- lapply(current_populated_runs, function(run) {
-      all_fits[[run]][["model_list"]][[q1, q2]]
-    })
-    compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
-    out_bisbmpop$model_list[[q1, q2]] <-
-      models_comparison[[which.max(
-        compared_models_bicl
-      )]]
-    if (length(current_populated_runs) > 1) {
-      # If there are multiple candidates we store the discarded others
-      discarded_models_comparison <- models_comparison[-which.max(compared_models_bicl)]
-      discarded_compared_models_bicl <- compared_models_bicl[-which.max(compared_models_bicl)]
-      out_bisbmpop$discarded_model_list[[q1, q2]] <- discarded_models_comparison[order(discarded_compared_models_bicl, decreasing = TRUE)]
-    }
-  }
-
-  # We now update the criteria and best fit
-  out_bisbmpop$store_criteria_and_best_fit()
-  # The discarded model list is truncated
-  out_bisbmpop$truncate_discarded_model_list()
-  return(out_bisbmpop)
-}
-merge_multiple_runs_bipartite_old_logic <- function(bisbmpop, tmp_fits) {
-  # For each Q1 and Q2, we compare all
-  out_bisbmpop <- bisbmpop$clone()
-  for (q1 in bisbmpop$global_opts$Q1_max) {
-    for (q2 in bisbmpop$global_opts$Q2_max) {
-      if (inherits(bisbmpop$model_list[[q1, q2]], "fitBipartiteSBMPop")) {
-        # All the models for the current q1 and q2 are stored
-        models_comparison <- # Note : this object is a list
-          c(bisbmpop$model_list[[q1, q2]], lapply(
-            tmp_fits,
-            function(fit) {
-              if (inherits(bisbmpop$model_list[[q1, q2]], "fitBipartiteSBMPop")) {
-                fit$model_list[[q1, q2]]
-              }
-            }
-          ))
-
-        # Here we filter out the eventual NULL elements of the list
-        models_comparison <- models_comparison[sapply(models_comparison, inherits, "fitBipartiteSBMPop")]
-        compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
-
-        # The best in the sense of the BICL is chosen
-        out_bisbmpop$model_list[[q1, q2]] <-
-          models_comparison[which.max(
-            compared_models_bicl
-          )]
-
-        other_discarded_models <- unlist(lapply(
-          tmp_fits,
-          function(fit) fit$discarded_model_list[[q1, q2]]
-        ))
-        # The same procedure is applied for the
-        discarded_models_comparison <-
-          c(bisbmpop$discarded_model_list[[q1, q2]], other_discarded_models)
-
-        discarded_models_comparison <- discarded_models_comparison[sapply(discarded_models_comparison, inherits, "fitBipartiteSBMPop")]
-        out_bisbmpop$discarded_model_list[[q1, q2]] <-
-          discarded_models_comparison[order(
-            vapply(discarded_models_comparison,
-              function(model) model$BICL,
-              FUN.VALUE = .1
-            ),
-            decreasing = TRUE
-          )]
-      }
-    }
-  }
-
-  # We now update the criteria and best fit
-  out_bisbmpop$store_criteria_and_best_fit()
-  # The discarded model list is truncated
-  out_bisbmpop$truncate_discarded_model_list()
-  return(out_bisbmpop)
-}
 #' Estimate a colBiSBM on a collection of networks
 #' @md
 #' @param netlist A list of matrices.
@@ -591,63 +484,7 @@ estimate_colBiSBM <-
       if (global_opts$verbosity >= 1) {
         cat("\nMerging the", nb_run, "models")
       }
-      # For each Q1 and Q2, we compare all
-      for (q1 in global_opts$Q1_max) {
-        for (q2 in global_opts$Q2_max) {
-          if (!is.null(bisbmpop$model_list[[q1, q2]])) {
-            # All the models for the current q1 and q2 are stored
-            models_comparison <- # Note : this object is a list
-              c(bisbmpop$model_list[[q1, q2]], lapply(
-                tmp_fits,
-                function(fit) {
-                  if (!is.null(fit$model_list[[q1, q2]])) {
-                    fit$model_list[[q1, q2]]
-                  }
-                }
-              ))
-
-            # TODO REMOVE For debug purpose
-            # Here we filter out the eventual NULL elements of the list
-            cat(paste0("DEBUG TO REMOVE: ", sum(sapply(models_comparison, is.null)), " NULL models in comparison!\n"))
-            models_comparison <- models_comparison[!sapply(models_comparison, is.null)]
-            compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
-            length_compared_models_bicl <- sapply(models_comparison, function(model) length(model$BICL))
-            if (is.list(compared_models_bicl)) {
-              temp_file <- tempfile(fileext = ".Rds")
-              message("Saving erroring models to ", temp_file)
-              saveRDS(models_comparison, file = temp_file)
-            }
-            # compared_models_bicl <- vapply(models_comparison, function(model) model$BICL,
-            #     FUN.VALUE = .1
-            #   )
-            # The best in the sense of the BICL is chosen
-            bisbmpop$model_list[[q1, q2]] <-
-              models_comparison[which.max(
-                compared_models_bicl
-              )]
-
-            # The same procedure is applied for the
-            discarded_models_comparison <-
-              c(bisbmpop$discarded_model_list[[q1, q2]], unlist(lapply(
-                tmp_fits,
-                function(fit) fit$discarded_model_list[[q1, q2]]
-              )))
-            bisbmpop$discarded_model_list[[q1, q2]] <-
-              discarded_models_comparison[order(
-                vapply(discarded_models_comparison,
-                  function(model) model$BICL,
-                  FUN.VALUE = .1
-                ),
-                decreasing = TRUE
-              )]
-          }
-        }
-      }
-
-      # We now update the criteria and best fit
-      bisbmpop$store_criteria_and_best_fit()
-      # The discarded model list is truncated
-      bisbmpop$truncate_discarded_model_list()
+      bisbmpop <- merge_multiple_runs_bipartite(fits = tmp_fits)
     }
     rm(tmp_fits)
     gc()
