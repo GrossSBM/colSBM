@@ -436,6 +436,6 @@ test_that("Test that merging works with pirho", {
   }
 
   merged_bisbmpop <- merge_multiple_runs_bipartite(fits = list(main_bisbmpop, far_bisbmpop, holes_bisbmpop))
-  merged_other_bisbmpop <- merge_multiple_runs_bipartite(fits = list(holes_bisbmpop,far_bisbmpop, main_bisbmpop))
+  merged_other_bisbmpop <- merge_multiple_runs_bipartite(fits = list(holes_bisbmpop, far_bisbmpop, main_bisbmpop))
   expect_equal(merged_bisbmpop[["model_list"]], merged_other_bisbmpop[["model_list"]])
 })

@@ -208,7 +208,7 @@ estimate_colSBM <-
 #' Function to merge multiple runs of the colBiSBM algorithm
 #'
 #' @param fits A list containing the nb_run fitted bisbmpop to merge
-#' 
+#'
 #' @return The modified bisbmpop object containing the new merged models
 #' @keywords internal
 merge_multiple_runs_bipartite <- function(fits) {
