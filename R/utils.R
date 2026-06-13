@@ -603,6 +603,7 @@ default_global_opts_unipartite <- function(netlist) {
     nb_init = 10L,
     nb_models = 5L,
     depth = 3L,
+    backend = "future",
     plot_details = 1L,
     max_pass = 10L,
     verbosity = 0L,
