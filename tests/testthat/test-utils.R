@@ -94,7 +94,7 @@ test_that("Testing the different models for generating bipartite networks", {
 })
 
 test_that("Wrong block proportions for generating collections", {
-    # pi model, pi is not a list
+  # pi model, pi is not a list
 
   expect_error(generate_bipartite_collection(
     nr = nr, nc = nc,
@@ -127,7 +127,7 @@ test_that("Wrong block proportions for generating collections", {
 })
 
 test_that("Correct block proportions for generating collections", {
-    # pi model, pi is not a list
+  # pi model, pi is not a list
 
   expect_no_error(generate_bipartite_collection(
     nr = nr, nc = nc,
