@@ -431,7 +431,6 @@ spectral_biclustering <- function(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 
   return(list(row_clustering = row_clustering, col_clustering = col_clustering))
 }
 
-# TODO : Modify the algorithm to use the rectangular matrix and its transpose
 bipartite_hierarchic_clustering <- function(X, K) {
   # Trivial clustering : everyone is part of the cluster
   if (all(K == c(1, 1))) {
@@ -603,6 +602,7 @@ default_global_opts_unipartite <- function(netlist) {
     nb_init = 10L,
     nb_models = 5L,
     depth = 3L,
+    backend = "future",
     plot_details = 1L,
     max_pass = 10L,
     verbosity = 0L,
