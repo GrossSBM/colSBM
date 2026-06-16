@@ -1,3 +1,8 @@
+# colSBM 0.4.9
+
+* estimate_colBiSBM : fixing a bug that occurred when merging the different runs
+* Extracted the merging to a dedicated function
+
 # colSBM 0.4.8
 
 * Improving the way to pass block proportions to `generate_bipartite_collections`
