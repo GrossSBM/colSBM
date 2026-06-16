@@ -4,12 +4,10 @@
 \alias{merge_multiple_runs_bipartite}
 \title{Function to merge multiple runs of the colBiSBM algorithm}
 \usage{
-merge_multiple_runs_bipartite(bisbmpop, tmp_fits)
+merge_multiple_runs_bipartite(fits)
 }
 \arguments{
-\item{bisbmpop}{A bisbmpop object that will contain the merged elements}
-
-\item{tmp_fits}{A list containing the nb_run fitted bisbmpop to merge}
+\item{fits}{A list containing the nb_run fitted bisbmpop to merge}
 }
 \value{
 The modified bisbmpop object containing the new merged models
@@ -17,3 +15,4 @@ The modified bisbmpop object containing the new merged models
 \description{
 Function to merge multiple runs of the colBiSBM algorithm
 }
+\keyword{internal}
