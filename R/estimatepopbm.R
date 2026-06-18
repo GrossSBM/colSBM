@@ -131,6 +131,10 @@ clusterize_unipartite_networks <- function(netlist,
     clustering_queue <- clustering_queue[-1]
 
     # If the collection contains only one network, add it to the final list
+    if (inherits(fit, "bmpop") && fit$best_fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      next
+    }
     if (inherits(fit, "bisbmpop") && fit$best_fit$M == 1) {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       next
