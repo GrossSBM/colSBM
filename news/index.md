@@ -1,5 +1,10 @@
 # Changelog
 
+## colSBM 0.4.10
+
+- @JulAgu fixed a bug that prevented unipartite collections to be
+  splitted all the way to single networks.
+
 ## colSBM 0.4.9
 
 - estimate_colBiSBM : fixing a bug that occurred when merging the
