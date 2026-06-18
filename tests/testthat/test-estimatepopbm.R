@@ -157,6 +157,37 @@ test_that("clusterize_bipartite_networks works with valid inputs", {
   expect_true(all(sapply(result$partition, inherits, "bisbmpop")))
 })
 
+
+test_that("clusterize_unipartite_networks can handle splitting apart two networks", {
+  set.seed(0)
+  alpha1 <- matrix(c(0.8, 0.1, 0.2, 0.7), byrow = TRUE, nrow = 2)
+  alpha2 <- matrix(c(0.8, 0.5, 0.5, 0.2), byrow = TRUE, nrow = 2)
+  first_collection <- generate_bipartite_collection(
+    nr = 50, nc = 25,
+    pi = c(0.5, 0.5), rho = c(0.5, 0.5),
+    alpha = alpha1, M = 1
+  )
+  second_collection <- generate_bipartite_collection(
+    nr = 50, nc = 25,
+    pi = c(0.5, 0.5), rho = c(0.5, 0.5),
+    alpha = alpha2, M = 1
+  )
+  netlist <- append(first_collection, second_collection)
+
+  result2split <- clusterize_bipartite_networks(
+    netlist = netlist,
+    colsbm_model = "iid",
+    global_opts = list(nb_cores = 1L, backend = "no_mc", verbosity = 2L, Q1_max = 4L, Q2_max = 4L),
+    fit_opts = common_fit_opts
+  )
+
+  expect_type(result2split, "list")
+  expect_named(result2split, c("partition", "cluster", "elapsed_time", "cluster_history"))
+  expect_true(all(sapply(result2split$partition, inherits, "bisbmpop")))
+  expect_length(result2split$cluster, length(netlist))
+  expect_true(all(colnames(result2split$cluster_history) == names(result2split$cluster)))
+})
+
 test_that("clusterize_bipartite_networks handles invalid colsbm_model", {
   netlist <- list(matrix(0, 10, 10), matrix(0, 10, 10))
 
