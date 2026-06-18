@@ -131,6 +131,10 @@ clusterize_unipartite_networks <- function(netlist,
     clustering_queue <- clustering_queue[-1]
 
     # If the collection contains only one network, add it to the final list
+    if (inherits(fit, "bmpop") && fit$best_fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      next
+    }
     if (inherits(fit, "bisbmpop") && fit$best_fit$M == 1) {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       next
@@ -658,7 +662,7 @@ partition_networks_list_from_dissimilarity <- function(
   nb_groups = 2L
 ) {
   # Sanity checks
-  check_networks_list(networks_list)
+  check_networks_list(networks_list, min_length = 1L)
   check_dissimilarity_matrix(dissimilarity_matrix)
   M <- length(networks_list)
 
@@ -671,7 +675,9 @@ partition_networks_list_from_dissimilarity <- function(
   }
 
 
-  if (M >= 3L) {
+  if (M == 1L) {
+    cl <- 1L
+  } else if (M >= 3L) {
     # If there is more than 3 networks they are splitted using partition around
     # K-medioids
     cl <- cutree(hclust(as.dist(sqrt(dissimilarity_matrix)), method = method), k = nb_groups)
