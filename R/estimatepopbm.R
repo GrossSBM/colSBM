@@ -658,7 +658,7 @@ partition_networks_list_from_dissimilarity <- function(
   nb_groups = 2L
 ) {
   # Sanity checks
-  check_networks_list(networks_list)
+  check_networks_list(networks_list, min_length = 1L)
   check_dissimilarity_matrix(dissimilarity_matrix)
   M <- length(networks_list)
 
