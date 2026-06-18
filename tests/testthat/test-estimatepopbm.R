@@ -36,6 +36,42 @@ test_that("clusterize_unipartite_networks works with valid inputs", {
   expect_true(all(colnames(result$cluster_history) == names(result$cluster)))
 })
 
+test_that("clusterize_unipartite_networks can handle splitting apart two networks", {
+  fast_fit_opts <- list(max_vem_steps = 100L)
+  set.seed(0)
+  alpha1 <- matrix(c(0.8, 0.1, 0.2, 0.7), byrow = TRUE, nrow = 2)
+  alpha2 <- matrix(c(0.8, 0.5, 0.5, 0.2), byrow = TRUE, nrow = 2)
+  first_collection <- generate_unipartite_collection(
+    n = 12,
+    pi = c(0.5, 0.5),
+    alpha = alpha1,
+    M = 1
+  )
+  second_collection <- generate_unipartite_collection(
+    n = 12,
+    pi = c(0.5, 0.5),
+    alpha = alpha2,
+    M = 1
+  )
+  netlist <- append(first_collection, second_collection)
+
+  result2split <- clusterize_unipartite_networks(
+    netlist = netlist,
+    colsbm_model = "iid",
+    nb_run = 1L,
+    global_opts = list(nb_cores = 1L, backend = "no_mc", verbosity = 0L, Q_max = 3L),
+    fit_opts = fast_fit_opts,
+    verbose = FALSE,
+    temp_save_path = NULL
+  )
+
+  expect_type(result2split, "list")
+  expect_named(result2split, c("partition", "cluster", "elapsed_time", "cluster_history"))
+  expect_true(all(sapply(result2split$partition, inherits, "fitSimpleSBMPop")))
+  expect_length(result2split$cluster, length(netlist))
+  expect_true(all(colnames(result2split$cluster_history) == names(result2split$cluster)))
+})
+
 test_that("clusterize_unipartite_networks handles invalid colsbm_model", {
   netlist <- list(matrix(0, 10, 10), matrix(0, 10, 10))
 
