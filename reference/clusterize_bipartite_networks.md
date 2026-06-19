@@ -89,10 +89,28 @@ clusterize_bipartite_networks(
 
 ## Value
 
-A list of models for the recursive partition of the collection of
-networks.
+A list with four elements:
 
-This functions make call to `estimate_colBiSBM`.
+- partition:
+
+  A list of models giving the best partition.
+
+- cluster:
+
+  A vector of integers giving the cluster of each network.
+
+- elapsed_time:
+
+  The total time taken by the clustering procedure.
+
+- clustering_history:
+
+  A matrix with M columns and has much rows as there are cuts during
+  partitioning.
+
+## Details
+
+This functions makes call to `estimate_colBiSBM`.
 
 ## See also
 

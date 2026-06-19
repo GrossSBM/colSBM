@@ -123,17 +123,23 @@ Defaults to a temporary file.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with two elements:</p>
+    <p>A list with four elements:</p>
 <dl><dt>partition</dt>
 <dd><p>A list of models giving the best partition.</p></dd>
 
 <dt>cluster</dt>
 <dd><p>A vector of integers giving the cluster of each network.</p></dd>
 
+<dt>elapsed_time</dt>
+<dd><p>The total time taken by the clustering procedure.</p></dd>
+
+<dt>clustering_history</dt>
+<dd><p>A matrix with M columns and has much rows as there are cuts during partitioning.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>This functions make call to <code>estimate_colSBM</code>.</p>
+    <p>This function makes call to <code>estimate_colSBM</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

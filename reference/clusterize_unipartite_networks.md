@@ -79,7 +79,7 @@ clusterize_unipartite_networks(
 
 ## Value
 
-A list with two elements:
+A list with four elements:
 
 - partition:
 
@@ -89,9 +89,18 @@ A list with two elements:
 
   A vector of integers giving the cluster of each network.
 
+- elapsed_time:
+
+  The total time taken by the clustering procedure.
+
+- clustering_history:
+
+  A matrix with M columns and has much rows as there are cuts during
+  partitioning.
+
 ## Details
 
-This functions make call to `estimate_colSBM`.
+This function makes call to `estimate_colSBM`.
 
 ## See also
 
