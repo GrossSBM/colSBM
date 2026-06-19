@@ -61,14 +61,18 @@ TRUE.}
 Defaults to a temporary file.}
 }
 \value{
-A list of models for the recursive partition of
-the collection of networks.
-
-This functions make call to \code{estimate_colBiSBM}.
+A list with four elements:
+\item{partition}{A list of models giving the best partition.}
+\item{cluster}{A vector of integers giving the cluster of each network.}
+\item{elapsed_time}{The total time taken by the clustering procedure.}
+\item{clustering_history}{A matrix with M columns and has much rows as there are cuts during partitioning.}
 }
 \description{
 Partition of a collection of bipartite networks based on their common
 mesoscale structures
+}
+\details{
+This functions makes call to \code{estimate_colBiSBM}.
 }
 \examples{
 alpha1 <- matrix(c(0.8, 0.1, 0.2, 0.7), byrow = TRUE, nrow = 2)

@@ -26,12 +26,14 @@
 #' @import cli
 #' @importFrom utils modifyList
 #'
-#' @return A list with two elements:
+#' @return A list with four elements:
 #' \item{partition}{A list of models giving the best partition.}
 #' \item{cluster}{A vector of integers giving the cluster of each network.}
+#' \item{elapsed_time}{The total time taken by the clustering procedure.}
+#' \item{clustering_history}{A matrix with M columns and has much rows as there are cuts during partitioning.}
 #'
 #' @details
-#' This functions make call to `estimate_colSBM`.
+#' This function makes call to `estimate_colSBM`.
 #' @export
 #'
 #' @seealso [colSBM::estimate_colSBM()],
@@ -112,7 +114,7 @@ clusterize_unipartite_networks <- function(netlist,
   cluster <- rep(1, length(netlist))
   names(cluster) <- net_id
 
-  cluster_history <- as.data.frame(matrix(cluster, nrow = 1L))
+  clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
 
 
   if (verbose) {
@@ -124,7 +126,7 @@ clusterize_unipartite_networks <- function(netlist,
       saveRDS(list(
         clustering_queue = clustering_queue,
         list_model_binary = list_model_binary,
-        cluster_history = cluster_history
+        clustering_history = clustering_history
       ), temp_save_path)
     }
     fit <- clustering_queue[[1]]
@@ -210,7 +212,7 @@ clusterize_unipartite_networks <- function(netlist,
 
       # Assign the new cluster to the networks
       cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
-      cluster_history <- rbind(cluster_history, matrix(unname(cluster), nrow = 1))
+      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
     } else {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       if (verbose) {
@@ -224,13 +226,13 @@ clusterize_unipartite_networks <- function(netlist,
     cli::cli_alert_success("Finished clustering")
   }
 
-  colnames(cluster_history) <- net_id
+  colnames(clustering_history) <- net_id
 
   output_list <- list(
     partition = list_model_binary,
     cluster = cluster,
     elapsed_time = Sys.time() - start_time,
-    cluster_history = cluster_history
+    clustering_history = clustering_history
   )
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
@@ -271,10 +273,15 @@ clusterize_unipartite_networks <- function(netlist,
 #' @import cli
 #' @importFrom utils modifyList
 #'
-#' @return A list of models for the recursive partition of
-#' the collection of networks.
+#' @return A list with four elements:
+#' \item{partition}{A list of models giving the best partition.}
+#' \item{cluster}{A vector of integers giving the cluster of each network.}
+#' \item{elapsed_time}{The total time taken by the clustering procedure.}
+#' \item{clustering_history}{A matrix with M columns and has much rows as there are cuts during partitioning.}
 #'
-#' This functions make call to `estimate_colBiSBM`.
+#' @details
+#' This functions makes call to `estimate_colBiSBM`.
+#'
 #' @export
 #'
 #' @seealso [colSBM::clusterize_unipartite_networks()], [colSBM::estimate_colBiSBM()],
