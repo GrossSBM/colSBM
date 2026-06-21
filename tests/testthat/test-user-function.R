@@ -18,8 +18,8 @@ test_that("Estimate colSBM runs without problems", {
     colsbm_model =
       "iid",
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 0L
     )
   ))
@@ -34,8 +34,8 @@ test_that("Estimate colSBM accepts netlist of tables", {
     ),
     colsbm_model = "iid",
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 0L
     )
   ))
@@ -51,8 +51,8 @@ test_that("Wrong model raises an error", {
     colsbm_model =
       "wrongmodel",
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 0L
     )
   ))
@@ -162,8 +162,8 @@ test_that("Estimate colBiSBM runs without problems with verbosity", {
     ),
     colsbm_model = "iid",
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 4L,
       Q1_max = NULL,
       Q2_max = NULL
@@ -181,8 +181,8 @@ test_that("Estimate colBiSBM accepts netlist of tables", {
     ),
     colsbm_model = "iid",
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 0L,
       Q1_max = NULL,
       Q2_max = NULL
@@ -224,8 +224,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       colsbm_model = "iid",
       nb_run = 2L,
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -239,8 +239,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       colsbm_model = "iid",
       nb_run = 2L,
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -253,8 +253,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection,
       colsbm_model = "pi",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -267,8 +267,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection_na,
       colsbm_model = "pi",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -281,8 +281,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection,
       colsbm_model = "rho",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -295,8 +295,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection_na,
       colsbm_model = "rho",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -309,8 +309,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection,
       colsbm_model = "pirho",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -323,8 +323,8 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
       netlist = pirho_collection_na,
       colsbm_model = "pirho",
       global_opts = list(
-        nb_cores = 2L,
-        backend = "parallel",
+        nb_cores = 1L,
+        backend = "no_mc",
         verbosity = 0L,
         Q1_max = 10L,
         Q2_max = 10L
@@ -375,7 +375,7 @@ test_that("Check that LBM and colBiSBM with one network return the same", {
   colBiSBM <- estimate_colBiSBM(
     netlist = list(testNet), colsbm_model = "iid",
     nb_run = 1L,
-    global_opts = list(verbosity = 0L, backend = "parallel"),
+    global_opts = list(verbosity = 0L, backend = "no_mc"),
     fit_opts = fit_opts
   )
 
@@ -415,8 +415,8 @@ test_that("Test that merging works with pirho", {
     colsbm_model = "pirho",
     nb_run = 1L,
     global_opts = list(
-      nb_cores = 2L,
-      backend = "parallel",
+      nb_cores = 1L,
+      backend = "no_mc",
       verbosity = 0L,
       Q1_max = 10L,
       Q2_max = 10L
