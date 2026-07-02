@@ -17,6 +17,36 @@
 #' @param fit_init Do not use!
 #' Optional fit init from where initializing the algorithm.
 #'
+#'
+#' @details The list of parameters \code{global_opts} essentially tunes the
+#' exploration process.
+#'  \itemize{
+#'  \item \code{nb_cores} integer for number of cores used for
+#'  parallelization. Default is 1.
+#'  \item \code{sbm_init} boolean specifying wether `{sbm}` package
+#' should be used to initialize the algorithm.
+#'  \item \code{spectral_init} boolean specifying wether a spectral
+#' clustering should be used to initialize the algorithm.
+#'  \item \code{nb_init} the number of different inits to perform
+#' to start the algorithm fit. Default to 10.
+#'  \item \code{verbosity} integer for verbosity (0, 1, 2, 3, 4). Default is 1.
+#'   0 will disable completely the output of the function.
+#'   modelisation is preferred
+#'  \item \code{Q_max} integer for the max size to explore. Default
+#' is computed with the following formula:
+#' `floor(log(sum(sapply(netlist, function(A) nrow(A)))) + 2)`
+#'  \item \code{nb_models} the number of models to keep for each values of Q.
+#'  Default is 5.
+#'  \item \code{depth} specifies how far around the best model the exploration will fit models. Default is 3.
+#'  \item \code{plot_details} integer to control the display of the exploration process. Values are 0 or 1. Default is 1.
+#'  \item \code{max_pass} the maximum number of passes that will be
+#'  executed. Default is 10.
+#'  \item \code{backend} the parallelization backend to use.
+#' Options available are "no_mc", "future", "parallel". Default is
+#' "future".
+#' Note: we plan to unify everything behind future.
+#' }
+#'
 #' @return A bmpop object listing a collection of fitted models for the
 #' collection of networks
 #' @export
