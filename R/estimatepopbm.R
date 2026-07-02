@@ -8,7 +8,8 @@
 #' @param distribution A string, the emission distribution, either "bernoulli"
 #' (the default) or "poisson"
 #' @param nb_run An integer, the number of run the algorithm do.
-#' @param global_opts Global options for the outer algorithm and the output
+#' @param global_opts Global options for the outer algorithm and
+#' the output. See `estimate_colSBM` for more informations on the elements of the list.
 #' @param fit_opts Fit options for the VEM algorithm
 #' @param fit_init Do not use!
 #' Optional fit init from where initializing the algorithm.
@@ -252,7 +253,8 @@ clusterize_unipartite_networks <- function(netlist,
 #' @param distribution A string, the emission distribution, either "bernoulli"
 #' (the default) or "poisson"
 #' @param nb_run An integer, the number of run the algorithm do.
-#' @param global_opts Global options for the outer algorithm and the output
+#' @param global_opts Global options for the outer algorithm and
+#' the output. See `estimate_colBiSBM` for more informations on the elements of the list.
 #' @param fit_opts Fit options for the VEM algorithm
 #' @param partition_init Optional partition list, a list of fitted collections
 #' (bisbmpop) from which to start partitioning
@@ -705,7 +707,8 @@ partition_networks_list_from_dissimilarity <- function(
 #' @param distribution A string, the emission distribution, either "bernoulli"
 #' (the default) or "poisson"
 #' @param nb_run An integer, the number of run the algorithm do. Defaults to 3.
-#' @param global_opts Global options for the outer algorithm and the output
+#' @param global_opts Global options for the outer algorithm and
+#' the output. See `estimate_colBiSBM` for more informations on the elements of the list.
 #' @param fit_opts Fit options for the VEM algorithm
 #' @param partition_init WIP A list of fitted collections from which to start the
 #' fusions

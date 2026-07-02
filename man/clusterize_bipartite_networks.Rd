@@ -33,7 +33,8 @@ clusterize_bipartite_networks(
 
 \item{nb_run}{An integer, the number of run the algorithm do.}
 
-\item{global_opts}{Global options for the outer algorithm and the output}
+\item{global_opts}{Global options for the outer algorithm and
+the output. See \code{estimate_colBiSBM} for more informations on the elements of the list.}
 
 \item{fit_opts}{Fit options for the VEM algorithm}
 
