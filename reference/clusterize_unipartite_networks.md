@@ -51,7 +51,8 @@ clusterize_unipartite_networks(
 
 - global_opts:
 
-  Global options for the outer algorithm and the output
+  Global options for the outer algorithm and the output. See
+  `estimate_colSBM` for more informations on the elements of the list.
 
 - fit_opts:
 

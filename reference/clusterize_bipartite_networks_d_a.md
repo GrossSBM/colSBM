@@ -51,7 +51,8 @@ clusterize_bipartite_networks_d_a(
 
 - global_opts:
 
-  Global options for the outer algorithm and the output
+  Global options for the outer algorithm and the output. See
+  `estimate_colBiSBM` for more informations on the elements of the list.
 
 - fit_opts:
 

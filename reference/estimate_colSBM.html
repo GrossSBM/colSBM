@@ -117,6 +117,34 @@ Optional fit init from where initializing the algorithm.</p></dd>
 collection of networks</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The list of parameters <code>global_opts</code> essentially tunes the
+exploration process.</p><ul><li><p><code>nb_cores</code> integer for number of cores used for
+parallelization. Default is 1.</p></li>
+<li><p><code>sbm_init</code> boolean specifying wether <code>{sbm}</code> package
+should be used to initialize the algorithm.</p></li>
+<li><p><code>spectral_init</code> boolean specifying wether a spectral
+clustering should be used to initialize the algorithm.</p></li>
+<li><p><code>nb_init</code> the number of different inits to perform
+to start the algorithm fit. Default to 10.</p></li>
+<li><p><code>verbosity</code> integer for verbosity (0, 1, 2, 3, 4). Default is 1.
+0 will disable completely the output of the function.
+modelisation is preferred</p></li>
+<li><p><code>Q_max</code> integer for the max size to explore. Default
+is computed with the following formula:
+<code>floor(log(sum(sapply(netlist, function(A) nrow(A)))) + 2)</code></p></li>
+<li><p><code>nb_models</code> the number of models to keep for each values of Q.
+Default is 5.</p></li>
+<li><p><code>depth</code> specifies how far around the best model the exploration will fit models. Default is 3.</p></li>
+<li><p><code>plot_details</code> integer to control the display of the exploration process. Values are 0 or 1. Default is 1.</p></li>
+<li><p><code>max_pass</code> the maximum number of passes that will be
+executed. Default is 10.</p></li>
+<li><p><code>backend</code> the parallelization backend to use.
+Options available are "no_mc", "future", "parallel". Default is
+"future".
+Note: we plan to unify everything behind future.</p></li>
+</ul></div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="clusterize_unipartite_networks.html">clusterize_unipartite_networks()</a></code>, <code><a href="bmpop.html">bmpop</a></code>,
 <code><a href="fitSimpleSBMPop.html">fitSimpleSBMPop</a></code>, <code>browseVignettes("colSBM")</code></p></div>
@@ -152,7 +180,7 @@ collection of networks</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>
