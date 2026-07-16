@@ -5,7 +5,7 @@
 #' @param FUN The function to use in parallel
 #' @param backend One of c("future", "parallel")
 #' @param nb_cores Number of parallel cores for parallel
-#' @param ...
+#' @param ... Other arguments to pass
 #'
 #' @return A list on which the FUN was applied with specified backend and
 #' parameters

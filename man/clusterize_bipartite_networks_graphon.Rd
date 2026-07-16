@@ -32,7 +32,8 @@ clusterize_bipartite_networks_graphon(
 
 \item{nb_run}{An integer, the number of run the algorithm do. Defaults to 3.}
 
-\item{global_opts}{Global options for the outer algorithm and the output}
+\item{global_opts}{Global options for the outer algorithm and
+the output. See \code{estimate_colBiSBM} for more informations on the elements of the list.}
 
 \item{fit_opts}{Fit options for the VEM algorithm}
 
