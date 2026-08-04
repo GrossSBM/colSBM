@@ -6,20 +6,31 @@
 #include <vector>
 
 using arma::mat;
+using arma::vec;
+using arma::rowvec;
 
 class ColSBM {
 public:
-  // basic fields
   std::vector<mat> A; // adjacency matrices
   int M;
   int Q;
+  int iterations;
+  double vbound;
+  std::vector<mat> tau;
+  std::vector<rowvec> pi;
+  std::vector<mat> emqr;
+  std::vector<mat> nmqr;
+  std::vector<mat> alpha;
+  std::vector<vec> delta;
 
   ColSBM(const std::vector<mat> &A_, int Q_);
   ~ColSBM();
 
-  // placeholder methods
-  void optimize(int max_step, double tol);
+  void initialize_state();
+  void compute_aggregates();
+  void update_pi();
   void step();
+  void optimize(int max_step, double tol);
   double get_vbound() const;
 };
 
