@@ -38,6 +38,12 @@ Imports:
     tibble,
     tidyr,
     utils
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
+Imports:
+    Rcpp,
+    RcppArmadillo
 Suggests:
     covr,
     knitr,
