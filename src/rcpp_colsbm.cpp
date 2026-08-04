@@ -28,5 +28,6 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   out["M"] = ptr->M;
   out["Q"] = ptr->Q;
   out["vbound"] = ptr->get_vbound();
+  out["iterations"] = ptr->iterations;
   return out;
 }
