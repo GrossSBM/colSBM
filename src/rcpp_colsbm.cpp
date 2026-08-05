@@ -29,6 +29,16 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   out["Q"] = ptr->Q;
   out["vbound"] = ptr->get_vbound();
   out["iterations"] = ptr->iterations;
-  out["tau"] = ptr->tau;
+  List mask_out(ptr->mask.size());
+  for (std::size_t i = 0; i < ptr->mask.size(); ++i) {
+    mask_out[i] = wrap(ptr->mask[i]);
+  }
+  out["mask"] = mask_out;
+  List tau_out(ptr->tau.size());
+  for (std::size_t i = 0; i < ptr->tau.size(); ++i) {
+    tau_out[i] = wrap(ptr->tau[i]);
+  }
+  out["tau"] = tau_out;
+
   return out;
 }
