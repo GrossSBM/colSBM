@@ -4,6 +4,7 @@
 
 #include <RcppArmadillo.h>
 #include <vector>
+#include "shared_conf.h"
 
 using arma::mat;
 using arma::vec;
