@@ -2,18 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 colsbm_create <- function(A, Q) {
-    .Call(`_colSBM_colsbm_create`, A, Q)
+    .Call('_colSBM_colsbm_create', PACKAGE = 'colSBM', A, Q)
 }
 
 colsbm_optimize <- function(ptr, max_step = 100L, tol = 1e-6) {
-    invisible(.Call(`_colSBM_colsbm_optimize`, ptr, max_step, tol))
+    invisible(.Call('_colSBM_colsbm_optimize', PACKAGE = 'colSBM', ptr, max_step, tol))
 }
 
 colsbm_vbound <- function(ptr) {
-    .Call(`_colSBM_colsbm_vbound`, ptr)
+    .Call('_colSBM_colsbm_vbound', PACKAGE = 'colSBM', ptr)
 }
 
 colsbm_info <- function(ptr) {
-    .Call(`_colSBM_colsbm_info`, ptr)
+    .Call('_colSBM_colsbm_info', PACKAGE = 'colSBM', ptr)
 }
 
