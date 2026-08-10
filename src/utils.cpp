@@ -1,8 +1,9 @@
+#include <RcppArmadillo.h>
 #include <algorithm>
 #include <cmath>
-#include <RcppArmadillo.h>
+#include <string>
 
-constexpr double kClampEps = 1e-10;
+constexpr double kClampEps = TOL;
 
 inline double clamp_log(double x, double eps = kClampEps) {
   return std::log(std::max(x, eps));
@@ -28,6 +29,26 @@ inline arma::mat log_clamped(const arma::mat &x, double eps = kClampEps) {
   return arma::log(arma::clamp(x, eps, arma::datum::inf));
 }
 
-inline arma::mat clamp_matrix(const arma::mat &x, double lo = kClampEps, double hi = 1-kClampEps) {
+inline arma::mat clamp_matrix(const arma::mat &x, double lo = kClampEps,
+                              double hi = 1 - kClampEps) {
   return arma::clamp(x, lo, hi);
+}
+
+inline void check_emission_distribution_unipartite(std::string distribution) {
+  std::vector<std::string> implemented_distributions{"bernoulli", "poisson"};
+  std::string result;
+
+  if (std::find(implemented_distributions.begin(),
+                implemented_distributions.end(),
+                distribution) == implemented_distributions.end()) {
+
+    for (std::size_t i = 0; i < implemented_distributions.size(); ++i) {
+      if (i > 0)
+        result += ", ";
+      result += implemented_distributions[i];
+    }
+
+    Rcpp::stop("Distribution " + distribution +
+               " not implemented ! Should be one of " + result + ".");
+  }
 }

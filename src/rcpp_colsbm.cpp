@@ -5,12 +5,16 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<ColSBM> colsbm_create(List A, int Q) {
-  return colsbm_xptr_from_list(A, Q);
+XPtr<ColSBM> colsbm_create(List A, int Q, List tau, bool directed = false,
+                           std::string distribution = "bernoulli",
+                           bool free_mixture = true, bool free_density = true) {
+  return colsbm_xptr_from_list(
+      A, Q, tau, directed = directed, distribution = distribution,
+      free_mixture = free_mixture, free_density = free_density);
 }
 
 // [[Rcpp::export]]
-void colsbm_optimize(XPtr<ColSBM> ptr, int max_step = 100L, double tol = 1e-6) {
+void colsbm_optimize(XPtr<ColSBM> ptr, int max_step = 100, double tol = 1e-6) {
   if (!ptr)
     stop("NULL pointer");
   ptr->optimize(max_step, tol);
@@ -42,6 +46,8 @@ List colsbm_info(XPtr<ColSBM> ptr) {
     tau_out[i] = wrap(ptr->tau[i]);
   }
   out["tau"] = tau_out;
+  out["alpha"] = ptr->alpha;
+  out["pim"] = ptr->pim;
 
   return out;
 }
