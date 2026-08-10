@@ -14,20 +14,20 @@ NULL
 
 #' @export
 colsbm_create <- function(A, Q) {
-    .Call(`_colSBM_colsbm_create`, A, as.integer(Q))
+  .Call(`_colSBM_colsbm_create`, A, as.integer(Q))
 }
 
 #' @export
 colsbm_optimize <- function(ptr, max_step = 100L, tol = 1e-6) {
-    .Call(`_colSBM_colsbm_optimize`, ptr, as.integer(max_step), as.double(tol))
+  .Call(`_colSBM_colsbm_optimize`, ptr, as.integer(max_step), as.double(tol))
 }
 
 #' @export
 colsbm_vbound <- function(ptr) {
-    .Call(`_colSBM_colsbm_vbound`, ptr)
+  .Call(`_colSBM_colsbm_vbound`, ptr)
 }
 
 #' @export
 colsbm_info <- function(ptr) {
-    .Call(`_colSBM_colsbm_info`, ptr)
+  .Call(`_colSBM_colsbm_info`, ptr)
 }
