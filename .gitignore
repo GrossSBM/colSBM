@@ -10,6 +10,7 @@ simulation/NA_robustness_analyse_files/*
 src/*.o
 src/*.so
 wip
+.clangd
 
 # Latex ignore
 ## Core latex/pdflatex auxiliary files:
