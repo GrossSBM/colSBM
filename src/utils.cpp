@@ -3,13 +3,11 @@
 #include <cmath>
 #include <string>
 
-constexpr double kClampEps = TOL;
-
-inline double clamp_log(double x, double eps = kClampEps) {
+inline double clamp_log(double x, double eps = TOL) {
   return std::log(std::max(x, eps));
 }
 
-inline double clamp_value(double x, double lo = kClampEps, double hi = 1.0) {
+inline double clamp_value(double x, double lo = TOL, double hi = 1.0) {
   return std::max(lo, std::min(hi, x));
 }
 
@@ -25,12 +23,13 @@ inline arma::mat softmax_rows(const arma::mat &x) {
   return out;
 }
 
-inline arma::mat log_clamped(const arma::mat &x, double eps = kClampEps) {
+inline arma::mat log_clamped(const arma::mat &x, double eps = TOL) {
   return arma::log(arma::clamp(x, eps, arma::datum::inf));
 }
-
-inline arma::mat clamp_matrix(const arma::mat &x, double lo = kClampEps,
-                              double hi = 1 - kClampEps) {
+//' @param hi a double specifying the max value to clamp, defaults to 1-TOL
+//' for the bernoulli distribution
+inline arma::mat clamp_matrix(const arma::mat &x, double lo = TOL,
+                              double hi = 1 - TOL) {
   return arma::clamp(x, lo, hi);
 }
 
