@@ -2,7 +2,6 @@
 #include "utils.cpp"
 #include <cmath>
 #include <string>
-#define DEBUG_VE true
 
 ColSBM::ColSBM(const std::vector<mat> &A_, int Q_, std::vector<mat> &tau_,
                bool directed_, std::string distribution_, bool free_mixture_,
@@ -22,7 +21,6 @@ void ColSBM::initialize_state() {
   emqr.clear();
   nmqr.clear();
   delta.clear();
-  vloss.clear();
   logfactA.clear();
 
   // Checking if distribution is implemented
@@ -36,13 +34,16 @@ void ColSBM::initialize_state() {
     mask_m.elem(find_nonfinite(A[m])).ones();
     mask.push_back(mask_m);
 
+    // And we set the NA in A to a value to allow computations
+    A[m].elem(find_nonfinite(A[m])).fill(NA_REPLACE_VALUE);
+
     // Equiprobability for pis
     rowvec pi_m(Q, arma::fill::value(1.0 / static_cast<double>(Q)));
     pim.push_back(pi_m);
 
     delta.push_back(1.0);
 
-    vloss.push_back(-arma::datum::inf);
+    vloss.push_back(std::vector<double>{});
 
     double logfact = 0.0;
     for (arma::uword i = 0; i < A[m].n_rows; ++i) {
@@ -63,7 +64,7 @@ void ColSBM::initialize_state() {
   update_alpha();
 
   update_pi();
-  vbound = 0.0;
+  compute_vbound(true);
 }
 
 void ColSBM::compute_aggregates() {
@@ -114,9 +115,10 @@ void ColSBM::update_pi() {
       }
     }
     // Renormalizing
-    if (arma::sum(mean_pi) != 1) {
-      Rcpp::warning("The mean pi did not sum to one, but to ",
-                    arma::sum(mean_pi)) mean_pi = mean_pi / arma::sum(mean_pi);
+    if ((float)arma::sum(mean_pi) != 1.0) {
+      Rcpp::warning("The mean pi did not sum to one, but to %.6f",
+                    arma::sum(mean_pi));
+      mean_pi = mean_pi / arma::sum(mean_pi);
     }
     if (DEBUG_VE) {
       Rcpp::Rcout << "mean pi : " << mean_pi
@@ -129,6 +131,10 @@ void ColSBM::update_pi() {
 }
 
 void ColSBM::update_alpha() {
+  if (DEBUG_VE) {
+    Rcpp::Rcout << "sum(EMQR) = " << arma::sum(emqr, 2)
+                << " | sum(NMQR) = " << arma::sum(nmqr, 2) << "\n";
+  }
   if (distribution == "bernoulli") {
     alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
   } else {
@@ -151,7 +157,6 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
   const mat Am = A[m] % Um;
 
   double prev_vloss = compute_network_vloss(m);
-  vloss[m] = prev_vloss;
 
   for (int it = 0; it < max_iter; ++it) {
     mat tau_new(tau_old.n_rows, tau_old.n_cols, arma::fill::zeros);
@@ -167,11 +172,10 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
       score += Am.t() * tau_old * logit_alpha + Um.t() * tau_old * log_1m_alpha;
     }
 
-    tau_new = softmax_rows(score);
+    tau_new = clamp_matrix(softmax_rows(score));
     tau[m] = tau_new;
 
     const double new_vloss = compute_network_vloss(m);
-    vloss[m] = new_vloss;
 
     const double delta_tau = arma::accu(arma::square(tau_new - tau_old)) /
                              static_cast<double>(tau_new.n_elem);
@@ -200,8 +204,8 @@ double ColSBM::compute_network_vloss(int m) const {
 
   // Vbound tau and alpha
   if (distribution == "bernoulli") {
-    obj += dircoef * arma::accu(em * log_clamped(delta_m * alpha) +
-                                (nm - em) * log_clamped(delta_m * (1 - alpha)));
+    obj += dircoef * arma::accu(em % log_clamped(delta_m * alpha) +
+                                (nm - em) % log_clamped(1 - delta_m * alpha));
   } else if (distribution == "poisson") {
   }
   // Vbound tau and pi
@@ -211,10 +215,7 @@ double ColSBM::compute_network_vloss(int m) const {
   }
 
   // Vbound entropy
-  if (distribution == "bernoulli") {
-    obj += -arma::accu(tau_m % log_clamped(tau_m));
-  } else {
-  }
+  obj += -arma::accu(tau_m % log_clamped(tau_m));
 
   return obj;
 }
@@ -228,39 +229,63 @@ void ColSBM::step() {
   // M step
   update_pi();
   update_alpha();
-
-  vbound = 0;
-  for (int m = 0; m < M; ++m) {
-    vbound += compute_network_vloss(m);
-  }
-  ++iterations;
 }
 
-void ColSBM::optimize(int max_step, double tol) {
+// A function to loop over all networks and store the vbound
+void ColSBM::compute_vbound(bool store_vloss = false) {
+  vbound = 0.0;
+  for (int m = 0; m < M; ++m) {
+    double vloss_m = compute_network_vloss(m);
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "vloss (" << m << ") : " << vloss_m << "\n";
+    }
+    if (store_vloss) {
+      // Casting the m element of the list as a NumericVector to allow pushing
+      // the loss value to it
+      // Rcpp::as<Rcpp::NumericVector>(vloss[m]);
+      std::vector<double> vloss_m_values =
+          Rcpp::as<std::vector<double>>(vloss[m]);
+      vloss_m_values.push_back((double)vloss_m);
+      vloss[m] = vloss_m_values;
+      if (DEBUG_VE) {
+        Rcpp::Rcout << "vloss[" << m
+                    << "] = " << Rcpp::as<std::vector<double>>(vloss[m]).back()
+                    << "\n";
+      }
+    }
+    vbound += vloss_m;
+  }
+}
+
+void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
   iterations = 0;
   vbound = 0.0;
   if (DEBUG_VE) {
     Rcpp::Rcout << "Taus are\n" << tau[1] << "\n";
   }
+
   // M step
   update_pi();
   update_alpha();
-  if (DEBUG_VE) {
-    Rcpp::Rcout << "Initialized alpha and pi\nalpha:\n"
-                << alpha << "\npi:\n"
-                << pim[1];
-  }
-  for (int m = 0; m < M; ++m) {
-    vbound += compute_network_vloss(m);
-  }
+
+  // Compute the first vbound
+  double prev_vbound = vbound;
+
   for (int it = 0; it < max_step; ++it) {
     if (DEBUG_VE) {
       Rcpp::Rcout << "Iteration " << it << "\n";
     }
+
+    // Make VE and M step
     step();
-    if (std::abs(vbound) < tol) {
+
+    // Update the vbound after step
+    prev_vbound = vbound;
+    compute_vbound(true);
+    if (std::abs(vbound - prev_vbound) < tol) {
       break;
     }
+    iterations = it;
   }
 }
 

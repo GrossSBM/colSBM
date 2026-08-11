@@ -31,7 +31,7 @@ public:
   cube nmqr;
   mat alpha;
   std::vector<double> delta;
-  std::vector<double> vloss;
+  Rcpp::List vloss;
   // TODO USE Will be used later to implement free mixture computation
   // this is the support of size QxM indicating which block q
   // is populated by network m
@@ -45,6 +45,7 @@ public:
 
   void initialize_state();
   void compute_aggregates();
+  void compute_vbound(bool store_vloss);
   void update_pi();
   void update_alpha();
   mat fixed_point_tau(int m, int max_iter, double tol = TOL);
