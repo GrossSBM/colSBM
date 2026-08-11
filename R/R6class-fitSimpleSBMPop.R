@@ -1265,6 +1265,10 @@ fitSimpleSBMPop <- R6::R6Class(
       self$compute_icl(map = TRUE)
       self$compute_BICL()
     },
+    #' To reorder the parameters according to diag(alpha) decreasing order
+    reorder_parameters = function() {
+      ord <- order(diag(self$alpha), decreasing = TRUE)
+    },
     #' The message printed when one prints the object
     #' @param type The title above the message.
     show = function(type = "Fitted Collection of Simple SBM") {
