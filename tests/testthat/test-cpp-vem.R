@@ -42,20 +42,20 @@ test_that("cpp VE yields the same results as the R procedure", {
 
   info <- colsbm_info(ptr)
 
-    expect_equal(rowSums(info$tau[[1]]), rep(1, nrow(info$tau[[1]])))
-    expect_true(all(info$tau[[1]] >= 0))
-    expect_true(is.list(info))
-    expect_equal(info$M, 4L)
-    expect_equal(info$Q, 3L)
-    expect_true(is.finite(info$vbound))
+  expect_equal(rowSums(info$tau[[1]]), rep(1, nrow(info$tau[[1]])))
+  expect_true(all(info$tau[[1]] >= 0))
+  expect_true(is.list(info))
+  expect_equal(info$M, 4L)
+  expect_equal(info$Q, 3L)
+  expect_true(is.finite(info$vbound))
 
-    labelize <- function(tau) {
-        sapply(seq_len(nrow(tau)), function(i) which.max(tau[i, ]))
-    }
+  labelize <- function(tau) {
+    sapply(seq_len(nrow(tau)), function(i) which.max(tau[i, ]))
+  }
 
-    # True quality checks
-    cpp_order <- order(diag(info$alpha), decreasing = TRUE)
-    expect_identical(R_fit$compute_vbound(), info$vbound)
-    cpp_taus <- lapply(info$tau, function(tau) tau[, cpp_order])
-    expect_equal(R_fit$tau, cpp_taus, tolerance = 1e-2)
+  # True quality checks
+  cpp_order <- order(diag(info$alpha), decreasing = TRUE)
+  expect_identical(R_fit$compute_vbound(), info$vbound)
+  cpp_taus <- lapply(info$tau, function(tau) tau[, cpp_order])
+  expect_equal(R_fit$tau, cpp_taus, tolerance = 1e-2)
 })
