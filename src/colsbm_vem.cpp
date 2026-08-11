@@ -98,8 +98,29 @@ void ColSBM::update_pi() {
     for (int m = 0; m < M; ++m) {
       total_nb_nodes += A[m].n_rows;
     }
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "total nb nodes : " << total_nb_nodes << "\n";
+    }
     for (int m = 0; m < M; ++m) {
-      mean_pi += (A[m].n_rows / total_nb_nodes) * pim[m];
+      if (DEBUG_VE) {
+        Rcpp::Rcout << "pim (" << m << ") : " << pim[m] << "\n";
+        Rcpp::Rcout << "weighted pi to add : "
+                    << ((float)A[m].n_rows / (float)total_nb_nodes) * pim[m]
+                    << "\n";
+      }
+      mean_pi += ((float)A[m].n_rows / (float)total_nb_nodes) * pim[m];
+      if (DEBUG_VE) {
+        Rcpp::Rcout << "mean pi : " << mean_pi << "\n";
+      }
+    }
+    // Renormalizing
+    if (arma::sum(mean_pi) != 1) {
+      Rcpp::warning("The mean pi did not sum to one, but to ",
+                    arma::sum(mean_pi)) mean_pi = mean_pi / arma::sum(mean_pi);
+    }
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "mean pi : " << mean_pi
+                  << "and sum : " << arma::sum(mean_pi) << "\n";
     }
     for (int m = 0; m < M; ++m) {
       pim[m] = mean_pi;
