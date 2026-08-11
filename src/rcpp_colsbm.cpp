@@ -32,6 +32,14 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   if (!ptr)
     stop("NULL pointer");
   List out;
+  List A_out(ptr->A.size());
+  for (std::size_t i = 0; i < ptr->A.size(); ++i) {
+    mat Ai = ptr->A[i];
+    // Replacing the masked constant by NaN
+    Ai.elem(find(ptr->mask[i] == 1)).fill(NA_REAL);
+    A_out[i] = wrap(Ai);
+  }
+  out["A"] = A_out;
   out["M"] = ptr->M;
   out["Q"] = ptr->Q;
   out["vbound"] = ptr->get_vbound();
@@ -46,8 +54,11 @@ List colsbm_info(XPtr<ColSBM> ptr) {
     tau_out[i] = wrap(ptr->tau[i]);
   }
   out["tau"] = tau_out;
+  out["emqr"] = ptr->emqr;
+  out["nmqr"] = ptr->nmqr;
   out["alpha"] = ptr->alpha;
   out["pim"] = ptr->pim;
+  out["vloss"] = ptr->vloss;
 
   return out;
 }
