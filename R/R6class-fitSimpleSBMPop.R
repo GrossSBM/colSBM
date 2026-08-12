@@ -1267,7 +1267,14 @@ fitSimpleSBMPop <- R6::R6Class(
     },
     #' To reorder the parameters according to diag(alpha) decreasing order
     reorder_parameters = function() {
-      ord <- order(diag(self$alpha), decreasing = TRUE)
+      if (self$Q != 1) {
+        lapply(seq(self$M), function(m) {
+          ord_m <- order(diag(self$alpham[[m]]), decreasing = TRUE)
+          self$Z[[m]] <- Z_label_switch(self$Z[[m]], ord_m)
+          self$tau[[m]] <- self$tau[[m]][, ord_m]
+          self$pim[[m]][ord_m]
+        })
+      }
     },
     #' The message printed when one prints the object
     #' @param type The title above the message.
