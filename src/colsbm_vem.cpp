@@ -114,12 +114,9 @@ void ColSBM::update_pi() {
         Rcpp::Rcout << "mean pi : " << mean_pi << "\n";
       }
     }
-    // Renormalizing
-    if ((float)arma::sum(mean_pi) != 1.0) {
-      Rcpp::warning("The mean pi did not sum to one, but to %.6f",
-                    arma::sum(mean_pi));
+
       mean_pi = mean_pi / arma::sum(mean_pi);
-    }
+
     if (DEBUG_VE) {
       Rcpp::Rcout << "mean pi : " << mean_pi
                   << "and sum : " << arma::sum(mean_pi) << "\n";
@@ -173,6 +170,8 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
     }
 
     tau_new = clamp_matrix(softmax_rows(score));
+    // To renormalize after clamping
+    tau_new = tau_new / arma::repmat(arma::sum(tau_new, 1), 1, 3);
     tau[m] = tau_new;
 
     const double new_vloss = compute_network_vloss(m);
