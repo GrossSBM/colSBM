@@ -65,6 +65,7 @@ void ColSBM::initialize_state() {
 
   update_pi();
   compute_vbound(true);
+  iterations = 1;
 }
 
 void ColSBM::compute_aggregates() {
@@ -171,7 +172,7 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
 
     tau_new = clamp_matrix(softmax_rows(score));
     // To renormalize after clamping
-    tau_new = tau_new / arma::repmat(arma::sum(tau_new, 1), 1, 3);
+    tau_new = tau_new / arma::repmat(arma::sum(tau_new, 1), 1, tau_new.n_cols);
     tau[m] = tau_new;
 
     const double new_vloss = compute_network_vloss(m);
@@ -269,7 +270,8 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
   // Compute the first vbound
   double prev_vbound = vbound.back();
 
-  for (int it = 0; it < max_step; ++it) {
+  // max_step - 1 to account for the first M step after provided taus
+  for (int it = 0; it < max_step-1; ++it) {
     if (DEBUG_VE) {
       Rcpp::Rcout << "Iteration " << it << "\n";
     }
@@ -280,10 +282,13 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
     // Update the vbound after step
     prev_vbound = vbound.back();
     compute_vbound(true);
+    ++iterations;
     if (std::abs(vbound.back() - prev_vbound) < tol) {
       break;
     }
-    iterations = it;
+  }
+  if (iterations > max_step) {
+    Rcpp::warning("The VEM failed to converge in %i max steps for Q=%i !", max_step, Q);
   }
 }
 
