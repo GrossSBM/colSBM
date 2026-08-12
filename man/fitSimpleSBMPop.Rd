@@ -164,6 +164,7 @@ parameters}
     \item \href{#method-fitSimpleSBMPop-ve_step}{\code{fitSimpleSBMPop$ve_step()}}
     \item \href{#method-fitSimpleSBMPop-update_mqr}{\code{fitSimpleSBMPop$update_mqr()}}
     \item \href{#method-fitSimpleSBMPop-optimize}{\code{fitSimpleSBMPop$optimize()}}
+    \item \href{#method-fitSimpleSBMPop-reorder_parameters}{\code{fitSimpleSBMPop$reorder_parameters()}}
     \item \href{#method-fitSimpleSBMPop-show}{\code{fitSimpleSBMPop$show()}}
     \item \href{#method-fitSimpleSBMPop-print}{\code{fitSimpleSBMPop$print()}}
     \item \href{#method-fitSimpleSBMPop-clone}{\code{fitSimpleSBMPop$clone()}}
@@ -837,7 +838,19 @@ Perform the whole initialization and VEM algorithm}
   }
   \subsection{Returns}{
     nothing; stores values
+To reorder the parameters according to diag(alpha) decreasing order
 The message printed when one prints the object
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitSimpleSBMPop-reorder_parameters"></a>}}
+\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-reorder_parameters}{}}}
+\subsection{\code{fitSimpleSBMPop$reorder_parameters()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$reorder_parameters()}
+    \if{html}{\out{</div>}}
   }
 }
 
