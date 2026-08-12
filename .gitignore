@@ -11,6 +11,7 @@ src/*.o
 src/*.so
 wip
 .clangd
+compile_commands.json
 
 # Latex ignore
 ## Core latex/pdflatex auxiliary files:
