@@ -735,6 +735,17 @@ compute_bicl_partition <- function(partition, penalty_factor = 0.5, verbose = TR
   stop("The provided partition is not a valid object for BIC-L computation.")
 }
 
+Z_label_switch <- function(Z, new_order) {
+  # Create a mapping of old labels to new labels
+  old_names <- names(Z)
+  label_map <- setNames(new_order, unique(Z))
+
+  # Use the mapping to replace labels in the vector
+  switched_labels <- label_map[Z]
+  names(switched_labels) <- old_names
+  return(switched_labels)
+}
+
 .xlogx <- function(x) {
   ifelse(x < 2 * .Machine$double.eps, 0, x * log(x))
 }
