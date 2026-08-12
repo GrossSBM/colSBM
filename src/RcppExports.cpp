@@ -41,7 +41,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // colsbm_vbound
-double colsbm_vbound(XPtr<ColSBM> ptr);
+std::vector<double> colsbm_vbound(XPtr<ColSBM> ptr);
 RcppExport SEXP _colSBM_colsbm_vbound(SEXP ptrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

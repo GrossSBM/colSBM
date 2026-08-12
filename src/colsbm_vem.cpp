@@ -232,7 +232,7 @@ void ColSBM::step() {
 
 // A function to loop over all networks and store the vbound
 void ColSBM::compute_vbound(bool store_vloss = false) {
-  vbound = 0.0;
+  double current_vbound=0.0;
   for (int m = 0; m < M; ++m) {
     double vloss_m = compute_network_vloss(m);
     if (DEBUG_VE) {
@@ -252,13 +252,12 @@ void ColSBM::compute_vbound(bool store_vloss = false) {
                     << "\n";
       }
     }
-    vbound += vloss_m;
+    current_vbound += vloss_m;
   }
+  vbound.push_back(current_vbound);
 }
 
 void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
-  iterations = 0;
-  vbound = 0.0;
   if (DEBUG_VE) {
     Rcpp::Rcout << "Taus are\n" << tau[1] << "\n";
   }
@@ -268,7 +267,7 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
   update_alpha();
 
   // Compute the first vbound
-  double prev_vbound = vbound;
+  double prev_vbound = vbound.back();
 
   for (int it = 0; it < max_step; ++it) {
     if (DEBUG_VE) {
@@ -279,16 +278,16 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
     step();
 
     // Update the vbound after step
-    prev_vbound = vbound;
+    prev_vbound = vbound.back();
     compute_vbound(true);
-    if (std::abs(vbound - prev_vbound) < tol) {
+    if (std::abs(vbound.back() - prev_vbound) < tol) {
       break;
     }
     iterations = it;
   }
 }
 
-double ColSBM::get_vbound() const { return vbound; }
+std::vector<double> ColSBM::get_vbound() const { return vbound; }
 
 // Convert an R list of matrices to an XPtr<ColSBM>
 Rcpp::XPtr<ColSBM> colsbm_xptr_from_list(const Rcpp::List &A, int Q,

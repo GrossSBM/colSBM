@@ -20,7 +20,7 @@ public:
   int Q;
   std::vector<mat> tau;
   int iterations;
-  double vbound;
+  std::vector<double> vbound;
   bool directed;
   bool free_mixture;
   bool free_density;
@@ -52,7 +52,7 @@ public:
   double compute_network_vloss(int m) const;
   void step();
   void optimize(int max_step, double tol);
-  double get_vbound() const;
+  std::vector<double> get_vbound() const;
 };
 
 // Helper to wrap/unwrap from R

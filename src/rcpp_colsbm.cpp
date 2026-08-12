@@ -21,7 +21,7 @@ void colsbm_optimize(XPtr<ColSBM> ptr, int max_step = 100, double tol = 1e-6) {
 }
 
 // [[Rcpp::export]]
-double colsbm_vbound(XPtr<ColSBM> ptr) {
+std::vector<double> colsbm_vbound(XPtr<ColSBM> ptr) {
   if (!ptr)
     stop("NULL pointer");
   return ptr->get_vbound();
