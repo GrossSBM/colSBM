@@ -27,6 +27,7 @@ public:
   std::string distribution;
   std::vector<double> logfactA;
   std::vector<rowvec> pim;
+  std::vector<rowvec> pi;
   cube emqr;
   cube nmqr;
   mat alpha;

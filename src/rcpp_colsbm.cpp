@@ -57,7 +57,9 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   out["emqr"] = ptr->emqr;
   out["nmqr"] = ptr->nmqr;
   out["alpha"] = ptr->alpha;
+  out["delta"] = ptr->delta;
   out["pim"] = ptr->pim;
+  out["pi"] = ptr->pi;
   out["vloss"] = ptr->vloss;
 
   return out;

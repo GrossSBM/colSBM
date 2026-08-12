@@ -18,6 +18,7 @@ ColSBM::~ColSBM() {}
 void ColSBM::initialize_state() {
   mask.clear();
   pim.clear();
+  pi.clear();
   emqr.clear();
   nmqr.clear();
   delta.clear();
@@ -40,6 +41,7 @@ void ColSBM::initialize_state() {
     // Equiprobability for pis
     rowvec pi_m(Q, arma::fill::value(1.0 / static_cast<double>(Q)));
     pim.push_back(pi_m);
+    pi.push_back(pi_m);
 
     delta.push_back(1.0);
 
@@ -95,6 +97,7 @@ void ColSBM::update_pi() {
   }
 
   if (!free_mixture) {
+    // If in iid the pi != pim, but weighted_mean(pim, w = n_m)
     rowvec mean_pi(Q, arma::fill::zeros);
     int total_nb_nodes{0};
     for (int m = 0; m < M; ++m) {
@@ -116,15 +119,18 @@ void ColSBM::update_pi() {
       }
     }
 
-      mean_pi = mean_pi / arma::sum(mean_pi);
+    mean_pi = mean_pi / arma::sum(mean_pi);
 
     if (DEBUG_VE) {
       Rcpp::Rcout << "mean pi : " << mean_pi
                   << "and sum : " << arma::sum(mean_pi) << "\n";
     }
     for (int m = 0; m < M; ++m) {
-      pim[m] = mean_pi;
+      pi[m] = mean_pi;
     }
+  } else {
+    // If we are in a case of free mixture the pi = pim
+    pi = pim;
   }
 }
 
@@ -158,7 +164,7 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
 
   for (int it = 0; it < max_iter; ++it) {
     mat tau_new(tau_old.n_rows, tau_old.n_cols, arma::fill::zeros);
-    const mat log_pi = arma::repmat(log_clamped(pim[m]), tau_old.n_rows, 1);
+    const mat log_pi = arma::repmat(log_clamped(pi[m]), tau_old.n_rows, 1);
     const mat log_alpha = log_clamped(alpha * delta[m]);
     const mat logit_alpha =
         log_clamped(alpha * delta[m] / (1.0 - alpha * delta[m]));
@@ -197,7 +203,7 @@ double ColSBM::compute_network_vloss(int m) const {
   const mat &em = emqr.slice(m);
   const mat &nm = nmqr.slice(m);
   const double delta_m = delta[m];
-  const rowvec pi_m = pim[m];
+  const rowvec pi_m = pi[m];
 
   double obj = 0.0;
   double dircoef = directed ? 1 : 0.5;
@@ -233,7 +239,7 @@ void ColSBM::step() {
 
 // A function to loop over all networks and store the vbound
 void ColSBM::compute_vbound(bool store_vloss = false) {
-  double current_vbound=0.0;
+  double current_vbound = 0.0;
   for (int m = 0; m < M; ++m) {
     double vloss_m = compute_network_vloss(m);
     if (DEBUG_VE) {
@@ -259,36 +265,38 @@ void ColSBM::compute_vbound(bool store_vloss = false) {
 }
 
 void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
-  if (DEBUG_VE) {
-    Rcpp::Rcout << "Taus are\n" << tau[1] << "\n";
-  }
-
-  // M step
-  update_pi();
-  update_alpha();
-
-  // Compute the first vbound
-  double prev_vbound = vbound.back();
-
-  // max_step - 1 to account for the first M step after provided taus
-  for (int it = 0; it < max_step-1; ++it) {
-    if (DEBUG_VE) {
-      Rcpp::Rcout << "Iteration " << it << "\n";
+  if (Q == 1) {
+    // In this case we only need to return the computed parameters at this step
+    // and fix the tau parameters
+    for (int m = 0; m < M; ++m) {
+      tau[m] = arma::ones(A[m].n_rows, 1);
     }
+    update_alpha();
+  } else {
+    // Compute the first vbound
+    double prev_vbound = vbound.back();
 
-    // Make VE and M step
-    step();
+    // max_step - 1 to account for the first M step after provided taus
+    for (int it = 0; it < max_step - 1; ++it) {
+      if (DEBUG_VE) {
+        Rcpp::Rcout << "Iteration " << it << "\n";
+      }
 
-    // Update the vbound after step
-    prev_vbound = vbound.back();
-    compute_vbound(true);
-    ++iterations;
-    if (std::abs(vbound.back() - prev_vbound) < tol) {
-      break;
+      // Make VE and M step
+      step();
+
+      // Update the vbound after step
+      prev_vbound = vbound.back();
+      compute_vbound(true);
+      ++iterations;
+      if (std::abs(vbound.back() - prev_vbound) < tol) {
+        break;
+      }
     }
-  }
-  if (iterations > max_step) {
-    Rcpp::warning("The VEM failed to converge in %i max steps for Q=%i !", max_step, Q);
+    if (iterations > max_step) {
+      Rcpp::warning("The VEM failed to converge in %i max steps for Q=%i !",
+                    max_step, Q);
+    }
   }
 }
 
