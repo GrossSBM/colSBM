@@ -1188,57 +1188,61 @@ fitSimpleSBMPop <- R6::R6Class(
       } else {
         #  browser()
         self$init_clust()
-        # lapply(seq(self$M), function(m) self$update_mqr(m))
-        self$m_step(...)
-        lapply(seq(self$M), function(m) self$update_pim(m, map = FALSE))
-        if (self$free_mixture) {
-          self$pi <- self$pim
+        if (self$fit_opts$use_cpp) {
+          self$cpp_computation()
         } else {
-          self$update_pi(1, map = FALSE)
-        }
-        step <- 0
-        vb <- self$compute_vbound()
-        self$vbound <- vb
-        step_condition <- TRUE
-        while (step_condition) {
-          if (!self$fit_opts$minibatch) {
-            lapply(
-              seq(self$M),
-              function(m) {
-                switch(self$fit_opts$algo_ve,
-                  "fp" = self$fixed_point_tau(m),
-                  self$ve_step(m, ...)
-                )
-                self$update_mqr(m)
-              }
-            )
-            lapply(seq_along(self$pi), function(m) self$update_pi(m, map = FALSE))
-            self$m_step(...)
+          # lapply(seq(self$M), function(m) self$update_mqr(m))
+          self$m_step(...)
+          lapply(seq(self$M), function(m) self$update_pim(m, map = FALSE))
+          if (self$free_mixture) {
+            self$pi <- self$pim
           } else {
-            seq_m <- sample.int(self$M)
-            lapply(
-              seq(self$M),
-              function(m) {
-                switch(self$fit_opts$algo_ve,
-                  "fp" = self$fixed_point_tau(seq_m[m]),
-                  self$ve_step(seq_m[m], ...)
-                )
-                self$update_mqr(seq_m[m])
-                self$update_pi(seq_m[m], map = FALSE)
-                self$m_step(...)
-              }
-            )
+            self$update_pi(1, map = FALSE)
           }
+          step <- 0
           vb <- self$compute_vbound()
-          self$vbound <- c(self$vbound, vb)
-          step <- step + 1
-          step_condition <- step < max_step &
-            self$vbound[length(self$vbound)] -
-              self$vbound[length(self$vbound) - 1] > tol
-          if (step %% 5 == 0) {
-            if (self$fit_opts$verbosity >= 1) {
-              print(paste0(step, ": ", vb))
-              print(self$alpha)
+          self$vbound <- vb
+          step_condition <- TRUE
+          while (step_condition) {
+            if (!self$fit_opts$minibatch) {
+              lapply(
+                seq(self$M),
+                function(m) {
+                  switch(self$fit_opts$algo_ve,
+                    "fp" = self$fixed_point_tau(m),
+                    self$ve_step(m, ...)
+                  )
+                  self$update_mqr(m)
+                }
+              )
+              lapply(seq_along(self$pi), function(m) self$update_pi(m, map = FALSE))
+              self$m_step(...)
+            } else {
+              seq_m <- sample.int(self$M)
+              lapply(
+                seq(self$M),
+                function(m) {
+                  switch(self$fit_opts$algo_ve,
+                    "fp" = self$fixed_point_tau(seq_m[m]),
+                    self$ve_step(seq_m[m], ...)
+                  )
+                  self$update_mqr(seq_m[m])
+                  self$update_pi(seq_m[m], map = FALSE)
+                  self$m_step(...)
+                }
+              )
+            }
+            vb <- self$compute_vbound()
+            self$vbound <- c(self$vbound, vb)
+            step <- step + 1
+            step_condition <- step < max_step &
+              self$vbound[length(self$vbound)] -
+                self$vbound[length(self$vbound) - 1] > tol
+            if (step %% 5 == 0) {
+              if (self$fit_opts$verbosity >= 1) {
+                print(paste0(step, ": ", vb))
+                print(self$alpha)
+              }
             }
           }
         }
@@ -1291,6 +1295,34 @@ fitSimpleSBMPop <- R6::R6Class(
         self$update_alpha()
         self$update_alpha(map = TRUE)
       }
+    },
+    cpp_computation = function(max_step = self$fit_opts$max_step, tol = 1e-3) {
+      if (self$fit_opts$verbosity > 2) {
+        cat("Creating C++ object\n")
+      }
+      ptr <- colsbm_create(
+        A = self$A, Q = self$Q, tau = self$tau,
+        directed = self$directed, distribution = self$distribution,
+        free_mixture = self$free_mixture,
+        free_density = self$free_density
+      )
+      if (self$fit_opts$verbosity > 2) {
+        cat("Starting C++ VEM\n")
+      }
+      colsbm_optimize(ptr, max_step = max_step, tol = tol)
+      if (self$fit_opts$verbosity > 2) {
+        cat("Finished C++ VEM, exporting back to R\n")
+      }
+      info <- colsbm_info(ptr)
+
+      self$alpha <- info[["alpha"]]
+      self$pim <- info[["pim"]]
+      self$pi <- info[["pi"]]
+      self$tau <- info[["tau"]]
+      self$emqr <- aperm(info[["emqr"]], c(3, 1, 2))
+      self$nmqr <- aperm(info[["nmqr"]], c(3, 1, 2))
+
+      # TODO Cpi still to implement
     },
     #' The message printed when one prints the object
     #' @param type The title above the message.

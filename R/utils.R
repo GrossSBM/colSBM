@@ -617,7 +617,8 @@ default_fit_opts_unipartite <- function() {
     algo_ve = "fp",
     approx_pois = FALSE,
     minibatch = TRUE,
-    verbosity = 0L
+    verbosity = 0L,
+    use_cpp = FALSE
   )
 }
 
