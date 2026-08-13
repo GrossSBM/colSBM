@@ -165,6 +165,7 @@ parameters}
     \item \href{#method-fitSimpleSBMPop-update_mqr}{\code{fitSimpleSBMPop$update_mqr()}}
     \item \href{#method-fitSimpleSBMPop-optimize}{\code{fitSimpleSBMPop$optimize()}}
     \item \href{#method-fitSimpleSBMPop-reorder_parameters}{\code{fitSimpleSBMPop$reorder_parameters()}}
+    \item \href{#method-fitSimpleSBMPop-cpp_computation}{\code{fitSimpleSBMPop$cpp_computation()}}
     \item \href{#method-fitSimpleSBMPop-show}{\code{fitSimpleSBMPop$show()}}
     \item \href{#method-fitSimpleSBMPop-print}{\code{fitSimpleSBMPop$print()}}
     \item \href{#method-fitSimpleSBMPop-clone}{\code{fitSimpleSBMPop$clone()}}
@@ -850,6 +851,17 @@ The message printed when one prints the object
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{fitSimpleSBMPop$reorder_parameters()}
+    \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitSimpleSBMPop-cpp_computation"></a>}}
+\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-cpp_computation}{}}}
+\subsection{\code{fitSimpleSBMPop$cpp_computation()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$cpp_computation(max_step = self$fit_opts$max_step, tol = 0.001)}
     \if{html}{\out{</div>}}
   }
 }
