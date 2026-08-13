@@ -31,6 +31,7 @@ public:
   cube emqr;
   cube nmqr;
   mat alpha;
+  std::vector<mat> alpham;
   std::vector<double> delta;
   Rcpp::List vloss;
   // TODO USE Will be used later to implement free mixture computation

@@ -57,6 +57,11 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   out["emqr"] = ptr->emqr;
   out["nmqr"] = ptr->nmqr;
   out["alpha"] = ptr->alpha;
+  List alpham_out(ptr->alpham.size());
+  for (std::size_t i = 0; i < ptr->alpham.size(); ++i) {
+    alpham_out[i] = wrap(ptr->alpham[i]);
+  }
+  out["alpham"] = alpham_out;
   out["delta"] = ptr->delta;
   out["pim"] = ptr->pim;
   out["pi"] = ptr->pi;

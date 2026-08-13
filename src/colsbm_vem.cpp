@@ -23,6 +23,7 @@ void ColSBM::initialize_state() {
   nmqr.clear();
   delta.clear();
   logfactA.clear();
+  alpham.clear();
 
   // Checking if distribution is implemented
   check_emission_distribution_unipartite(distribution);
@@ -37,6 +38,10 @@ void ColSBM::initialize_state() {
 
     // And we set the NA in A to a value to allow computations
     A[m].elem(find_nonfinite(A[m])).fill(NA_REPLACE_VALUE);
+
+    // Initialize alpham
+    mat alpha_m(Q, Q, arma::fill::value(1.0 / static_cast<double>(Q)));
+    alpham.push_back(alpha_m);
 
     // Equiprobability for pis
     rowvec pi_m(Q, arma::fill::value(1.0 / static_cast<double>(Q)));
@@ -140,8 +145,15 @@ void ColSBM::update_alpha() {
                 << " | sum(NMQR) = " << arma::sum(nmqr, 2) << "\n";
   }
   if (distribution == "bernoulli") {
+    for (int m = 0; m < M; ++m) {
+      alpham[m] = clamp_matrix(emqr.slice(m) / nmqr.slice(m), TOL, 1.0);
+    }
     alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
   } else {
+    for (int m = 0; m < M; ++m) {
+      alpham[m] =
+          clamp_matrix(emqr.slice(m) / nmqr.slice(m), TOL, arma::datum::inf);
+    }
     alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL,
                          arma::datum::inf);
   }
