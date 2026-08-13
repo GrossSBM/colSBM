@@ -1252,6 +1252,7 @@ fitSimpleSBMPop <- R6::R6Class(
         } else {
           self$update_pi(1, map = TRUE)
         }
+        self$reorder_parameters()
         #  self$compute_parameters()
         #    self$compute_icl()
       }
@@ -1272,8 +1273,23 @@ fitSimpleSBMPop <- R6::R6Class(
           ord_m <- order(diag(self$alpham[[m]]), decreasing = TRUE)
           self$Z[[m]] <- Z_label_switch(self$Z[[m]], ord_m)
           self$tau[[m]] <- self$tau[[m]][, ord_m]
-          self$pim[[m]][ord_m]
+          self$Cpi[, m] <- self$Cpi[ord_m, m, drop = FALSE]
+          self$pim[[m]] <- self$pim[[m]][ord_m]
+          self$pi[[m]] <- self$pi[[m]][ord_m]
+          self$emqr[m, , ] <- self$emqr[m, ord_m, ord_m]
+          self$nmqr[m, , ] <- self$nmqr[m, ord_m, ord_m]
+          self$alpham[[m]] <- matrix(self$alpham[[m]][ord_m, ord_m, drop = FALSE], nrow = self$Q, ncol = self$Q)
+
+          # MAP
+          self$map$Z[[m]] <- self$map$Z[[m]][, ord_m]
+          self$map$pim[[m]] <- self$map$pim[[m]][ord_m]
+          self$map$pi[[m]] <- self$map$pi[[m]][ord_m]
+          self$map$emqr[m, , ] <- self$map$emqr[m, ord_m, ord_m]
+          self$map$nmqr[m, , ] <- self$map$nmqr[m, ord_m, ord_m]
+          self$map$alpham[[m]] <- matrix(self$map$alpham[[m]][ord_m, ord_m, drop = FALSE], nrow = self$Q, ncol = self$Q)
         })
+        self$update_alpha()
+        self$update_alpha(map = TRUE)
       }
     },
     #' The message printed when one prints the object
