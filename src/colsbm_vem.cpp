@@ -71,6 +71,9 @@ void ColSBM::initialize_state() {
   update_alpha();
 
   update_pi();
+  reorder_parameters();
+  update_alpha();
+
   compute_vbound(true);
   iterations = 1;
 }
@@ -209,6 +212,62 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
   return tau[m];
 }
 
+void ColSBM::reorder_parameters() {
+  uvec ord_m;
+  for (int m = 0; m < M; ++m) {
+    ord_m = arma::sort_index(alpham[m].diag(), "descend");
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "Reordering network " << m << " order is ";
+      ord_m.print(Rcpp::Rcout);
+      Rcpp::Rcout << "\n";
+    }
+
+    // Sorting all related objects
+
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "Tau will be\n";
+      tau[m].cols(ord_m).brief_print(Rcpp::Rcout);
+      Rcpp::Rcout << "\n";
+    }
+
+    tau[m] = tau[m].cols(ord_m);
+
+    // Retrieving slice m as a matrix
+    mat emqr_m = emqr.slice(m);
+    emqr_m = emqr_m.rows(ord_m);
+    emqr_m = emqr_m.cols(ord_m);
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "emqr will be\n";
+      emqr_m.brief_print(Rcpp::Rcout);
+      Rcpp::Rcout << "\n";
+    }
+    // Restoring the slice from the permutated matrix
+    emqr.slice(m) = emqr_m;
+
+    // Retrieving slice m as a matrix
+    mat nmqr_m = nmqr.slice(m);
+    nmqr_m = nmqr_m.rows(ord_m);
+    nmqr_m = nmqr_m.cols(ord_m);
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "nmqr will be\n";
+      nmqr_m.brief_print(Rcpp::Rcout);
+      Rcpp::Rcout << "\n";
+    }
+    // Restoring the slice from the permutated matrix
+    nmqr.slice(m) = nmqr_m;
+
+    if (DEBUG_VE) {
+      Rcpp::Rcout << "pi is\n";
+      pim[m].brief_print(Rcpp::Rcout);
+      Rcpp::Rcout << "pi will be\n";
+      pim[m](ord_m).t().brief_print(Rcpp::Rcout);
+      Rcpp::Rcout << "\n";
+    }
+    // Turning back pim to rowvec
+    pim[m] = pim[m](ord_m).t();
+  }
+}
+
 double ColSBM::compute_network_vloss(int m) const {
 
   const mat &tau_m = tau[m];
@@ -244,6 +303,23 @@ void ColSBM::step() {
     fixed_point_tau(m, 1, TOL);
   }
   compute_aggregates();
+  if (DEBUG_VE) {
+    Rcpp::Rcout << "Before reordering\n";
+    for (int m = 0; m < M; ++m) {
+      tau[m].brief_print(Rcpp::Rcout);
+      alpham[m].brief_print(Rcpp::Rcout);
+      pim[m].brief_print(Rcpp::Rcout);
+    }
+  }
+  reorder_parameters();
+  if (DEBUG_VE) {
+    Rcpp::Rcout << "After reordering\n";
+    for (int m = 0; m < M; ++m) {
+      tau[m].brief_print(Rcpp::Rcout);
+      alpham[m].brief_print(Rcpp::Rcout);
+      pim[m].brief_print(Rcpp::Rcout);
+    }
+  }
   // M step
   update_pi();
   update_alpha();

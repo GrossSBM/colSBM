@@ -47,6 +47,7 @@ public:
 
   void initialize_state();
   void compute_aggregates();
+  void reorder_parameters();
   void compute_vbound(bool store_vloss);
   void update_pi();
   void update_alpha();
