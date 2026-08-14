@@ -377,6 +377,11 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
       prev_vbound = vbound.back();
       compute_vbound(true);
       ++iterations;
+      if (DEBUG_LOOP) {
+        Rcpp::Rcout << "Iteration " << iterations
+                    << " |Delta vb| = " << std::abs(vbound.back() - prev_vbound)
+                    << " | tol = " << tol << "\n";
+      }
       if (std::abs(vbound.back() - prev_vbound) < tol) {
         break;
       }
