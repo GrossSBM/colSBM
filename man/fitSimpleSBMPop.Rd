@@ -193,7 +193,7 @@ parameters}
   Cpi = NULL,
   Calpha = NULL,
   logfactA = NULL,
-  fit_opts = list(algo_ve = "fp", approx_pois = FALSE, minibatch = TRUE, verbosity = 1)
+  fit_opts = list()
 )}
     \if{html}{\out{</div>}}
   }
@@ -825,7 +825,11 @@ Perform the whole initialization and VEM algorithm}
 \subsection{\code{fitSimpleSBMPop$optimize()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$optimize(max_step = self$fit_opts$max_step, tol = 0.001, ...)}
+    \preformatted{fitSimpleSBMPop$optimize(
+  max_step = self$fit_opts$max_vem_steps,
+  tol = self$fit_opts$tolerance,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -861,7 +865,10 @@ The message printed when one prints the object
 \subsection{\code{fitSimpleSBMPop$cpp_computation()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$cpp_computation(max_step = self$fit_opts$max_step, tol = 0.001)}
+    \preformatted{fitSimpleSBMPop$cpp_computation(
+  max_step = self$fit_opts$max_vem_steps,
+  tol = self$fit_opts$tolerance
+)}
     \if{html}{\out{</div>}}
   }
 }

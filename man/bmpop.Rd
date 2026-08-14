@@ -122,7 +122,7 @@ details of the user function for more information.}
   }
   \subsection{Returns}{
     A new 'sbmpop' object.
-Fit a list of SBM if fit_sbm == TRUE
+Fit a list of SBM if self$global_opts$sbm_init == TRUE
   }
 }
 
