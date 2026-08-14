@@ -17,3 +17,13 @@ colsbm_info <- function(ptr) {
     .Call('_colSBM_colsbm_info', PACKAGE = 'colSBM', ptr)
 }
 
+#' Reimplementation of quadratic form in C++
+#'
+#' @param x the quadratic form
+#' @param y the matrix on which x is applied
+#'
+#' @return t(x)%*% y %*% x, but faster I hope
+tquadform_cpp <- function(x, y) {
+    .Call('_colSBM_tquadform_cpp', PACKAGE = 'colSBM', x, y)
+}
+

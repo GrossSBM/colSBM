@@ -597,12 +597,12 @@ default_global_opts_unipartite <- function(netlist) {
   list(
     Q_min = 1L,
     Q_max = floor(log(sum(n))) + 2,
-    sbm_init = TRUE,
+    sbm_init = FALSE,
     spectral_init = TRUE,
     nb_init = 10L,
     nb_models = 5L,
     depth = 3L,
-    backend = "future",
+    backend = "no_mc",
     plot_details = 1L,
     max_pass = 10L,
     verbosity = 0L,
@@ -618,7 +618,9 @@ default_fit_opts_unipartite <- function() {
     approx_pois = FALSE,
     minibatch = TRUE,
     verbosity = 0L,
-    use_cpp = FALSE
+    use_cpp = FALSE,
+    tolerance = 1e-3,
+    max_vem_steps = 1000L
   )
 }
 
@@ -632,7 +634,7 @@ default_global_opts_bipartite <- function(netlist) {
     Q2_max = floor(log(sum(sapply(netlist, function(A) ncol(A)))) + 2),
     nb_init = 10L,
     nb_models = 5L,
-    backend = "future",
+    backend = "no_mc",
     depth = 1L,
     plot_details = 1L,
     max_pass = 10L,
@@ -754,7 +756,8 @@ Z_label_switch <- function(Z, new_order) {
   ifelse(x < 2 * .Machine$double.eps, 0, x * .log(y, eps = eps))
 }
 .quadform <- function(x, y) tcrossprod(x %*% y, x)
-.tquadform <- function(x, y) crossprod(x, y %*% x)
+# .tquadform <- function(x, y) crossprod(x, y %*% x)
+.tquadform <- tquadform_cpp
 logistic <- function(x) 1 / (1 + exp(-x))
 logit <- function(x) log(x / (1 - x))
 .logit <- function(x, eps = NULL) {

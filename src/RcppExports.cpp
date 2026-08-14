@@ -62,12 +62,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tquadform_cpp
+arma::mat tquadform_cpp(mat& x, mat& y);
+RcppExport SEXP _colSBM_tquadform_cpp(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< mat& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(tquadform_cpp(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_colSBM_colsbm_create", (DL_FUNC) &_colSBM_colsbm_create, 7},
     {"_colSBM_colsbm_optimize", (DL_FUNC) &_colSBM_colsbm_optimize, 3},
     {"_colSBM_colsbm_vbound", (DL_FUNC) &_colSBM_colsbm_vbound, 1},
     {"_colSBM_colsbm_info", (DL_FUNC) &_colSBM_colsbm_info, 1},
+    {"_colSBM_tquadform_cpp", (DL_FUNC) &_colSBM_tquadform_cpp, 2},
     {NULL, NULL, 0}
 };
 
