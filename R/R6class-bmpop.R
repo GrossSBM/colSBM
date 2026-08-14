@@ -116,19 +116,7 @@ bmpop <- R6::R6Class(
       self$fit_sbm <- fit_sbm
       self$free_density <- free_density
       self$free_mixture <- free_mixture
-      self$global_opts <- list(
-        Q_min = 1L,
-        Q_max = floor(log(sum(self$n))) + 2,
-        sbm_init = TRUE,
-        spectral_init = TRUE,
-        nb_init = 10L,
-        nb_models = 5L,
-        depth = 3L,
-        plot_details = 1L,
-        max_pass = 10L,
-        verbosity = 0L,
-        nb_cores = 1L
-      )
+      self$global_opts <- default_global_opts_unipartite(netlist = netlist)
       self$global_opts <- utils::modifyList(self$global_opts, global_opts)
       self$vbound <- rep(-Inf, self$global_opts$Q_max)
       self$ICL <- rep(-Inf, self$global_opts$Q_max)
@@ -143,28 +131,20 @@ bmpop <- R6::R6Class(
         )
       }
       if (!is.null(self$fit_sbm)) self$global_opts$sbm_init <- FALSE
-      self$fit_opts <- list(
-        approx_pois = FALSE,
-        algo_ve = "fp",
-        minibatch = TRUE,
-        verbosity = 0
-      )
+      self$fit_opts <- default_fit_opts_unipartite()
       self$fit_opts <- utils::modifyList(self$fit_opts, fit_opts)
     },
 
-    #' Fit a list of SBM if fit_sbm == TRUE
+    #' Fit a list of SBM if self$global_opts$sbm_init == TRUE
     #'
     #' @return nothing; but stores the values
     optimize_sbm = function() {
       ## Need to change ICL computation for Z^map
       if (is.null(self$fit_sbm)) {
-        #  p <- progressr::progressor(along = self$A)
         self$fit_sbm <-
           colsbm_lapply(
-            #          bettermc::mclapply(
             X = seq_along(self$A),
             FUN = function(m) {
-              #     p(sprintf("m=%g", m))
               sbm::estimateSimpleSBM(
                 model = self$distribution,
                 netMat = as.matrix(self$A[[m]]),
@@ -175,7 +155,8 @@ bmpop <- R6::R6Class(
                 )
               )
             },
-            nb_cores = self$global_opts$nb_cores
+            nb_cores = self$global_opts$nb_cores,
+            backend = self$global_opts$backend
           )
       }
       self$ICL_sbm <- rep(-Inf, self$global_opts$Q_max)
@@ -200,8 +181,6 @@ bmpop <- R6::R6Class(
     #'
     #' @return bmpop object
     optimize_from_sbm = function(index, Q, nb_clusters) {
-      # browser()
-      # for (q in seq(self$global_opts$Q_min, self$global_opts$Q_max)) {
       lapply(seq_along(self$A), function(m) self$fit_sbm[[m]]$setModel(index = Q))
       Z_sbm <- lapply(
         seq_along(self$fit_sbm[index]),
@@ -231,61 +210,59 @@ bmpop <- R6::R6Class(
               init_method = "given",
               fit_opts = self$fit_opts
             )
+          } else if (it == 2) {
+            Z_init <- lapply(
+              seq_along(Z_sbm),
+              function(m) {
+                # ord contains Q probabilities and is
+                # deterministically ranked from the lowest to the highest
+                # intra-connection probability
+                ord <- order(prob[[m]])
+                # This returns the cluster membership (Z) in this order
+                # and this clustering is put in Z_init
+                ord[match(Z_sbm[[m]], unique(Z_sbm[[m]]))]
+              }
+            )
+            mypopbm <- fitSimpleSBMPop$new(
+              A = self$A[index],
+              mask = self$mask[index],
+              distribution = self$distribution,
+              net_id = self$net_id,
+              directed = self$directed,
+              free_density = self$free_density,
+              free_mixture = self$free_mixture,
+              Q = Q,
+              Z = Z_init,
+              logfactA = self$logfactA,
+              init_method = "given",
+              fit_opts = self$fit_opts
+            )
           } else {
-            if (it == 2) {
-              Z_init <- lapply(
-                seq_along(Z_sbm),
-                function(m) {
-                  # ord contains Q probabilities and is
-                  # deterministically ranked from the lowest to the highest
-                  # intra-connection probability
-                  ord <- order(prob[[m]])
-                  # This returns the cluster membership (Z) in this order
-                  # and this clustering is put in Z_init
-                  ord[match(Z_sbm[[m]], unique(Z_sbm[[m]]))]
-                }
-              )
-              mypopbm <- fitSimpleSBMPop$new(
-                A = self$A[index],
-                mask = self$mask[index],
-                distribution = self$distribution,
-                net_id = self$net_id,
-                directed = self$directed,
-                free_density = self$free_density,
-                free_mixture = self$free_mixture,
-                Q = Q,
-                Z = Z_init,
-                logfactA = self$logfactA,
-                init_method = "given",
-                fit_opts = self$fit_opts
-              )
-            } else {
-              Z_init <- lapply(
-                seq_along(Z_sbm),
-                function(m) {
-                  # Here the order is ranked by the highest to the lowest prob
-                  # but using a sampling (introducing randomness)
-                  ord <- sample(seq_along(prob[[m]]),
-                    size = length(prob[[m]]), prob = prob[[m]]
-                  )
-                  ord[match(Z_sbm[[m]], unique(Z_sbm[[m]]))]
-                }
-              )
-              mypopbm <- fitSimpleSBMPop$new(
-                A = self$A[index],
-                mask = self$mask[index],
-                distribution = self$distribution,
-                net_id = self$net_id,
-                directed = self$directed,
-                free_density = self$free_density,
-                free_mixture = self$free_mixture,
-                Q = Q,
-                Z = Z_init,
-                logfactA = self$logfactA,
-                init_method = "given",
-                fit_opts = self$fit_opts
-              )
-            }
+            Z_init <- lapply(
+              seq_along(Z_sbm),
+              function(m) {
+                # Here the order is ranked by the highest to the lowest prob
+                # but using a sampling (introducing randomness)
+                ord <- sample(seq_along(prob[[m]]),
+                  size = length(prob[[m]]), prob = prob[[m]]
+                )
+                ord[match(Z_sbm[[m]], unique(Z_sbm[[m]]))]
+              }
+            )
+            mypopbm <- fitSimpleSBMPop$new(
+              A = self$A[index],
+              mask = self$mask[index],
+              distribution = self$distribution,
+              net_id = self$net_id,
+              directed = self$directed,
+              free_density = self$free_density,
+              free_mixture = self$free_mixture,
+              Q = Q,
+              Z = Z_init,
+              logfactA = self$logfactA,
+              init_method = "given",
+              fit_opts = self$fit_opts
+            )
           }
           mypopbm$optimize()
           return(mypopbm)
@@ -384,9 +361,9 @@ bmpop <- R6::R6Class(
     #' @return nothing; but stores the values
     burn_in = function() {
       # browser()
-      if (self$global_opts$sbm_init | !is.null(self$fit_sbm)) {
+      if (self$global_opts$sbm_init || !is.null(self$fit_sbm)) {
         if (self$global_opts$verbosity >= 2) {
-          cat("Starting optimization of ", self$M, "SBMs")
+          cat("Starting optimization of ", self$M, "SBMs\n")
         }
         self$optimize_sbm()
       }
@@ -404,6 +381,8 @@ bmpop <- R6::R6Class(
           }
         )
       }
+
+      # For fitting from a given init
       if (!is.null(self$Z_init)) {
         if (self$global_opts$verbosity >= 2) {
           cat("Starting initialization from given clustering. \n")
@@ -437,8 +416,8 @@ bmpop <- R6::R6Class(
             self$BICL[Q] <- best_models[[1]]$BICL
             rm(models)
           },
-          nb_cores = self$global_opts$nb_cores # ,
-          # mc.share.copy = FALSE
+          nb_cores = self$global_opts$nb_cores,
+          backend = self$global_opts$backend
         )
         # voir pour l'init spectral.
       }
@@ -605,7 +584,8 @@ bmpop <- R6::R6Class(
                 }
               )
             },
-            nb_cores = self$global_opts$nb_cores
+            nb_cores = self$global_opts$nb_cores,
+            backend = self$global_opts$backend
           )
         list_popbm <- unlist(list_popbm)
         if (purrr::is_empty(list_popbm) & old_icl[Q] < old_icl[Q - 1]) { # a verifier et ou ou
@@ -793,7 +773,8 @@ bmpop <- R6::R6Class(
               }
               return(best_models)
             },
-            nb_cores = self$global_opts$nb_cores
+            nb_cores = self$global_opts$nb_cores,
+            backend = self$global_opts$backend
           )
         list_popbm <- unlist(list_popbm)
         if (purrr::is_empty(list_popbm)) {
@@ -1081,10 +1062,21 @@ bmpop <- R6::R6Class(
       # After having selected the best_models we plot their points
       # x being Q the number of clusters and y being their BICL
       if (self$global_opts$plot_details >= 1) {
-        points(
-          purrr::map_dbl(unlist(best_models), "Q"),
-          purrr::map_dbl(unlist(best_models), ~ .$BICL)
-        )
+        if (self$global_opts$sbm_init) {
+          points(
+            purrr::map_dbl(unlist(best_models), "Q"),
+            purrr::map_dbl(unlist(best_models), ~ .$BICL)
+          )
+        } else {
+          current_BICL <- purrr::map_dbl(unlist(best_models), ~ .$BICL)
+          plot(purrr::map_dbl(unlist(best_models), "Q"),
+            current_BICL,
+            col = "green", pch = 5,
+            xlab = "Q", ylab = "BICL",
+            xlim = c(self$global_opts$Q_min - 1, self$global_opts$Q_max + 1),
+            ylim = c(1.1 * max(current_BICL), .8 * max(current_BICL))
+          )
+        }
       }
       return(best_models)
     },

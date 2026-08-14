@@ -108,12 +108,9 @@ estimate_colSBM <-
       },
       stop("colsbm_model unknown. Must be one of iid, pi, delta or deltapi")
     )
-    if (is.null(global_opts$backend)) {
-      global_opts$backend <- "parallel"
-    }
-    if (is.null(global_opts$nb_cores)) {
-      global_opts$nb_cores <- 1L
-    }
+    go <- default_global_opts_unipartite(netlist)
+    global_opts <- utils::modifyList(x = go, val = global_opts)
+
     nb_cores <- global_opts$nb_cores
     if (is.null(global_opts$Q_max)) {
       Q_max <- floor(log(sum(sapply(netlist, function(A) nrow(A)))) + 2)
@@ -126,7 +123,7 @@ estimate_colSBM <-
       if (is.null(net_id)) {
         net_id <- seq_along(netlist)
       }
-      if (is.null(fit_sbm)) {
+      if (global_opts$sbm_init && is.null(fit_sbm)) {
         fit_sbm <-
           colsbm_lapply(
             # bettermc::mclapply(

@@ -147,12 +147,7 @@ fitSimpleSBMPop <- R6::R6Class(
                           Cpi = NULL,
                           Calpha = NULL,
                           logfactA = NULL,
-                          fit_opts = list(
-                            algo_ve = "fp",
-                            approx_pois = FALSE,
-                            minibatch = TRUE,
-                            verbosity = 1
-                          )) {
+                          fit_opts = list()) {
       if (is.null(directed)) {
         directed <- !isSymmetric.matrix(A[[1]])
       }
@@ -209,14 +204,7 @@ fitSimpleSBMPop <- R6::R6Class(
         }
       }
       lapply(seq_along(self$A), function(m) self$A[[m]][is.na(self$A[[m]])] <- -1)
-      self$fit_opts <- list(
-        algo_ve = "fp",
-        approx_pois = FALSE,
-        minibatch = TRUE,
-        verbosity = 1,
-        max_step = 100L,
-        nlopt_algo = "NLOPT_LD_MMA"
-      )
+      self$fit_opts <- default_fit_opts_unipartite()
       self$fit_opts <- modifyList(self$fit_opts, fit_opts)
       self$weight <- weight
       self$pi <- vector("list", self$M)
@@ -1151,7 +1139,7 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @param ... Other parameters
     #'
     #' @return nothing; stores values
-    optimize = function(max_step = self$fit_opts$max_step, tol = 1e-3, ...) {
+    optimize = function(max_step = self$fit_opts$max_vem_steps, tol = self$fit_opts$tolerance, ...) {
       if (self$Q == 1) {
         self$tau <- lapply(seq(self$M), function(m) matrix(1, self$n[m], 1))
         self$Z <- lapply(seq(self$M), function(m) rep(1, self$n[m]))
@@ -1189,7 +1177,7 @@ fitSimpleSBMPop <- R6::R6Class(
         #  browser()
         self$init_clust()
         if (self$fit_opts$use_cpp) {
-          self$cpp_computation()
+          self$cpp_computation(max_step = max_step, tol = tol)
         } else {
           # lapply(seq(self$M), function(m) self$update_mqr(m))
           self$m_step(...)
@@ -1296,9 +1284,9 @@ fitSimpleSBMPop <- R6::R6Class(
         self$update_alpha(map = TRUE)
       }
     },
-    cpp_computation = function(max_step = self$fit_opts$max_step, tol = 1e-3) {
-      if (self$fit_opts$verbosity > 2) {
-        cat("Creating C++ object\n")
+    cpp_computation = function(max_step = self$fit_opts$max_vem_steps, tol = self$fit_opts$tolerance) {
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Creating C++ object for Q=", self$Q, "\n")
       }
       ptr <- colsbm_create(
         A = self$A, Q = self$Q, tau = self$tau,
@@ -1306,21 +1294,25 @@ fitSimpleSBMPop <- R6::R6Class(
         free_mixture = self$free_mixture,
         free_density = self$free_density
       )
-      if (self$fit_opts$verbosity > 2) {
+      if (self$fit_opts$verbosity >= 2) {
         cat("Starting C++ VEM\n")
       }
       colsbm_optimize(ptr, max_step = max_step, tol = tol)
-      if (self$fit_opts$verbosity > 2) {
+      if (self$fit_opts$verbosity >= 2) {
         cat("Finished C++ VEM, exporting back to R\n")
       }
       info <- colsbm_info(ptr)
-
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Took ", info$iterations, " steps of VEM\n")
+      }
       self$alpha <- info[["alpha"]]
       self$pim <- info[["pim"]]
       self$pi <- info[["pi"]]
       self$tau <- info[["tau"]]
       self$emqr <- aperm(info[["emqr"]], c(3, 1, 2))
       self$nmqr <- aperm(info[["nmqr"]], c(3, 1, 2))
+      self$vbound <- info$vbound
+      self$vloss <- info$vloss
 
       # TODO Cpi still to implement
     },
