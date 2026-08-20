@@ -321,7 +321,7 @@ generate_bipartite_collection <- function(
 #' @keywords internal
 #'
 #' @return A vector : The clusters labels
-spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 50L) {
+spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 100L) {
   X <- as.matrix(X)
   n <- nrow(X)
   if (K == 1) {
