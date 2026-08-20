@@ -173,6 +173,25 @@ check_unipartite_colsbm_models <- function(
     error_arg = arg,
     error_call = call
   )
+  switch(colsbm_model,
+    "iid" = {
+      free_density <- FALSE
+      free_mixture <- FALSE
+    },
+    "pi" = {
+      free_density <- FALSE
+      free_mixture <- TRUE
+    },
+    "delta" = {
+      free_density <- TRUE
+      free_mixture <- FALSE
+    },
+    "deltapi" = {
+      free_density <- TRUE
+      free_mixture <- TRUE
+    }
+  )
+  return(list(free_mixture = free_mixture, free_density = free_density))
 }
 
 #' Check colSBM emission distribution
