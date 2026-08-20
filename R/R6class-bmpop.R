@@ -457,7 +457,7 @@ bmpop <- R6::R6Class(
       counter <- 0
       #      nb_pass <- 0
       Q <- Q_min + 1
-      while (Q <= Q_max & counter < self$global_opts$depth) {
+      while (Q <= Q_max && counter < self$global_opts$depth) {
         if (is.null(self$model_list[[1]][[Q - 1]])) {
           list_popbm <- self$optimize_spectral(index, Q - 1, 1L)
           if (!is.null(self$fit_sbm[[Q - 1]])) {
