@@ -749,6 +749,17 @@ Z_label_switch <- function(Z, new_order) {
   return(switched_labels)
 }
 
+say <- function(message, level = 0, cli_command = cli::cli_alert_info, .envir = parent.frame()) {
+  # Utilise cli::cli_alert pour un formattage élégant
+  if (level > 0) {
+    # Crée une indentation avec des espaces
+    indent <- paste(rep("  ", level), collapse = "")
+    cli_command("{indent}{message}")
+  } else {
+    cli_command(message)
+  }
+}
+
 .xlogx <- function(x) {
   ifelse(x < 2 * .Machine$double.eps, 0, x * log(x))
 }
