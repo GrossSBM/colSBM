@@ -125,7 +125,7 @@ cpp_estimate_colSBM <-
       if (verbose) {
         message("Initialising spectral clustering")
       }
-      spectral_inits <- lapply(netlist, spectral_clustering, K = 2)
+      spectral_inits <- lapply(netlist, spectral_clustering, K = 2) |> futurize::futurize(seed = TRUE)
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
       spectral_taus <- lapply(spectral_taus, function(mat) {
         mat[mat < 1e-6] <- 1e-6
@@ -259,7 +259,7 @@ cpp_forward <-
     }
 
     # Compute splits from the initial model
-    next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start)))
+    next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start)) |> futurize::futurize(seed = TRUE))
     model_list <- list(start_model)
     for (Q in seq(3, Q_max)) {
       if (verbose) {
@@ -282,7 +282,7 @@ cpp_forward <-
         )
         tmp_fit$optimize()
         tmp_fit
-      })
+      }) |> futurize::futurize(seed = TRUE)
       best_model_idx <- which.max(sapply(models, function(model) model[["BICL"]]))
       if (verbose) {
         message("Best splitted model index is ", best_model_idx, " with BICL = ", models[[best_model_idx]][["BICL"]])
@@ -329,7 +329,7 @@ cpp_backward <-
       }
 
       # Compute merges using merge_clust function
-      Z_merges <- purrr::transpose(lapply(seq(M), function(m) merge_clust(Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)))
+      Z_merges <- purrr::transpose(lapply(seq(M), function(m) merge_clust(Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)) |> futurize::futurize(seed = TRUE))
 
       # Fit models for each merge
       merged_models <- lapply(seq_along(Z_merges), function(merge_idx) {
@@ -352,7 +352,7 @@ cpp_backward <-
         # Optimize the model
         tmp_fit$optimize()
         tmp_fit
-      })
+      }) |> futurize::futurize(seed = TRUE)
 
       # Select the best model among the merged ones
       best_model_idx <- which.max(sapply(merged_models, function(model) model[["BICL"]]))
