@@ -214,8 +214,26 @@ cpp_estimate_colSBM <-
       }
     }
 
+    mybmpop <- bmpop$new(
+      netlist = netlist,
+      net_id = net_id,
+      directed = directed,
+      distribution = distribution,
+      free_density = free_density,
+      free_mixture = free_mixture,
+      fit_sbm = fit_sbm,
+      global_opts = global_opts,
+      Z_init = Z_init,
+      fit_opts = fit_opts
+    )
 
-    return(model_list)
+    mybmpop[["model_list"]] <- model_list
+    mybmpop[["BICL"]] <- vapply(model_list, function(mod) mod[["BICL"]], numeric(1))
+    mybmpop[["vbound"]] <- vapply(model_list, function(mod) tail(mod[["vbound"]], 1), numeric(1))
+    mybmpop[["ICL"]] <- vapply(model_list, function(mod) tail(mod[["ICL"]], 1), numeric(1))
+    mybmpop[["best_fit"]] <- model_list[[which.max(mybmpop[["BICL"]])]]
+
+    return(list(model_list, mybmpop))
   }
 
 #' Forward phase estimation for colSBM
@@ -402,7 +420,7 @@ compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
     }
     if (verbose) {
       print_bicl <- merged[[i]][["BICL"]]
-      message("Best model for Q=", k," has BICL = ",print_bicl)
+      message("Best model for Q=", k, " has BICL = ", print_bicl)
       # say(message = "Best model for Q={.val {k}} has BICL = {.val {print_bicl}}")
     }
   }
