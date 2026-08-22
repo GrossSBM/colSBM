@@ -183,27 +183,24 @@ cpp_estimate_colSBM <-
       # Pass the initial model to cpp_forward which will compute the splits
       splitted_model_list <- cpp_forward(start_model, netlist, Q_start = 2L, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = verbose, current_model_list = model_list)
 
-      if (max(sapply(splitted_model_list, function(mod) mod$BICL)) > best_bicl) {
+      model_list <- compare_model_lists(model_list, splitted_model_list)
+
+      if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
         if (verbose) {
           say("BICL criterion increased in forward phase, going for backward")
         }
-        best_bicl <- max(sapply(splitted_model_list, function(mod) mod$BICL))
+        best_bicl <- max(sapply(model_list, function(mod) mod$BICL))
       } else {
         if (verbose) {
           say("BICL criterion did not increase in forward phase, stopping optimization.")
         }
         break
       }
-      if (length(model_list) == length(splitted_model_list)) {
-        print(length(model_list))
-        model_list <- compare_model_lists(model_list, splitted_model_list)
-        print(length(model_list))
-      } else {
-        model_list <- splitted_model_list
-      }
 
-      model_list <- cpp_backward(model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose)
 
+      merged_model_list <- cpp_backward(model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose)
+
+      model_list <- compare_model_lists(model_list, merged_model_list)
       if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
         if (verbose) {
           say("BICL criterion increased in backward phase, going for forward")
@@ -216,7 +213,7 @@ cpp_estimate_colSBM <-
         break
       }
     }
-    model_list <- compare_model_lists(model_list, splitted_model_list)
+
 
     return(model_list)
   }
@@ -353,17 +350,72 @@ cpp_backward <-
     return(backward_model_list)
   }
 
-compare_model_lists <- function(model_list1, model_list2) {
-  bicl_1 <- sapply(model_list1, function(mod) mod[["BICL"]])
-  bicl_2 <- sapply(model_list1, function(mod) mod[["BICL"]])
-
-  idx_max_bicl <- ifelse(bicl_1 >= bicl_2, 1, 2)
-
-  model_list_merged <- lapply(seq_along(idx_max_bicl), function(list_idx) {
-    if (idx_max_bicl[list_idx] == 1) {
-      return(model_list1[[list_idx]])
+#' Compare two list of models to merge them by the best BICL
+#'
+#' @param model_list1 a list of fit...SBM with a BICL attribute
+#' @param model_list2 a second list of fit...SBM with a BICL
+#' attribute
+#' @param verbose a boolean that controls if the function print
+#' messages. Default to TRUE
+#'
+#' @return a list of fit...SBM merged by selecting the best BICL
+#' for each model size Q provided
+compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
+  # --- Normalise each list: keep the best model per Q ---------------------
+  # A list may hold several models fitted at the same Q (e.g. from different
+  # splits/merges). Only the best BICL per Q matters for the comparison, so
+  # we collapse each list to one model per Q first.
+  best_per_Q <- function(model_list) {
+    if (length(model_list) == 0L) {
+      return(list())
     }
-    return(model_list2[[list_idx]])
-  })
-  return(model_list_merged)
+    Qs <- vapply(model_list, function(mod) mod[["Q"]], numeric(1))
+    BICLs <- vapply(model_list, function(mod) mod[["BICL"]], numeric(1))
+    # For each Q, keep the index of the model with the highest BICL.
+    # In case of a tie, the first occurrence wins (stable order).
+    best_idx <- tapply(seq_along(Qs), Qs, function(idx) idx[which.max(BICLs[idx])])
+    model_list[best_idx]
+  }
+
+  list1 <- best_per_Q(model_list1)
+  list2 <- best_per_Q(model_list2)
+
+  Q1 <- vapply(list1, function(mod) mod[["Q"]], numeric(1))
+  Q2 <- vapply(list2, function(mod) mod[["Q"]], numeric(1))
+
+  # --- Align by Q value (robust to list order) ----------------------------
+  common_Q <- intersect(Q1, Q2)
+  only1_Q <- setdiff(Q1, Q2)
+  only2_Q <- setdiff(Q2, Q1)
+
+  # --- Compare BICL on the common Qs --------------------------------------
+  merged <- vector("list", length(common_Q))
+  for (i in seq_along(common_Q)) {
+    k <- common_Q[i]
+    mod1 <- list1[[match(k, Q1)]]
+    mod2 <- list2[[match(k, Q2)]]
+    # In case of a tie, keep the first list (mod1)
+    if (mod1[["BICL"]] >= mod2[["BICL"]]) {
+      merged[[i]] <- mod1
+    } else {
+      merged[[i]] <- mod2
+    }
+    if (verbose) {
+      print_bicl <- merged[[i]][["BICL"]]
+      message("Best model for Q=", k," has BICL = ",print_bicl)
+      # say(message = "Best model for Q={.val {k}} has BICL = {.val {print_bicl}}")
+    }
+  }
+
+  # --- Re-add the non-aligned models --------------------------------------
+  if (length(only1_Q) > 0L) {
+    merged <- c(merged, list1[match(only1_Q, Q1)])
+  }
+  if (length(only2_Q) > 0L) {
+    merged <- c(merged, list2[match(only2_Q, Q2)])
+  }
+
+  # --- Sort by Q ascending ------------------------------------------------
+  merged_Q <- vapply(merged, function(mod) mod[["Q"]], numeric(1))
+  merged[order(merged_Q)]
 }
