@@ -556,8 +556,8 @@ fitSimpleSBMPop <- R6::R6Class(
     #' Computes the BICL criterion
     #' @param map Wether to use the MAP parameters or not, a boolean, defaults
     #' to FALSE.
-    #' @return The ICL for the model.
-    compute_BICL = function(map = TRUE) {
+    #' @return The BICL for the model.
+    compute_BICL = function(map = TRUE, ...) {
       # browser()
       #    Z_unique <- lapply(self$Z, function(Z) sort(unique(Z)))
       #    uz <- unique(Z_unique)
