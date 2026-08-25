@@ -118,12 +118,12 @@ cpp_estimate_colSBM <-
     # Otherwise, create the initial model with spectral clustering
     if (!is.null(fit_init)) {
       if (verbose) {
-        message("Using provided init for the model at Q=2")
+        say("Using provided init for the model at Q=2")
       }
       start_model <- fit_init
     } else {
       if (verbose) {
-        message("Initialising spectral clustering")
+        say("Initialising spectral clustering")
       }
       spectral_inits <- lapply(netlist, spectral_clustering, K = 2) |> futurize::futurize(seed = TRUE)
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
@@ -133,7 +133,7 @@ cpp_estimate_colSBM <-
         mat / rowSums(mat)
       })
       if (verbose) {
-        message("Fitting the model at Q=2")
+        say("Fitting the model at Q=2")
       }
       start_model <- fitSimpleSBMPop$new(
         A = netlist,
@@ -152,7 +152,7 @@ cpp_estimate_colSBM <-
 
       start_model$optimize()
       if (verbose) {
-        message("Model fitted !")
+        say("Model fitted !")
       }
     }
 
@@ -183,7 +183,11 @@ cpp_estimate_colSBM <-
       # Pass the initial model to cpp_forward which will compute the splits
       splitted_model_list <- cpp_forward(start_model, netlist, Q_start = 2L, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = verbose, current_model_list = model_list)
 
-      model_list <- compare_model_lists(model_list, splitted_model_list)
+      model_list <- compare_model_lists(
+        model_list1 = model_list,
+        model_list2 = splitted_model_list,
+        verbose = verbose
+      )
 
       if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
         if (verbose) {
@@ -200,7 +204,11 @@ cpp_estimate_colSBM <-
 
       merged_model_list <- cpp_backward(model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose)
 
-      model_list <- compare_model_lists(model_list, merged_model_list)
+      model_list <- compare_model_lists(
+        model_list1 = model_list,
+        model_list2 = merged_model_list,
+        verbose = verbose
+      )
       if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
         if (verbose) {
           say("BICL criterion increased in backward phase, going for forward")
@@ -233,7 +241,7 @@ cpp_estimate_colSBM <-
     mybmpop[["ICL"]] <- vapply(model_list, function(mod) tail(mod[["ICL"]], 1), numeric(1))
     mybmpop[["best_fit"]] <- model_list[[which.max(mybmpop[["BICL"]])]]
 
-    return(list(model_list, mybmpop))
+    return(mybmpop)
   }
 
 #' Forward phase estimation for colSBM
@@ -254,8 +262,7 @@ cpp_forward <-
     M <- length(netlist)
 
     if (verbose) {
-      if (!is.null(iteration)) {}
-      message("Computing splits for Q_start=", Q_start)
+      say("Computing splits for Q_start=", Q_start, level = 1L)
     }
 
     # Compute splits from the initial model
@@ -263,7 +270,7 @@ cpp_forward <-
     model_list <- list(start_model)
     for (Q in seq(3, Q_max)) {
       if (verbose) {
-        message("Fitting models at Q=", Q)
+        say("Fitting models at Q=", Q, level = 1L)
       }
       models <- lapply(seq_along(next_splits), function(split_idx) {
         tmp_fit <- fitSimpleSBMPop$new(
@@ -285,11 +292,15 @@ cpp_forward <-
       }) |> futurize::futurize(seed = TRUE)
       best_model_idx <- which.max(sapply(models, function(model) model[["BICL"]]))
       if (verbose) {
-        message("Best splitted model index is ", best_model_idx, " with BICL = ", models[[best_model_idx]][["BICL"]])
+        bicl <- models[[best_model_idx]][["BICL"]]
+        say(
+          "Best splitted model index is ", best_model_idx, " with BICL = ", bicl,
+          level = 1L
+        )
       }
       model_list <- append(model_list, models[[best_model_idx]])
       if (verbose) {
-        message("Computing next splits")
+        say("Computing next splits", level = 1L)
       }
       next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)))
     }
@@ -316,7 +327,10 @@ cpp_backward <-
     Q_max <- length(model_list)
 
     if (verbose) {
-      message("Starting backward phase from Q=", Q_max, " down to Q=", Q_min)
+      say(
+        "Starting backward phase from Q=", Q_max, " down to Q=", Q_min,
+        level = 1L
+      )
     }
 
     # Initialize the result list with the models from the forward phase
@@ -325,7 +339,7 @@ cpp_backward <-
     # Process from Q_max down to Q_min + 1
     for (Q in seq(Q_max, Q_min + 1, by = -1)) {
       if (verbose) {
-        message("Processing merges for Q=", Q)
+        say("Fitting merges for Q=", Q - 1, level = 1L)
       }
 
       # Compute merges using merge_clust function
@@ -358,7 +372,11 @@ cpp_backward <-
       best_model_idx <- which.max(sapply(merged_models, function(model) model[["BICL"]]))
 
       if (verbose) {
-        message("Best merged model index is ", best_model_idx, " with BICL = ", merged_models[[best_model_idx]][["BICL"]])
+        bicl <- merged_models[[best_model_idx]][["BICL"]]
+        say(
+          "Best merged model index is ", best_model_idx, " with BICL = ", bicl,
+          level = 1L
+        )
       }
 
       # Add the best merged model to the backward list
@@ -420,8 +438,10 @@ compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
     }
     if (verbose) {
       print_bicl <- merged[[i]][["BICL"]]
-      message("Best model for Q=", k, " has BICL = ", print_bicl)
-      # say(message = "Best model for Q={.val {k}} has BICL = {.val {print_bicl}}")
+      say(
+        "Best model for Q=", k, " has BICL = ", print_bicl,
+        level = 1L
+      )
     }
   }
 
