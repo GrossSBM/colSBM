@@ -457,3 +457,244 @@ compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
   merged_Q <- vapply(merged, function(mod) mod[["Q"]], numeric(1))
   merged[order(merged_Q)]
 }
+
+#' Partition of a collection of unipartite networks based on their common
+#' mesoscale structures
+#'
+#' @param netlist A list of matrices.
+#' @param colsbm_model Which colSBM to use, one of "iid", "pi", "delta", "deltapi",
+#' @param directed A boolean, should the networks be considered as directed or not.
+#' @param net_id A vector of string, the name of the networks.
+#' @param distribution A string, the emission distribution, either "bernoulli"
+#' (the default) or "poisson"
+#' @param nb_run An integer, the number of run the algorithm do.
+#' @param global_opts Global options for the outer algorithm and
+#' the output. See `estimate_colSBM` for more informations on the elements of the list.
+#' @param fit_opts Fit options for the VEM algorithm
+#' @param fit_init Do not use!
+#' Optional fit init from where initializing the algorithm.
+#' @param full_inference The default "FALSE", the algorithm stop once splitting
+#' groups of networks does not improve the BICL criterion. If "TRUE", then
+#' continue to split groups until a trivial classification of one network per
+#' group.
+#' @param verbose A boolean, should the function be verbose or not. Default to
+#' TRUE.
+#'
+#' @param temp_save_path A string, the path where to save the temporary results.
+#' Defaults to a temporary file.
+#'
+#' @importFrom future.apply future_lapply
+#' @import cli
+#' @importFrom utils modifyList
+#'
+#' @return A list with four elements:
+#' \item{partition}{A list of models giving the best partition.}
+#' \item{cluster}{A vector of integers giving the cluster of each network.}
+#' \item{elapsed_time}{The total time taken by the clustering procedure.}
+#' \item{clustering_history}{A matrix with M columns and has much rows as there are cuts during partitioning.}
+#'
+#' @details
+#' This function makes call to `estimate_colSBM`.
+#' @export
+#'
+#' @seealso [colSBM::estimate_colSBM()],
+#' \code{\link[colSBM]{fitSimpleSBMPop}}, `browseVignettes("colSBM")`
+#'
+#' @examples
+#' alpha1 <- matrix(c(0.8, 0.1, 0.2, 0.7), byrow = TRUE, nrow = 2)
+#' alpha2 <- matrix(c(0.8, 0.5, 0.5, 0.2), byrow = TRUE, nrow = 2)
+#' first_collection <- generate_unipartite_collection(
+#'   n = 50,
+#'   pi = c(0.5, 0.5),
+#'   alpha = alpha1, M = 2
+#' )
+#' second_collection <- generate_unipartite_collection(
+#'   n = 50,
+#'   pi = c(0.5, 0.5),
+#'   alpha = alpha2, M = 2
+#' )
+#'
+#' netlist <- append(first_collection, second_collection)
+#'
+#' \dontrun{
+#' cl_separated <- clusterize_networks(
+#'   netlist = netlist,
+#'   colsbm_model = "iid"
+#' )
+#' }
+clusterize_unipartite_networks_cpp <- function(netlist,
+                                               colsbm_model,
+                                               directed = FALSE,
+                                               net_id = NULL,
+                                               distribution = "bernoulli",
+                                               nb_run = 3L,
+                                               global_opts = list(),
+                                               fit_opts = list(),
+                                               fit_init = NULL,
+                                               full_inference = FALSE,
+                                               verbose = TRUE,
+                                               temp_save_path = tempfile(fileext = ".Rds")) {
+  check_unipartite_colsbm_models(colsbm_model = colsbm_model)
+  # Check if a netlist is provided, try to cast it if not
+  netlist <- check_networks_list(networks_list = netlist)
+  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  check_colsbm_emission_distribution(emission_distribution = distribution)
+  check_networks_list_match_emission_distribution(
+    networks_list = netlist,
+    emission_distribution = distribution
+  )
+  go <- default_global_opts_unipartite(netlist = netlist)
+  go$plot_details <- 0
+  go <- utils::modifyList(go, global_opts)
+  global_opts <- go
+  fo <- default_fit_opts_unipartite()
+  fo <- utils::modifyList(fo, fit_opts)
+  fit_opts <- fo
+
+  # Fit the initial model on the full collection
+  if (verbose) {
+    if (!is.null(temp_save_path)) {
+      cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
+    }
+    cli::cli_h1("Fitting the full collection")
+  }
+  start_time <- Sys.time()
+  my_sbmpop <- cpp_estimate_colSBM(
+    netlist = netlist,
+    colsbm_model = colsbm_model,
+    directed = directed,
+    net_id = net_id,
+    distribution = distribution,
+    nb_run = nb_run,
+    global_opts = global_opts,
+    fit_opts = fit_opts
+  )
+
+  clustering_queue <- list(my_sbmpop)
+  list_model_binary <- list()
+  cluster <- rep(1, length(netlist))
+  names(cluster) <- net_id
+
+  clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
+
+
+  if (verbose) {
+    cli::cli_h1("Beginning clustering")
+  }
+  # Process the clustering queue
+  while (length(clustering_queue) > 0) {
+    if (!is.null(temp_save_path)) {
+      saveRDS(list(
+        clustering_queue = clustering_queue,
+        list_model_binary = list_model_binary,
+        clustering_history = clustering_history
+      ), temp_save_path)
+    }
+    fit <- clustering_queue[[1]]
+    clustering_queue <- clustering_queue[-1]
+
+    # If the collection contains only one network, add it to the final list
+    if (inherits(fit, "bmpop") && fit$best_fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      next
+    }
+    if (inherits(fit, "bisbmpop") && fit$best_fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      next
+    }
+    if (inherits(fit, "fitBipartiteSBMPop") && fit$M == 1) {
+      list_model_binary <- append(list_model_binary, list(fit))
+      next
+    }
+
+    # Compute the dissimilarity matrix
+    dist_bm <- compute_dissimilarity_matrix(collection = fit)
+    # Partition the networks based on the dissimilarity matrix
+    cl <- partition_networks_list_from_dissimilarity(
+      networks_list = fit$A,
+      dissimilarity_matrix = dist_bm,
+      nb_groups = 2L
+    )
+
+    if (verbose) {
+      cli::cli_h2("Trying to split the collection of {.val {fit$net_id}}")
+    }
+    # Fit models for the sub-collections
+    fits <- colsbm_lapply(
+      c(1, 2),
+      function(k) {
+        Z_init <- lapply(
+          fit$model_list,
+          function(mod) mod$Z[cl == k]
+        )
+
+        if (verbose) {
+          cli::cli_alert_info("Fitting a sub collection with : {.val {fit$net_id[cl == k]}}")
+        }
+
+        return(
+          cpp_estimate_colSBM(
+            netlist = fit$A[cl == k],
+            colsbm_model = colsbm_model,
+            net_id = fit$net_id[cl == k],
+            distribution = distribution,
+            nb_run = min(sum(cl == k), nb_run),
+            Z_init = Z_init,
+            global_opts = global_opts,
+            fit_opts = fit_opts,
+            fit_sbm = fit$fit_sbm[cl == k],
+          )
+        )
+      },
+      backend = global_opts[["backend"]],
+      nb_cores = global_opts[["nb_cores"]]
+    )
+
+
+    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    # Decide whether to continue splitting or add to final list
+    if (full_inference || bicl_increased) {
+      clustering_queue <- append(clustering_queue, fits)
+      if (verbose && bicl_increased) {
+        cli::cli_alert_success("Splitting collections improved the BIC-L criterion")
+      }
+      if (verbose && full_inference) {
+        cli::cli_alert_info("Full inference mode enabled, continuing to split collections")
+      }
+      prev_cluster <- unique(cluster[fit$net_id])
+
+      #  Making room for a new cluster
+      cluster[cluster > prev_cluster] <- cluster[cluster > prev_cluster] + 1
+
+      # Assign the new cluster to the networks
+      cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
+      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
+    } else {
+      list_model_binary <- append(list_model_binary, list(fit$best_fit))
+      if (verbose) {
+        cli::cli_alert_danger("Splitting collections {.emph decreased} the BIC-L criterion")
+      }
+    }
+  }
+
+  # Final message indicating the end of clustering
+  if (verbose) {
+    cli::cli_alert_success("Finished clustering")
+  }
+
+  colnames(clustering_history) <- net_id
+
+  output_list <- list(
+    partition = list_model_binary,
+    cluster = cluster,
+    elapsed_time = Sys.time() - start_time,
+    clustering_history = clustering_history
+  )
+  if (!is.null(temp_save_path)) {
+    saveRDS(output_list, temp_save_path)
+    if (verbose) {
+      cli::cli_alert_info("The final results are saved at {.val {temp_save_path}}")
+    }
+  }
+  return(output_list)
+}
