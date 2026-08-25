@@ -1033,7 +1033,6 @@ fitSimpleSBMPop <- R6::R6Class(
                   .threshold(tau_tmp[, self$Cpi[, m], drop = FALSE])
                 self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
                 self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
-                tau_tmp
               } else {
                 tau_tmp <- .one_hot(self$Z[[m]], self$Q)
                 tau_tmp[, self$Cpi[, m]] <-
@@ -1044,14 +1043,12 @@ fitSimpleSBMPop <- R6::R6Class(
                 #   .rowSums(tau_tmp[,self$Cpi[,m], drop = FALSE], self$n[m], sum(self$Cpi[,m]))
                 self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
                 self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
-                # a <- self$emqr[m,,]/self$nmqr[m,,]
-                # prob <- self$Q*diag(a) #+ rowSums(a)
-                # p <- sample(self$Q, prob = prob)
-                # tau_tmp <- tau_tmp[,p]
-                # self$emqr[m,,] <- self$emqr[m,p,p]
-                # self$nmqr[m,,] <- self$nmqr[m,p,p]
-                tau_tmp
               }
+              a <- self$emqr[m, , ] / self$nmqr[m, , ]
+              p <- order(diag(a), decreasing = TRUE)
+              tau_tmp <- tau_tmp[, p]
+              self$emqr[m, , ] <- self$emqr[m, p, p]
+              self$nmqr[m, , ] <- self$nmqr[m, p, p]
               tau_tmp
             }
           ),
@@ -1066,6 +1063,11 @@ fitSimpleSBMPop <- R6::R6Class(
                 .threshold(tau_tmp[, self$Cpi[, m], drop = FALSE])
               self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
               self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
+              a <- self$emqr[m, , ] / self$nmqr[m, , ]
+              p <- order(diag(a), decreasing = TRUE)
+              tau_tmp <- tau_tmp[, p]
+              self$emqr[m, , ] <- self$emqr[m, p, p]
+              self$nmqr[m, , ] <- self$nmqr[m, p, p]
               tau_tmp
             }
           )
