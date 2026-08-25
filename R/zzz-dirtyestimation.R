@@ -117,12 +117,12 @@ cpp_estimate_colSBM <-
     # If fit_init is provided, use it as the initial model
     # Otherwise, create the initial model with spectral clustering
     if (!is.null(fit_init)) {
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 1) {
         say("Using provided init for the model at Q=2")
       }
       start_model <- fit_init
     } else {
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 1) {
         say("Initialising spectral clustering")
       }
       spectral_inits <- lapply(netlist, spectral_clustering, K = 2) |> futurize::futurize(seed = TRUE)
@@ -132,7 +132,7 @@ cpp_estimate_colSBM <-
         mat[mat > 1 - 1e-6] <- 1 - 1e-6
         mat / rowSums(mat)
       })
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 1) {
         say("Fitting the model at Q=2")
       }
       start_model <- fitSimpleSBMPop$new(
@@ -151,7 +151,7 @@ cpp_estimate_colSBM <-
       )
 
       start_model$optimize()
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 1) {
         say("Model fitted !")
       }
     }
@@ -181,41 +181,47 @@ cpp_estimate_colSBM <-
     for (iter in seq(10)) {
       # Forward phase: estimate models for Q from 2 to Q_max
       # Pass the initial model to cpp_forward which will compute the splits
-      splitted_model_list <- cpp_forward(start_model, netlist, Q_start = 2L, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = verbose, current_model_list = model_list)
+      splitted_model_list <- cpp_forward(start_model, netlist,
+        Q_start = 2L, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = verbose, current_model_list = model_list,
+        global_opts = global_opts
+      )
 
       model_list <- compare_model_lists(
         model_list1 = model_list,
         model_list2 = splitted_model_list,
-        verbose = verbose
+        global_opts = global_opts
       )
 
       if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
-        if (verbose) {
+        if (global_opts[["verbosity"]] >= 1) {
           say("BICL criterion increased in forward phase, going for backward")
         }
         best_bicl <- max(sapply(model_list, function(mod) mod$BICL))
       } else {
-        if (verbose) {
+        if (global_opts[["verbosity"]] >= 1) {
           say("BICL criterion did not increase in forward phase, stopping optimization.")
         }
         break
       }
 
 
-      merged_model_list <- cpp_backward(model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose)
+      merged_model_list <- cpp_backward(
+        model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose,
+        global_opts = global_opts
+      )
 
       model_list <- compare_model_lists(
         model_list1 = model_list,
         model_list2 = merged_model_list,
-        verbose = verbose
+        global_opts = global_opts
       )
       if (max(sapply(model_list, function(mod) mod$BICL)) > best_bicl) {
-        if (verbose) {
+        if (global_opts[["verbosity"]] >= 1) {
           say("BICL criterion increased in backward phase, going for forward")
         }
         best_bicl <- max(sapply(model_list, function(mod) mod$BICL))
       } else {
-        if (verbose) {
+        if (global_opts[["verbosity"]] >= 1) {
           say("BICL criterion did not increase in backward phase, stopping optimization.")
         }
         break
@@ -257,11 +263,11 @@ cpp_estimate_colSBM <-
 #'
 #' @return A list of fitted models for Q from 2 to Q_max
 cpp_forward <-
-  function(start_model, netlist, Q_start, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = FALSE, iteration = NULL, current_model_list) {
+  function(start_model, netlist, Q_start, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = FALSE, iteration = NULL, current_model_list, global_opts = default_global_opts_unipartite()) {
     # Initialize taus
     M <- length(netlist)
 
-    if (verbose) {
+    if (global_opts[["verbosity"]] >= 2) {
       say("Computing splits for Q_start=", Q_start, level = 1L)
     }
 
@@ -269,7 +275,7 @@ cpp_forward <-
     next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start)) |> futurize::futurize(seed = TRUE))
     model_list <- list(start_model)
     for (Q in seq(3, Q_max)) {
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 2) {
         say("Fitting models at Q=", Q, level = 1L)
       }
       models <- lapply(seq_along(next_splits), function(split_idx) {
@@ -291,7 +297,7 @@ cpp_forward <-
         tmp_fit
       }) |> futurize::futurize(seed = TRUE)
       best_model_idx <- which.max(sapply(models, function(model) model[["BICL"]]))
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 2) {
         bicl <- models[[best_model_idx]][["BICL"]]
         say(
           "Best splitted model index is ", best_model_idx, " with BICL = ", bicl,
@@ -299,7 +305,7 @@ cpp_forward <-
         )
       }
       model_list <- append(model_list, models[[best_model_idx]])
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 2) {
         say("Computing next splits", level = 1L)
       }
       next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)))
@@ -321,12 +327,12 @@ cpp_forward <-
 #'
 #' @return A list of fitted models for Q from Q_max down to Q_min
 cpp_backward <-
-  function(model_list, netlist, Q_min, distribution, free_mixture, free_density, fit_opts, verbose = FALSE) {
+  function(model_list, netlist, Q_min, distribution, free_mixture, free_density, fit_opts, verbose = FALSE, global_opts = default_global_opts_unipartite()) {
     M <- length(netlist)
     # Get the maximum number of clusters from the model list
     Q_max <- length(model_list)
 
-    if (verbose) {
+    if (global_opts[["verbosity"]] >= 2) {
       say(
         "Starting backward phase from Q=", Q_max, " down to Q=", Q_min,
         level = 1L
@@ -338,7 +344,7 @@ cpp_backward <-
 
     # Process from Q_max down to Q_min + 1
     for (Q in seq(Q_max, Q_min + 1, by = -1)) {
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 2) {
         say("Fitting merges for Q=", Q - 1, level = 1L)
       }
 
@@ -371,7 +377,7 @@ cpp_backward <-
       # Select the best model among the merged ones
       best_model_idx <- which.max(sapply(merged_models, function(model) model[["BICL"]]))
 
-      if (verbose) {
+      if (global_opts[["verbosity"]] >= 2) {
         bicl <- merged_models[[best_model_idx]][["BICL"]]
         say(
           "Best merged model index is ", best_model_idx, " with BICL = ", bicl,
@@ -391,16 +397,15 @@ cpp_backward <-
 #' @param model_list1 a list of fit...SBM with a BICL attribute
 #' @param model_list2 a second list of fit...SBM with a BICL
 #' attribute
-#' @param verbose a boolean that controls if the function print
-#' messages. Default to TRUE
 #'
 #' @return a list of fit...SBM merged by selecting the best BICL
 #' for each model size Q provided
-compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
+compare_model_lists <- function(model_list1, model_list2, global_opts = default_global_opts_unipartite()) {
   # --- Normalise each list: keep the best model per Q ---------------------
   # A list may hold several models fitted at the same Q (e.g. from different
   # splits/merges). Only the best BICL per Q matters for the comparison, so
   # we collapse each list to one model per Q first.
+
   best_per_Q <- function(model_list) {
     if (length(model_list) == 0L) {
       return(list())
@@ -436,7 +441,7 @@ compare_model_lists <- function(model_list1, model_list2, verbose = TRUE) {
     } else {
       merged[[i]] <- mod2
     }
-    if (verbose) {
+    if (global_opts[["verbosity"]] >= 2) {
       print_bicl <- merged[[i]][["BICL"]]
       say(
         "Best model for Q=", k, " has BICL = ", print_bicl,
