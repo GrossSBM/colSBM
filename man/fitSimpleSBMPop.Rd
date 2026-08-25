@@ -512,7 +512,7 @@ Computes the BICL criterion
 \subsection{\code{fitSimpleSBMPop$compute_BICL()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE)}
+    \preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -524,7 +524,7 @@ to FALSE.}
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    The ICL for the model.
+    The BICL for the model.
 Computes the exact ICL criterion
   }
 }

@@ -15,7 +15,8 @@ cpp_forward(
   fit_opts,
   verbose = FALSE,
   iteration = NULL,
-  current_model_list
+  current_model_list,
+  global_opts = default_global_opts_unipartite()
 )
 }
 \arguments{

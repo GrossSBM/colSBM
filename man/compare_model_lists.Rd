@@ -4,16 +4,17 @@
 \alias{compare_model_lists}
 \title{Compare two list of models to merge them by the best BICL}
 \usage{
-compare_model_lists(model_list1, model_list2, verbose = TRUE)
+compare_model_lists(
+  model_list1,
+  model_list2,
+  global_opts = default_global_opts_unipartite()
+)
 }
 \arguments{
 \item{model_list1}{a list of fit...SBM with a BICL attribute}
 
 \item{model_list2}{a second list of fit...SBM with a BICL
 attribute}
-
-\item{verbose}{a boolean that controls if the function print
-messages. Default to TRUE}
 }
 \value{
 a list of fit...SBM merged by selecting the best BICL
