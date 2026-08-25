@@ -749,15 +749,24 @@ Z_label_switch <- function(Z, new_order) {
   return(switched_labels)
 }
 
-say <- function(message, level = 0, cli_command = cli::cli_alert_info, .envir = parent.frame()) {
-  # Utilise cli::cli_alert pour un formattage élégant
-  if (level > 0) {
-    # Crée une indentation avec des espaces
-    indent <- paste(rep("  ", level), collapse = "")
-    cli_command("{indent}{message}")
-  } else {
-    cli_command(message)
-  }
+#' Format and emit a message with cli, supporting cli markup and indentation
+#'
+#' @param ... One or more character strings to concatenate and display,
+#' possibly containing cli markup such as `{.val x}`.
+#' @param level An integer, the indentation level of the message. Each level
+#' indents by two spaces.
+#' @param cli_command A cli emitting function used to display the message.
+#' Defaults to `cli::cli_alert_info()`.
+#'
+#' @noMd
+#' @noRd
+say <- function(..., level = 0, cli_command = cli::cli_alert_info) {
+  cli::cli_div(
+    class = "indented-message",
+    theme = list("div.indented-message" = list("margin-left" = 2L * level))
+  )
+  cli_command(paste0(...), .envir = parent.frame())
+  cli::cli_end()
 }
 
 .xlogx <- function(x) {
