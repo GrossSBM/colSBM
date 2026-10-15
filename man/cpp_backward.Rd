@@ -12,7 +12,8 @@ cpp_backward(
   free_mixture,
   free_density,
   fit_opts,
-  verbose = FALSE
+  verbose = FALSE,
+  global_opts = default_global_opts_unipartite()
 )
 }
 \arguments{
