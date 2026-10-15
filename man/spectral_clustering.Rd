@@ -4,7 +4,7 @@
 \alias{spectral_clustering}
 \title{Perform a spectral clustering}
 \usage{
-spectral_clustering(X, K, kmeans.nstart = 400L, kmeans.iter.max = 100L)
+spectral_clustering(X, K, kmeans.nstart = 400L, kmeans.iter.max = 1000L)
 }
 \arguments{
 \item{X}{an adjacency matrix}
