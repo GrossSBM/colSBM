@@ -817,13 +817,7 @@ fitSimpleSBMPop <- R6::R6Class(
         } else {
           up <- TRUE
         }
-        # if (self$vloss[[m]][length(self$vloss[[m]])] <
-        #     self$vloss[[m]][length(self$vloss[[m]]) - 1] & it == 1 & reup_counter == 0) {
-        #     tau_old <- t(vapply(seq(self$n[m]),
-        #                     function(i) gtools::rdirichlet(1, exp(self$tau[[m]][i])/sum(exp(self$tau[[m]][i]))),
-        #                     FUN.VALUE = rep(.1, self$Q)))
-        #     it == 0
-        # }
+
         if (up) {
           self$tau[[m]] <- tau_new
           tau_old <- tau_new

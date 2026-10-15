@@ -1,7 +1,8 @@
 test_that("R with C++ yields the same results as the R procedure on modular networks", {
+  set.seed(12)
   M <- 4L
   true_pi <- c(0.6, 0.3, 0.1)
-  nbNodes <- 1000
+  nbNodes <- 200
   K <- length(true_pi)
   true_alpha <- diag(c(0.9, 0.5, 0.1))
   sbm_sampler <- sbm::sampleSimpleSBM(nbNodes = nbNodes, blockProp = true_pi, connectParam = list(mean = true_alpha), directed = TRUE)
@@ -11,21 +12,10 @@ test_that("R with C++ yields the same results as the R procedure on modular netw
   effective_pi <- rowMeans(simplify2array(effective_pim))
   A <- lapply(seq(M), function(m) sbm_realisations[[m]][["networkData"]])
 
-  # A spectral clustering for the start
-  spectral_labels <- lapply(A, spectral_clustering, K)
 
-  spectral_taus <- lapply(spectral_labels, .one_hot, K)
+  cpp_fit <- cpp_estimate_colSBM(netlist = A, colsbm_model = "iid", fit_opts = list(use_cpp = TRUE, verbosity = 2L), global_opts = list(verbosity = 2))
 
-  spectral_taus <- lapply(spectral_taus, function(tau) {
-    tau[tau < 1e-6] <- 1e-6
-    tau[tau > 1 - 1e-6] <- 1 - 1e-6
-    tau <- tau / rowSums(tau)
-  })
-
-
-  R_fit <- estimate_colSBM(netlist = A, colsbm_model = "iid", fit_opts = list(use_cpp = FALSE, verbosity = 2L))
-
-  RCpp_fit <- estimate_colSBM(netlist = A, colsbm_model = "iid", fit_opts = list(use_cpp = TRUE, verbosity = 2L), global_opts = list(backend = "no_mc", verbosity = 2L), nb_run = 1L)
+  R_fit <- estimate_colSBM(netlist = A, colsbm_model = "iid", fit_opts = list(use_cpp = FALSE, verbosity = 2L), global_opts = list(verbosity = 2L), nb_run = 1L)
 })
 
 test_that("R with C++ yields the same results as the R procedure on core-periphery networks", {
@@ -80,7 +70,7 @@ test_that("R with C++ yields the same results as the R procedure on core-periphe
 
   # True quality checks
 
-  expect_gte(tail(info$vbound, 1), tail(R_fit$vbound, 1))
+  expect_equal(tail(info$vbound, 1), tail(R_fit$vbound, 1), tolerance = 1e-4)
   expect_equal(info$tau, R_fit$tau, tolerance = 1e-1)
   ## Parameters checks
 
