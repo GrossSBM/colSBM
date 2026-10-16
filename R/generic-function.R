@@ -621,7 +621,7 @@ plot.fitBipartiteSBMPop <- function(
         p_pi <-
           df_pi |>
           ggplot2::ggplot(ggplot2::aes(
-            fill = as.factor(q),
+            fill = factor(q, levels = oRow),
             y = name,
             x = Proportion
           )) +
@@ -666,7 +666,7 @@ plot.fitBipartiteSBMPop <- function(
           dplyr::mutate(Proportion = value)
         p_rho <- df_rho |>
           ggplot2::ggplot(ggplot2::aes(
-            fill = as.factor(q),
+            fill = factor(q, levels = oCol),
             y = name,
             x = Proportion
           )) +
