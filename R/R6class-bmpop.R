@@ -183,15 +183,9 @@ bmpop <- R6::R6Class(
         lapply(seq_along(self$A), function(m) self$fit_sbm[[m]]$setModel(index = q))
         self$ICL_sbm[q] <- sum(purrr::map_dbl(self$fit_sbm, ~ .$ICL))
       }
-      if (self$global_opts$plot_details >= 1) {
-        plot(seq(self$global_opts$Q_min, self$global_opts$Q_max),
-          self$ICL_sbm[self$global_opts$Q_min:self$global_opts$Q_max],
-          col = "green", pch = 5,
-          xlab = "Q", ylab = "BICL",
-          xlim = c(self$global_opts$Q_min - 1, self$global_opts$Q_max + 1),
-          ylim = c(1.1 * max(self$ICL_sbm), .8 * max(self$ICL_sbm))
-        )
-      }
+      # NB: the trace plot is drawn by show_trace() at the end of burn_in() and
+      # after each pass of optimize(), so that it stays consistent with the
+      # final plot.bmpop() and is never cropped by a fixed ylim.
     },
     #' Fit the colSBM mode using sbm as initializations
     #' @param index The sequence of networks number going from 1 to M
@@ -846,12 +840,24 @@ bmpop <- R6::R6Class(
     #'
     #' @return nothing; but stores the values
 
+    #' Draw the trace of the fitted criteria (BICL, ICL, vbound, SBM)
+    #' as a function of Q, consistent with plot(bmpop).
+    #'
+    #' @return nothing; plots to the active device.
+    show_trace = function() {
+      if (self$global_opts$plot_details >= 1) {
+        p <- plot.bmpop(self)
+        if (!is.null(p)) print(p)
+      }
+      invisible(NULL)
+    },
     optimize = function() {
       # browser()
       #      future::plan("future::multisession", workers = self$global_opts$nb_cores)
       #  progressr::handlers(global = TRUE)
       # progressr::handlers("progress")
       self$burn_in()
+      self$show_trace()
       improved <- TRUE
       nb_pass <- 0
       Q <- 1
@@ -868,6 +874,7 @@ bmpop <- R6::R6Class(
         }
         Q <- self$forward_pass(Q_min = max(Q, self$global_opts$Q_min))
         Q <- self$backward_pass(Q_max = min(Q, self$global_opts$Q_max))
+        self$show_trace()
         improved <- self$improved$backward | self$improved$forward
         nb_pass <- nb_pass + 1
       }
@@ -1081,10 +1088,7 @@ bmpop <- R6::R6Class(
       # After having selected the best_models we plot their points
       # x being Q the number of clusters and y being their BICL
       if (self$global_opts$plot_details >= 1) {
-        points(
-          purrr::map_dbl(unlist(best_models), "Q"),
-          purrr::map_dbl(unlist(best_models), ~ .$BICL)
-        )
+        self$show_trace()
       }
       return(best_models)
     },

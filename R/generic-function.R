@@ -54,8 +54,11 @@ plot.fitSimpleSBMPop <- function(
   net_id = 1L,
   ...
 ) {
-  if (is.null(ord)) ord <- order(diag(x$alpha), decreasing = TRUE)
-  p <- switch(type,
+  if (is.null(ord)) {
+    ord <- order(diag(x$alpha), decreasing = TRUE)
+  }
+  p <- switch(
+    type,
     graphon = {
       if (x$Q == 1) {
         ymin <- rep(0, each = x$Q)
@@ -78,15 +81,33 @@ plot.fitSimpleSBMPop <- function(
           ymin = ymin
         ) %>%
         ggplot2::ggplot(ggplot2::aes(
-          xmin = xmin, ymin = ymin,
-          xmax = xmax, ymax = ymax, fill = value
+          xmin = xmin,
+          ymin = ymin,
+          xmax = xmax,
+          ymax = ymax,
+          fill = value
         )) +
         ggplot2::geom_rect() +
-        ggplot2::scale_fill_gradient2("alpha", low = "white", mid = "red", midpoint = 1) +
-        ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][ord][1:(x$Q - 1)]), linewidth = .2) +
-        ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][ord][1:(x$Q - 1)]), linewidth = .2) +
+        ggplot2::scale_fill_gradient2(
+          "alpha",
+          low = "white",
+          mid = "red",
+          midpoint = 1
+        ) +
+        ggplot2::geom_hline(
+          yintercept = cumsum(x$pi[[net_id]][ord][1:(x$Q - 1)]),
+          linewidth = .2
+        ) +
+        ggplot2::geom_vline(
+          xintercept = cumsum(x$pi[[net_id]][ord][1:(x$Q - 1)]),
+          linewidth = .2
+        ) +
         ggplot2::scale_y_reverse() +
-        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
+        ggplot2::theme_bw(
+          base_size = 15,
+          base_rect_size = 1,
+          base_line_size = 1
+        ) +
         ggplot2::xlab("") +
         ggplot2::ylab("") +
         ggplot2::coord_equal(expand = FALSE)
@@ -97,6 +118,10 @@ plot.fitSimpleSBMPop <- function(
       } else {
         pim <- x$pim
       }
+      # pim <- pim[ord]
+      # The blocks are reordered via `ord` for display, so the axes are
+      # labelled with the original block ids (as they appear in x$Z) in order
+      # to stay coherent with the clustering memberships.
       p_alpha <- x$alpha[ord, ord] %>%
         t() %>%
         reshape2::melt() %>%
@@ -105,8 +130,13 @@ plot.fitSimpleSBMPop <- function(
         ggplot2::scale_fill_gradient2("alpha", low = "white", high = "red") +
         ggplot2::geom_hline(yintercept = seq(x$Q) + .5) +
         ggplot2::geom_vline(xintercept = seq(x$Q) + .5) +
-        ggplot2::scale_y_reverse() +
-        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
+        ggplot2::scale_x_continuous(breaks = seq(x$Q), labels = ord) +
+        ggplot2::scale_y_reverse(breaks = seq(x$Q), labels = ord) +
+        ggplot2::theme_bw(
+          base_size = 15,
+          base_rect_size = 1,
+          base_line_size = 1
+        ) +
         ggplot2::xlab("") +
         ggplot2::ylab("") +
         ggplot2::coord_fixed(expand = FALSE)
@@ -116,33 +146,39 @@ plot.fitSimpleSBMPop <- function(
       } else {
         xl <- ""
       }
-      df <- purrr::map_dfc(
-        seq_along(x$net_id),
-        function(m) {
-          setNames(
-            data.frame(x$pim[[m]][ord]),
-            x$net_id[m]
-          )
-        }
-      )
-      names(df) <- x$net_id
       if (mixture) {
+        df <- purrr::map_dfc(
+          seq_along(x$net_id),
+          function(m) {
+            setNames(
+              data.frame(x$pim[[m]][ord]),
+              x$net_id[m]
+            )
+          }
+        )
+        names(df) <- x$net_id
         p_pi <-
           df %>%
-          #    rename() %>%
-          dplyr::mutate(q = seq(x$Q)) %>%
+          dplyr::mutate(q = ord) %>%
           tidyr::pivot_longer(cols = -c(q)) %>%
-          ggplot2::ggplot(ggplot2::aes(fill = as.factor(q), y = name, x = value)) +
+          ggplot2::ggplot(ggplot2::aes(
+            fill = factor(q, levels = ord),
+            y = name,
+            x = value
+          )) +
           ggplot2::geom_col() +
           ggplot2::coord_flip(expand = FALSE) +
-          ggplot2::scale_fill_brewer("Block",
-            type = "qual", palette = "Paired",
+          ggplot2::scale_fill_brewer(
+            "Block",
+            type = "qual",
+            palette = "Paired",
             direction = -1
           ) +
           ggplot2::ylab("") +
-          ggplot2::ylab(xl) +
+          ggplot2::xlab("") +
           ggplot2::theme_bw(base_size = 15)
-        p_alpha <- (p_alpha | p_pi) + patchwork::plot_layout(guides = "collect", widths = c(.65, .35)) +
+        p_alpha <- (p_alpha | p_pi) +
+          patchwork::plot_layout(guides = "collect", widths = c(.65, .35)) +
           patchwork::plot_annotation(title = NULL)
       }
       return(p_alpha)
@@ -154,31 +190,46 @@ plot.fitSimpleSBMPop <- function(
         order(Z)
       ] %>% # t() %>%
         reshape2::melt() %>%
-        dplyr::mutate(con = x$alpha[x$Z[[net_id]], x$Z[[net_id]]][
-          order(Z),
-          order(Z)
-        ] %>% # t() %>%#[x$Z[[net_id]], x$Z[[net_id]]][
-          #  order(Z),
-          #    order(Z)] %>%
-          reshape2::melt() %>%
-          dplyr::pull(value))
+        dplyr::mutate(
+          con = x$alpha[x$Z[[net_id]], x$Z[[net_id]]][
+            order(Z),
+            order(Z)
+          ] %>% # t() %>%#[x$Z[[net_id]], x$Z[[net_id]]][
+            #  order(Z),
+            #    order(Z)] %>%
+            reshape2::melt() %>%
+            dplyr::pull(value)
+        )
       if (x$Q > 1) {
         vlines_xintercept <- cumsum(tabulate(Z)[seq(x$Q, 2)]) + .5
       } else {
         vlines_xintercept <- cumsum(tabulate(Z)[1]) + .5
       }
-      ggplot2::ggplot(data = block_con_df, ggplot2::aes(x = as.factor(.data$Var2), y = as.factor(.data$Var1), fill = .data$value, alpha = .data$value)) +
-        ggplot2::geom_tile(ggplot2::aes(alpha = .data$con),
-          fill = "red", linewidth = 0, show.legend = FALSE
+      ggplot2::ggplot(
+        data = block_con_df,
+        ggplot2::aes(
+          x = as.factor(.data$Var2),
+          y = as.factor(.data$Var1),
+          fill = .data$value,
+          alpha = .data$value
+        )
+      ) +
+        ggplot2::geom_tile(
+          ggplot2::aes(alpha = .data$con),
+          fill = "red",
+          linewidth = 0,
+          show.legend = FALSE
         ) +
         ggplot2::geom_tile(show.legend = FALSE) +
         ggplot2::geom_hline(
           yintercept = cumsum(tabulate(Z)[1:(x$Q - 1)]) + .5,
-          col = "red", linewidth = .5
+          col = "red",
+          linewidth = .5
         ) +
         ggplot2::geom_vline(
           xintercept = vlines_xintercept,
-          col = "red", linewidth = .5
+          col = "red",
+          linewidth = .5
         ) +
         ggplot2::scale_fill_gradient(low = "white", high = "black") +
         ggplot2::ylab("") +
@@ -188,7 +239,8 @@ plot.fitSimpleSBMPop <- function(
           breaks = ""
         ) +
         # ggplot2::scale_y_reverse() +
-        ggplot2::scale_y_discrete( # limits = rev,
+        ggplot2::scale_y_discrete(
+          # limits = rev,
           breaks = "", # label = rev(custom_lab3),
           guide = ggplot2::guide_axis(angle = 0)
         ) +
@@ -286,21 +338,40 @@ plot.bmpop <- function(x, type = "trace", ...) {
     vbound = x$vbound
   )
   if (!is.null(x$ICL_sbm)) {
-    tb %>% dplyr::mutate(SBM = x$ICL_sbm)
+    tb$SBM <- x$ICL_sbm
   }
+  # Only keep the values of Q for which at least one criterion has been
+  # computed. This makes the trace usable while the fit is still ongoing
+  # (during which the remaining criteria are initialized to -Inf) and avoids
+  # plotting "infinite" points.
+  criterion_cols <- setdiff(names(tb), "Q")
+  keep <- rowSums(is.finite(as.matrix(tb[criterion_cols]))) > 0L
+  tb <- tb[keep, , drop = FALSE]
+  if (nrow(tb) == 0L) {
+    return(NULL)
+  }
+  bestQ <- tb$Q[which.max(tb$BICL)]
   p <- tb %>%
     tidyr::pivot_longer(cols = -Q, names_to = "Criterion") %>%
     ggplot2::ggplot(ggplot2::aes(
-      x = Q, y = value,
-      linetype = Criterion, color = Criterion,
+      x = Q,
+      y = value,
+      linetype = Criterion,
+      color = Criterion,
       shape = Criterion
     )) +
     ggplot2::annotate(
       geom = "rect",
-      xmin = max(which.max(x$BICL) -
-        x$global_opts$depth, 1),
-      xmax = min(which.max(x$BICL) +
-        x$global_opts$depth, length(x$BICL)),
+      xmin = max(
+        bestQ -
+          x$global_opts$depth,
+        1
+      ),
+      xmax = min(
+        bestQ +
+          x$global_opts$depth,
+        max(tb$Q)
+      ),
       ymin = -Inf,
       ymax = Inf,
       fill = "gray90"
@@ -356,7 +427,8 @@ plot.bmpop <- function(x, type = "trace", ...) {
 #' plot(cl_joint$best_fit)
 #' }
 plot.fitBipartiteSBMPop <- function(
-  x, type = "graphon",
+  x,
+  type = "graphon",
   oRow = NULL,
   oCol = NULL,
   mixture = FALSE,
@@ -366,7 +438,8 @@ plot.fitBipartiteSBMPop <- function(
   ...
 ) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
-  p <- switch(type,
+  p <- switch(
+    type,
     graphon = {
       # The below order use net_id parameters
       if (x$Q[2] == 1) {
@@ -390,14 +463,20 @@ plot.fitBipartiteSBMPop <- function(
         ymin <- rep(0, each = x$Q[2])
         ymax <- rep(1, each = x$Q[2])
       } else {
-        ymin <- rep(c(0, cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)])), each = x$Q[2])
+        ymin <- rep(
+          c(0, cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)])),
+          each = x$Q[2]
+        )
         ymax <- rep(c(cumsum(x$pi[[net_id]][[1]][oRow])), each = x$Q[2])
       }
       if (x$Q[2] == 1) {
         xmin <- rep(0, x$Q[1])
         xmax <- rep(1, x$Q[1])
       } else {
-        xmin <- rep(c(0, cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)])), x$Q[1])
+        xmin <- rep(
+          c(0, cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)])),
+          x$Q[1]
+        )
         xmax <- rep(cumsum(x$pi[[net_id]][[2]][oCol]), x$Q[1])
       }
       p_graphon <- (x$alpha[oRow, oCol]) |>
@@ -410,29 +489,50 @@ plot.fitBipartiteSBMPop <- function(
           ymax = ymax
         ) |>
         ggplot2::ggplot(ggplot2::aes(
-          xmin = xmin, ymin = ymin,
-          xmax = xmax, ymax = ymax, fill = .data[["value"]]
+          xmin = xmin,
+          ymin = ymin,
+          xmax = xmax,
+          ymax = ymax,
+          fill = .data[["value"]]
         )) +
         ggplot2::geom_rect() +
-        ggplot2::scale_fill_gradient2("alpha",
-          low = "white", mid = "red",
-          midpoint = 1, limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
+        ggplot2::scale_fill_gradient2(
+          "alpha",
+          low = "white",
+          mid = "red",
+          midpoint = 1,
+          limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha)))
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
-        ggplot2::geom_hline(yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]), linewidth = .2) +
-        ggplot2::geom_vline(xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]), linewidth = .2)
+        ggplot2::guides(
+          fill = ggplot2::guide_legend(title = sprintf("\u03B1"))
+        ) +
+        ggplot2::geom_hline(
+          yintercept = cumsum(x$pi[[net_id]][[1]][oRow][1:(x$Q[1] - 1)]),
+          linewidth = .2
+        ) +
+        ggplot2::geom_vline(
+          xintercept = cumsum(x$pi[[net_id]][[2]][oCol][1:(x$Q[2] - 1)]),
+          linewidth = .2
+        )
       if (values) {
         p_graphon <- p_graphon +
-          ggplot2::geom_text(ggplot2::aes(
-            x = (.data$xmin + .data$xmax) / 2,
-            y = (.data$ymin + .data$ymax) / 2,
-            label = round(.data$value, 2)
-          ), color = "black")
+          ggplot2::geom_text(
+            ggplot2::aes(
+              x = (.data$xmin + .data$xmax) / 2,
+              y = (.data$ymin + .data$ymax) / 2,
+              label = round(.data$value, 2)
+            ),
+            color = "black"
+          )
       }
 
       p_graphon <- p_graphon +
         ggplot2::scale_y_reverse() +
-        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
+        ggplot2::theme_bw(
+          base_size = 15,
+          base_rect_size = 1,
+          base_line_size = 1
+        ) +
         ggplot2::xlab("Column Blocks") +
         ggplot2::ylab("Row Blocks") +
         ggplot2::ggtitle(x[["net_id"]][net_id]) +
@@ -458,12 +558,20 @@ plot.fitBipartiteSBMPop <- function(
       if (is.null(oCol)) {
         oCol <- order(mean_pi %*% x$alpha, decreasing = TRUE)
       }
+      # The blocks are reordered via oRow/oCol for display, so the axes are
+      # labelled with the original block ids (as they appear in x$Z) in order
+      # to stay coherent with the clustering memberships.
       p_alpha <- x$alpha[oRow, oCol, drop = FALSE] |>
         t() |>
         reshape2::melt() |>
-        ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2, fill = .data$value)) +
+        ggplot2::ggplot(ggplot2::aes(
+          x = .data$Var1,
+          y = .data$Var2,
+          fill = .data$value
+        )) +
         ggplot2::geom_tile() +
-        ggplot2::scale_fill_gradient2("alpha",
+        ggplot2::scale_fill_gradient2(
+          "alpha",
           low = "white",
           high = "red",
           limits = c(
@@ -471,19 +579,28 @@ plot.fitBipartiteSBMPop <- function(
             ifelse(x$distribution == "bernoulli", 1, max(x$alpha))
           )
         ) +
-        ggplot2::guides(fill = ggplot2::guide_legend(title = sprintf("\u03B1"))) +
+        ggplot2::guides(
+          fill = ggplot2::guide_legend(title = sprintf("\u03B1"))
+        ) +
         ggplot2::geom_hline(yintercept = seq(x$Q[1]) + .5) +
         ggplot2::geom_vline(xintercept = seq(x$Q[2]) + .5) +
-        ggplot2::scale_x_continuous(breaks = seq(x$Q[2])) +
-        ggplot2::scale_y_reverse(breaks = seq(x$Q[1])) +
-        ggplot2::theme_bw(base_size = 15, base_rect_size = 1, base_line_size = 1) +
+        ggplot2::scale_x_continuous(breaks = seq(x$Q[2]), labels = oCol) +
+        ggplot2::scale_y_reverse(breaks = seq(x$Q[1]), labels = oRow) +
+        ggplot2::theme_bw(
+          base_size = 15,
+          base_rect_size = 1,
+          base_line_size = 1
+        ) +
         ggplot2::xlab("") +
         ggplot2::ylab("") +
         ggplot2::coord_fixed(expand = FALSE)
 
       if (values) {
         p_alpha <- p_alpha +
-          ggplot2::geom_text(ggplot2::aes(label = round(value, 2)), color = "black")
+          ggplot2::geom_text(
+            ggplot2::aes(label = round(value, 2)),
+            color = "black"
+          )
       }
       #  scale_y_reverse()
       xl <- ""
@@ -498,33 +615,42 @@ plot.fitBipartiteSBMPop <- function(
             )
           }
         ) |>
-          dplyr::mutate(q = seq(x$Q[1])) |>
+          dplyr::mutate(q = oRow) |>
           tidyr::pivot_longer(cols = -c(q)) |>
           dplyr::mutate(Proportion = value)
         p_pi <-
           df_pi |>
           ggplot2::ggplot(ggplot2::aes(
-            fill = as.factor(q), y = name,
+            fill = factor(q, levels = oRow),
+            y = name,
             x = Proportion
           )) +
           ggplot2::geom_col() +
           ggplot2::coord_flip(expand = FALSE) +
-          ggplot2::scale_fill_brewer("Row block",
-            type = "qual", palette = "Paired",
+          ggplot2::scale_fill_brewer(
+            "Row block",
+            type = "qual",
+            palette = "Paired",
             direction = -1
           ) +
-          ggplot2::guides(fill = ggplot2::guide_legend(
-            ncol = x$Q[1] %/% 3 + 1,
-            byrow = TRUE
-          )) +
+          ggplot2::guides(
+            fill = ggplot2::guide_legend(
+              ncol = x$Q[1] %/% 3 + 1,
+              byrow = TRUE
+            )
+          ) +
           ggplot2::ylab("") +
           ggplot2::ylab(xl) +
           ggplot2::xlab("Row proportions") +
           ggplot2::theme_classic() +
-          ggplot2::theme(axis.text.x = ggplot2::element_text(
-            angle = 90, vjust = .5,
-            hjust = 1
-          ), aspect.ratio = 1 / x$Q[1])
+          ggplot2::theme(
+            axis.text.x = ggplot2::element_text(
+              angle = 90,
+              vjust = .5,
+              hjust = 1
+            ),
+            aspect.ratio = 1 / x$Q[1]
+          )
 
         df_rho <- purrr::map_dfc(
           seq_along(x$net_id),
@@ -535,28 +661,33 @@ plot.fitBipartiteSBMPop <- function(
             )
           }
         ) |>
-          dplyr::mutate(q = seq(x$Q[2])) |>
+          dplyr::mutate(q = oCol) |>
           tidyr::pivot_longer(cols = -c(q)) |>
           dplyr::mutate(Proportion = value)
         p_rho <- df_rho |>
           ggplot2::ggplot(ggplot2::aes(
-            fill = as.factor(q), y = name,
+            fill = factor(q, levels = oCol),
+            y = name,
             x = Proportion
           )) +
           ggplot2::geom_col() +
           # ggplot2::coord_flip(expand = FALSE) +
-          ggplot2::scale_fill_brewer("Column block",
-            type = "qual", palette = "Set2",
+          ggplot2::scale_fill_brewer(
+            "Column block",
+            type = "qual",
+            palette = "Set2",
             direction = -1
           ) +
           # Reversing net id to match row
           ggplot2::scale_y_discrete(limits = rev) +
           # Reversing prop order to match the alpha
           ggplot2::scale_x_reverse() +
-          ggplot2::guides(fill = ggplot2::guide_legend(
-            ncol = x$Q[2] %/% 3 + 1,
-            byrow = TRUE
-          )) +
+          ggplot2::guides(
+            fill = ggplot2::guide_legend(
+              ncol = x$Q[2] %/% 3 + 1,
+              byrow = TRUE
+            )
+          ) +
           ggplot2::ylab("") +
           ggplot2::ylab(xl) +
           ggplot2::xlab("Column proportions") +
@@ -564,13 +695,27 @@ plot.fitBipartiteSBMPop <- function(
           ggplot2::theme(aspect.ratio = 1 / x$Q[2])
         if (values) {
           p_pi <- p_pi +
-            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
+            ggplot2::geom_text(
+              ggplot2::aes(
+                label = ifelse(
+                  Proportion > values_min,
+                  round(Proportion, 2),
+                  ""
+                )
+              ),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
               data = df_pi
             )
           p_rho <- p_rho +
-            ggplot2::geom_text(ggplot2::aes(label = ifelse(Proportion > values_min, round(Proportion, 2), "")),
+            ggplot2::geom_text(
+              ggplot2::aes(
+                label = ifelse(
+                  Proportion > values_min,
+                  round(Proportion, 2),
+                  ""
+                )
+              ),
               position = ggplot2::position_stack(vjust = 0.5),
               color = "black",
               data = df_rho
@@ -585,7 +730,9 @@ plot.fitBipartiteSBMPop <- function(
                               RRAAAA
                               "
         p_alpha <- patchwork::wrap_plots(
-          R = p_pi, C = p_rho, A = p_alpha,
+          R = p_pi,
+          C = p_rho,
+          A = p_alpha,
           design = mixture_layout
         )
       }
@@ -599,7 +746,9 @@ plot.fitBipartiteSBMPop <- function(
           mean_rho <- 1
           oRow <- order(x$alpha %*% mean_rho, decreasing = TRUE)
         } else if (x$free_mixture_row || x$free_mixture_col) {
-          mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) pi[[2]]))
+          mean_rho <- matrixStats::rowMeans2(sapply(x$pim, function(pi) {
+            pi[[2]]
+          }))
           oRow <- order(x$alpham[[net_id]] %*% mean_rho, decreasing = TRUE)
         } else {
           oRow <- order(rowMeans(x$alpha), decreasing = TRUE)
@@ -624,14 +773,26 @@ plot.fitBipartiteSBMPop <- function(
         ymin <- rep(0, each = x$Q[2]) + 0.5
         ymax <- rep(x$n[[1]][[net_id]], each = x$Q[2]) + 0.5
       } else {
-        ymin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[1]])[oRow][1:(x$Q[1] - 1)])), each = x$Q[2]) + 0.5
-        ymax <- rep(c(cumsum(tabulate(x$Z[[net_id]][[1]])[oRow])), each = x$Q[2]) + 0.5
+        ymin <- rep(
+          c(0, cumsum(tabulate(x$Z[[net_id]][[1]])[oRow][1:(x$Q[1] - 1)])),
+          each = x$Q[2]
+        ) +
+          0.5
+        ymax <- rep(
+          c(cumsum(tabulate(x$Z[[net_id]][[1]])[oRow])),
+          each = x$Q[2]
+        ) +
+          0.5
       }
       if (x$Q[2] == 1) {
         xmin <- rep(0, x$Q[1]) + 0.5
         xmax <- rep(x$n[[2]][[net_id]], x$Q[1]) + 0.5
       } else {
-        xmin <- rep(c(0, cumsum(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])), x$Q[1]) + 0.5
+        xmin <- rep(
+          c(0, cumsum(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])),
+          x$Q[1]
+        ) +
+          0.5
         xmax <- rep(cumsum(tabulate(x$Z[[net_id]][[2]])[oCol]), x$Q[1]) + 0.5
       }
 
@@ -656,7 +817,8 @@ plot.fitBipartiteSBMPop <- function(
       }
 
       p_block <- ggplot2::ggplot(
-        data = block_df, ggplot2::aes(
+        data = block_df,
+        ggplot2::aes(
           x = .data$Var2,
           y = .data$Var1,
           fill = .data$value
@@ -664,22 +826,47 @@ plot.fitBipartiteSBMPop <- function(
       ) +
         ggplot2::geom_tile(show.legend = FALSE) +
         ggplot2::geom_hline(
-          yintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[1]])[rev(oRow)][x$Q[1]:2])) + .5,
-          col = "red", linewidth = .5
+          yintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[1]])[rev(
+            oRow
+          )][x$Q[1]:2])) +
+            .5,
+          col = "red",
+          linewidth = .5
         ) +
         ggplot2::geom_vline(
-          xintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[2]])[oCol][1:(x$Q[2] - 1)])) + .5,
-          col = "red", linewidth = .5
+          xintercept = cumsum(stats::na.omit(tabulate(x$Z[[net_id]][[2]])[oCol][
+            1:(x$Q[2] - 1)
+          ])) +
+            .5,
+          col = "red",
+          linewidth = .5
         ) +
-        ggplot2::scale_fill_gradient2(high = "black", mid = "white", low = "transparent")
+        ggplot2::scale_fill_gradient2(
+          high = "black",
+          mid = "white",
+          low = "transparent"
+        )
 
       if (values) {
         p_block <- p_block +
-          ggplot2::geom_tile(ggplot2::aes(
-            alpha = alpha
-          ), fill = "red") +
-          ggplot2::guides(alpha = ggplot2::guide_legend(title = sprintf("\u03B1"), reverse = T)) +
-          scale_alpha_continuous(limits = c(0, ifelse(x$distribution == "bernoulli", 1, max(x$alpha))))
+          ggplot2::geom_tile(
+            ggplot2::aes(
+              alpha = alpha
+            ),
+            fill = "red"
+          ) +
+          ggplot2::guides(
+            alpha = ggplot2::guide_legend(
+              title = sprintf("\u03B1"),
+              reverse = T
+            )
+          ) +
+          scale_alpha_continuous(
+            limits = c(
+              0,
+              ifelse(x$distribution == "bernoulli", 1, max(x$alpha))
+            )
+          )
       }
 
       p_block <- p_block +
@@ -732,19 +919,34 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
   Q1max <- Qmax[1]
   Q2max <- Qmax[2]
 
-  completeness_mat <- outer(seq(1, Q1max), seq(1, Q2max), Vectorize(function(q1, q2) {
-    ifelse(is.null(x$model_list[[q1, q2]]$clustering_is_complete), NA, x$model_list[[q1, q2]]$clustering_is_complete)
-  }))
+  completeness_mat <- outer(
+    seq(1, Q1max),
+    seq(1, Q2max),
+    Vectorize(function(q1, q2) {
+      ifelse(
+        is.null(x$model_list[[q1, q2]]$clustering_is_complete),
+        NA,
+        x$model_list[[q1, q2]]$clustering_is_complete
+      )
+    })
+  )
   completeness_df <- completeness_mat |>
     reshape2::melt(value.name = "clustering_is_complete") |>
     dplyr::rename(Q1 = "Var1", Q2 = "Var2") |>
     dplyr::mutate(Q1 = as.factor(Q1), Q2 = as.factor(Q2)) |>
     dplyr::select(all_of(c("Q1", "Q2", "clustering_is_complete"))) |>
     dplyr::filter(!is.na(clustering_is_complete)) |>
-    dplyr::mutate(clustering_is_complete = ifelse(clustering_is_complete, "Yes", "No"))
+    dplyr::mutate(
+      clustering_is_complete = ifelse(clustering_is_complete, "Yes", "No")
+    )
 
-  criterion_complete_df <- dplyr::left_join(x = criterion_df, completeness_df, by = c("Q1", "Q2"))
-  criterion_complete_df$is_max <- criterion_complete_df$criterion == max(criterion_complete_df$criterion)
+  criterion_complete_df <- dplyr::left_join(
+    x = criterion_df,
+    completeness_df,
+    by = c("Q1", "Q2")
+  )
+  criterion_complete_df$is_max <- criterion_complete_df$criterion ==
+    max(criterion_complete_df$criterion)
 
   # Convert TRUE FALSE to factor
 
@@ -752,21 +954,35 @@ plot.bisbmpop <- function(x, criterion = "BICL", ...) {
     ggplot2::geom_tile(ggplot2::aes(x = Q2, y = Q1, fill = criterion)) +
     ggplot2::geom_point(
       ggplot2::aes(
-        x = Q2, y = Q1,
-        fill = criterion, color = clustering_is_complete,
+        x = Q2,
+        y = Q1,
+        fill = criterion,
+        color = clustering_is_complete,
         shape = is_max
       ),
       size = 8
     ) +
     ggplot2::scale_shape_manual(name = "Is Max?", values = c(-9, 17)) +
-    ggplot2::scale_fill_distiller(name = criterion, palette = "Spectral", direction = 1L) +
+    ggplot2::scale_fill_distiller(
+      name = criterion,
+      palette = "Spectral",
+      direction = 1L
+    ) +
     ggplot2::scale_color_brewer(name = "Is Complete?", type = "div") +
     ggplot2::theme(aspect.ratio = Q1max / Q2max) +
     ggplot2::theme_classic()
   p
 }
 utils::globalVariables(c(
-  "Q", "Q1", "Q2", "Criterion", "Proportion",
-  "clustering_is_complete", "is_max",
-  "Var1", "Var2", "value", "name"
+  "Q",
+  "Q1",
+  "Q2",
+  "Criterion",
+  "Proportion",
+  "clustering_is_complete",
+  "is_max",
+  "Var1",
+  "Var2",
+  "value",
+  "name"
 ))
