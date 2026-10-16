@@ -1,5 +1,10 @@
 # Changelog
 
+## colSBM 0.4.11
+
+- For `meso` plots, the `ord, oRow, oCol` now coherently control the
+  display of the blocks, labels and axis ticks.
+
 ## colSBM 0.4.10
 
 - @JulAgu fixed a bug that prevented unipartite collections to be
