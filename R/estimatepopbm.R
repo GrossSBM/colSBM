@@ -765,7 +765,7 @@ clusterize_bipartite_networks_graphon <- function(
   fo <- utils::modifyList(fo, fit_opts)
   fit_opts <- fo
 
-  if (verbose) {
+  if (verbose && keep_history) {
     cli::cli_text("Temporary results will be saved as {.val {temp_save_path}} after each step")
   }
   if (is.null(partition_init)) {
@@ -795,6 +795,21 @@ clusterize_bipartite_networks_graphon <- function(
     names(cluster) <- net_id
   } else {
     collections <- partition_init
+    # A partition_init must be homogeneous: mixing bisbmpop and
+    # fitBipartiteSBMPop objects would leave the graphon distances undefined.
+    collection_classes <- vapply(collections, function(col) {
+      if (inherits(col, "bisbmpop")) {
+        "bisbmpop"
+      } else if (inherits(col, "fitBipartiteSBMPop")) {
+        "fitBipartiteSBMPop"
+      } else {
+        "unsupported"
+      }
+    }, character(1))
+    stopifnot(
+      "All elements of partition_init must be objects of the same class (bisbmpop or fitBipartiteSBMPop)" =
+        all(collection_classes == collection_classes[1]) && collection_classes[1] != "unsupported"
+    )
     cluster <- unlist(lapply(seq_along(collections), function(idx) {
       setNames(rep(idx, length(collections[[idx]]$net_id)), nm = collections[[idx]]$net_id)
     }))
@@ -852,7 +867,9 @@ clusterize_bipartite_networks_graphon <- function(
   has_bicl_increased <- TRUE
   # Loop to merge collections
   while (length(collections) > 1 && (has_bicl_increased || full_inference)) {
-    saveRDS(list(fusion_history = fusion_history, bicl_history = bicl_history), temp_save_path)
+    if (!is.null(temp_save_path)) {
+      saveRDS(list(fusion_history = fusion_history, bicl_history = bicl_history), temp_save_path)
+    }
     if (verbose) {
       cli::cli_h2("Step {.val {step}} on a max of {.val {max_steps}} step{?s}")
       cli::cli_alert_info("Computing distances between collections")
@@ -951,6 +968,7 @@ clusterize_bipartite_networks_d_a <- function(
   verbose = TRUE,
   temp_save_path = tempdir()
 ) {
+  max_nb_steps <- check_is_integer_over_thresh(max_nb_steps, thresh = 1L)
   clust_step <- 1L
   bicl_increased <- TRUE
   old_desc_BICL <- -Inf
@@ -1030,6 +1048,9 @@ clusterize_bipartite_networks_d_a <- function(
     }
     clust_step <- clust_step + 1L
   }
+  # If the loop is exhausted because max_nb_steps was reached, return the last
+  # ascending result instead of falling through to an implicit NULL
+  return(asc_res)
 }
 
 clusterize_bipartite_networks_low_penalty_first <- function(netlist,
@@ -1179,7 +1200,7 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
             nb_run = min(sum(cl == k), nb_run),
             Z_init = Z_init,
             global_opts = global_opts,
-            fit_opts = fit_opts,
+            fit_opts = fit_opts_no_pen,
             sep_BiSBM = filtered_sep_BiSBM
           )
         )
