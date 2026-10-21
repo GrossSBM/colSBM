@@ -52,15 +52,19 @@ void ColSBM::initialize_state() {
 
     vloss.push_back(std::vector<double>{});
 
-    double logfact = 0.0;
-    for (arma::uword i = 0; i < A[m].n_rows; ++i) {
-      for (arma::uword j = 0; j < A[m].n_cols; ++j) {
-        if (mask_m(i, j) < 0.5) {
-          logfact += std::lgamma(A[m](i, j) + 1.0);
+    if (distribution == "poisson") {
+      double logfact = 0.0;
+      for (arma::uword i = 0; i < A[m].n_rows; ++i) {
+        for (arma::uword j = 0; j < A[m].n_cols; ++j) {
+          if (mask_m(i, j) < 0.5) {
+            logfact += std::lgamma(A[m](i, j) + 1.0);
+          }
         }
       }
+      logfactA.push_back(logfact);
+    } else {
+      logfactA.push_back(0.0);
     }
-    logfactA.push_back(logfact);
   }
 
   emqr.zeros(Q, Q, M);
