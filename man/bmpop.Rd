@@ -70,6 +70,7 @@ the current best fit.}
     \item \href{#method-bmpop-burn_in}{\code{bmpop$burn_in()}}
     \item \href{#method-bmpop-forward_pass}{\code{bmpop$forward_pass()}}
     \item \href{#method-bmpop-backward_pass}{\code{bmpop$backward_pass()}}
+    \item \href{#method-bmpop-show_trace}{\code{bmpop$show_trace()}}
     \item \href{#method-bmpop-optimize}{\code{bmpop$optimize()}}
     \item \href{#method-bmpop-choose_models}{\code{bmpop$choose_models()}}
     \item \href{#method-bmpop-show}{\code{bmpop$show()}}
@@ -326,19 +327,31 @@ The optimization method
 }
 
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-bmpop-optimize"></a>}}
-\if{latex}{\out{\hypertarget{method-bmpop-optimize}{}}}
-\subsection{\code{bmpop$optimize()}}{
+\if{html}{\out{<a id="method-bmpop-show_trace"></a>}}
+\if{latex}{\out{\hypertarget{method-bmpop-show_trace}{}}}
+\subsection{\code{bmpop$show_trace()}}{
   This method performs the burn in and the steps of moving window with
 cluster splitting (forward pass) and merging (backward pass) around the mode found.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{bmpop$optimize()}
+    \preformatted{bmpop$show_trace()}
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
     nothing; but stores the values
-Performs the model selection based on the BICL criterion
+Draw the trace of the fitted criteria (BICL, ICL, vbound, SBM)
+as a function of Q, consistent with plot(bmpop).
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-bmpop-optimize"></a>}}
+\if{latex}{\out{\hypertarget{method-bmpop-optimize}{}}}
+\subsection{\code{bmpop$optimize()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{bmpop$optimize()}
+    \if{html}{\out{</div>}}
   }
 }
 
