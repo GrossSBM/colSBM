@@ -79,7 +79,8 @@ test_that("cpp poisson vbound agrees with the R procedure on identical parameter
       if (free_density) {
         expect_equal(info$delta[2], 1 / 2, tolerance = 3e-2)
         expect_equal(info$delta[3], 1 / 3, tolerance = 3e-2)
-      }    }
+      }
+    }
   }
 })
 
