@@ -18,6 +18,71 @@ test_that("cpp runs normally and stops on non implemented emission distribution"
   expect_error(colsbm_create(A, Q = 2L, tau = taus, distribution = "Poisson"))
 })
 
+test_that("cpp poisson vbound agrees with the R procedure on identical parameters", {
+  set.seed(42)
+  M <- 4L
+  Q <- 3L
+  n <- 120L
+  true_pi <- c(0.5, 0.3, 0.2)
+  dens <- c(1, 0.5, 1 / 3, 1)
+  lambda <- matrix(c(4, 1, 0.5, 1, 3, 0.5, 0.5, 0.5, 2), Q, Q)
+  rNetwork <- function(d) {
+    z <- sample(Q, n, TRUE, true_pi)
+    Am <- matrix(0, n, n)
+    for (i in seq_len(n)) for (j in seq_len(n)) if (i != j) Am[i, j] <- rpois(1, d * lambda[z[i], z[j]])
+    Am
+  }
+  A <- lapply(dens, rNetwork)
+  taus <- lapply(seq_len(M), function(m) {
+    tau <- matrix(1e-6, n, Q)
+    tau[cbind(seq_len(n), (seq_len(n) %% Q) + 1)] <- 1 - 1e-6
+    tau / rowSums(tau)
+  })
+
+  for (directed in c(TRUE, FALSE)) {
+    for (free_density in c(FALSE, TRUE)) {
+      ptr <- colsbm_create(
+        A = A, Q = Q, tau = taus, directed = directed,
+        distribution = "poisson", free_mixture = TRUE,
+        free_density = free_density
+      )
+      colsbm_optimize(ptr, max_step = 200L, tol = 1e-3)
+      info <- colsbm_info(ptr)
+      expect_true(all(is.finite(info$vbound)))
+      expect_equal(info$M, M)
+      expect_equal(info$Q, Q)
+
+      # Feed the C++ final parameters back into the R object and ask R for its
+      # own vbound: the two must agree to machine precision.
+      fit <- colSBM:::fitSimpleSBMPop$new(
+        A = A, Q = Q, Z = taus, directed = directed,
+        distribution = "poisson", free_mixture = TRUE,
+        free_density = free_density, init_method = "given",
+        fit_opts = colSBM:::default_fit_opts_unipartite()
+      )
+      fit$tau <- info$tau
+      fit$pi <- info$pi
+      fit$pim <- info$pim
+      fit$alpha <- info$alpha
+      fit$delta <- info$delta
+      fit$alpham <- info$alpham
+      fit$emqr <- aperm(info$emqr, c(3, 1, 2))
+      fit$nmqr <- aperm(info$nmqr, c(3, 1, 2))
+      fit$logfactA <- vapply(
+        seq_along(A),
+        function(m) sum(lfactorial(A[[m]]) * (1 - fit$mask[[m]]), na.rm = TRUE),
+        FUN.VALUE = .1
+      )
+      expect_equal(tail(info$vbound, 1), fit$compute_vbound(), tolerance = 1e-3)
+
+      # The delta models must recover the network densities
+      if (free_density) {
+        expect_equal(info$delta[2], 1 / 2, tolerance = 3e-2)
+        expect_equal(info$delta[3], 1 / 3, tolerance = 3e-2)
+      }    }
+  }
+})
+
 test_that("cpp VE yields the same results as the R procedure on modular networks", {
   M <- 4L
   true_pi <- c(0.6, 0.3, 0.1)
