@@ -74,18 +74,20 @@
 #' )
 #' }
 cpp_estimate_colSBM <-
-  function(netlist,
-           colsbm_model,
-           net_id = NULL,
-           directed = NULL,
-           distribution = "bernoulli",
-           fit_sbm = NULL,
-           nb_run = 3L,
-           global_opts = list(),
-           fit_opts = list(),
-           Z_init = NULL,
-           fit_init = NULL,
-           verbose = FALSE) {
+  function(
+    netlist,
+    colsbm_model,
+    net_id = NULL,
+    directed = NULL,
+    distribution = "bernoulli",
+    fit_sbm = NULL,
+    nb_run = 3L,
+    global_opts = list(),
+    fit_opts = list(),
+    Z_init = NULL,
+    fit_init = NULL,
+    verbose = FALSE
+  ) {
     netlist <- check_networks_list(
       networks_list = netlist,
       min_length = 1L
@@ -125,8 +127,11 @@ cpp_estimate_colSBM <-
       if (global_opts[["verbosity"]] >= 1) {
         say("Initialising spectral clustering")
       }
-      spectral_inits <- colsbm_lapply(netlist, spectral_clustering,
-        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]],
+      spectral_inits <- colsbm_lapply(
+        netlist,
+        spectral_clustering,
+        backend = global_opts[["backend"]],
+        nb_cores = global_opts[["nb_cores"]],
         K = 2
       )
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
@@ -157,6 +162,12 @@ cpp_estimate_colSBM <-
       if (global_opts[["verbosity"]] >= 1) {
         say("Model fitted !")
       }
+      # Propose empty-block variants of the initial fit (free mixture only)
+      # and keep the best one by BICL
+      start_variants <- propose_empty_blocks(start_model)
+      start_model <- start_variants[[which.max(
+        vapply(start_variants, function(mod) mod[["BICL"]], numeric(1))
+      )]]
     }
 
     # Compute Q=1
@@ -184,8 +195,17 @@ cpp_estimate_colSBM <-
     for (iter in seq(10)) {
       # Forward phase: estimate models for Q from 2 to Q_max
       # Pass the initial model to cpp_forward which will compute the splits
-      splitted_model_list <- cpp_forward(start_model, netlist,
-        Q_start = 2L, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = verbose, current_model_list = model_list,
+      splitted_model_list <- cpp_forward(
+        start_model,
+        netlist,
+        Q_start = 2L,
+        Q_max,
+        distribution,
+        free_mixture,
+        free_density,
+        fit_opts,
+        verbose = verbose,
+        current_model_list = model_list,
         global_opts = global_opts
       )
 
@@ -202,14 +222,22 @@ cpp_estimate_colSBM <-
         best_bicl <- max(sapply(model_list, function(mod) mod$BICL))
       } else {
         if (global_opts[["verbosity"]] >= 1) {
-          say("BICL criterion did not increase in forward phase, stopping optimization.")
+          say(
+            "BICL criterion did not increase in forward phase, stopping optimization."
+          )
         }
         break
       }
 
-
       merged_model_list <- cpp_backward(
-        model_list = model_list, netlist = netlist, Q_min = Q_min, distribution = distribution, free_mixture = free_mixture, free_density = free_density, fit_opts = fit_opts, verbose = verbose,
+        model_list = model_list,
+        netlist = netlist,
+        Q_min = Q_min,
+        distribution = distribution,
+        free_mixture = free_mixture,
+        free_density = free_density,
+        fit_opts = fit_opts,
+        verbose = verbose,
         global_opts = global_opts
       )
 
@@ -225,7 +253,9 @@ cpp_estimate_colSBM <-
         best_bicl <- max(sapply(model_list, function(mod) mod$BICL))
       } else {
         if (global_opts[["verbosity"]] >= 1) {
-          say("BICL criterion did not increase in backward phase, stopping optimization.")
+          say(
+            "BICL criterion did not increase in backward phase, stopping optimization."
+          )
         }
         break
       }
@@ -245,13 +275,82 @@ cpp_estimate_colSBM <-
     )
 
     mybmpop[["model_list"]] <- model_list
-    mybmpop[["BICL"]] <- vapply(model_list, function(mod) mod[["BICL"]], numeric(1))
-    mybmpop[["vbound"]] <- vapply(model_list, function(mod) tail(mod[["vbound"]], 1), numeric(1))
-    mybmpop[["ICL"]] <- vapply(model_list, function(mod) tail(mod[["ICL"]], 1), numeric(1))
+    mybmpop[["BICL"]] <- vapply(
+      model_list,
+      function(mod) mod[["BICL"]],
+      numeric(1)
+    )
+    mybmpop[["vbound"]] <- vapply(
+      model_list,
+      function(mod) tail(mod[["vbound"]], 1),
+      numeric(1)
+    )
+    mybmpop[["ICL"]] <- vapply(
+      model_list,
+      function(mod) tail(mod[["ICL"]], 1),
+      numeric(1)
+    )
     mybmpop[["best_fit"]] <- model_list[[which.max(mybmpop[["BICL"]])]]
 
     return(mybmpop)
   }
+
+#' Propose empty-block variants of a fitted model by updating Cpi and Calpha
+#'
+#' After a fit with free mixture, some blocks may be almost empty in some
+#' networks. This mirrors the bmpop exploration: for thresholds 1% to 5% on the
+#' fitted pi, build the support Cpi (blocks with pi above the threshold are
+#' populated), recompute Calpha as the union of the pairwise outer products, and
+#' re-fit the cloned model with `init_method = "empty"` so that empty blocks are
+#' really zeroed out. The original fit is always returned first.
+#'
+#' @param fit A fitted `fitSimpleSBMPop` object.
+#'
+#' @keywords internal
+#'
+#' @return A list of `fitSimpleSBMPop`: the original fit followed by the
+#' proposed empty-block variants (if any).
+propose_empty_blocks <- function(fit) {
+  tmp_list <- list(fit)
+  if (fit$free_mixture & fit$M > 1) {
+    Q <- fit$Q
+    C1 <- vapply(
+      seq(fit$M),
+      function(m) fit$pi[[m]] > 1 / fit$n[m],
+      FUN.VALUE = rep(TRUE, Q)
+    )
+    dim(C1) <- c(Q, fit$M)
+    for (zeros in seq(5)) {
+      Cpi <- vapply(
+        seq(fit$M),
+        function(m) fit$pi[[m]] > zeros / 100, # fit$n[m],
+        FUN.VALUE = rep(TRUE, Q)
+      )
+      dim(Cpi) <- c(Q, fit$M)
+      if (
+        any(!Cpi) &
+          all(rowSums(Cpi) > 0) &
+          (zeros == 1 | any(Cpi != C1))
+      ) {
+        tmp_res <- fit$clone()
+        tmp_res$Cpi <- Cpi
+        tmp_res$Calpha <-
+          Reduce(
+            "+",
+            lapply(
+              seq(fit$M),
+              function(m) tcrossprod(Cpi[, m])
+            )
+          ) >
+            0
+        tmp_res$init_method <- "empty"
+        tmp_res$optimize()
+        tmp_list <- c(tmp_list, tmp_res)
+      }
+    }
+  }
+  tmp_list
+}
 
 #' Forward phase estimation for colSBM
 #'
@@ -264,9 +363,24 @@ cpp_estimate_colSBM <-
 #' @param fit_opts Fit options for the VEM algorithm
 #' @param fit_init Initial fitted model to start the forward phase
 #'
+#' @keywords internal
+#'
 #' @return A list of fitted models for Q from 2 to Q_max
 cpp_forward <-
-  function(start_model, netlist, Q_start, Q_max, distribution, free_mixture, free_density, fit_opts, verbose = FALSE, iteration = NULL, current_model_list, global_opts = default_global_opts_unipartite()) {
+  function(
+    start_model,
+    netlist,
+    Q_start,
+    Q_max,
+    distribution,
+    free_mixture,
+    free_density,
+    fit_opts,
+    verbose = FALSE,
+    iteration = NULL,
+    current_model_list,
+    global_opts = default_global_opts_unipartite()
+  ) {
     # Initialize taus
     M <- length(netlist)
 
@@ -275,9 +389,13 @@ cpp_forward <-
     }
 
     # Compute splits from the initial model
-    next_splits <- purrr::transpose(colsbm_lapply(seq(M),
-      function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start),
-      backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+    next_splits <- purrr::transpose(colsbm_lapply(
+      seq(M),
+      function(m) {
+        split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start)
+      },
+      backend = global_opts[["backend"]],
+      nb_cores = global_opts[["nb_cores"]]
     ))
     model_list <- list(start_model)
     for (Q in seq(3, Q_max)) {
@@ -302,15 +420,23 @@ cpp_forward <-
             fit_opts = fit_opts
           )
           tmp_fit$optimize()
-          tmp_fit
+          # Propose empty-block variants of this split fit (free mixture only)
+          propose_empty_blocks(tmp_fit)
         },
-        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+        backend = global_opts[["backend"]],
+        nb_cores = global_opts[["nb_cores"]]
       )
-      best_model_idx <- which.max(sapply(models, function(model) model[["BICL"]]))
+      models <- unlist(models, recursive = FALSE)
+      best_model_idx <- which.max(sapply(models, function(model) {
+        model[["BICL"]]
+      }))
       if (global_opts[["verbosity"]] >= 2) {
         bicl <- models[[best_model_idx]][["BICL"]]
         say(
-          "Best splitted model index is ", best_model_idx, " with BICL = ", bicl,
+          "Best splitted model index is ",
+          best_model_idx,
+          " with BICL = ",
+          bicl,
           level = 1L
         )
       }
@@ -318,7 +444,13 @@ cpp_forward <-
       if (global_opts[["verbosity"]] >= 2) {
         say("Computing next splits", level = 1L)
       }
-      next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)))
+      next_splits <- purrr::transpose(lapply(seq(M), function(m) {
+        split_clust(
+          X = netlist[[m]],
+          Z = model_list[[Q - 1]][["Z"]][[m]],
+          Q = Q
+        )
+      }))
     }
 
     return(model_list)
@@ -335,16 +467,31 @@ cpp_forward <-
 #' @param fit_opts Fit options for the VEM algorithm
 #' @param verbose Logical, should we print messages?
 #'
+#' @keywords internal
+#'
 #' @return A list of fitted models for Q from Q_max down to Q_min
 cpp_backward <-
-  function(model_list, netlist, Q_min, distribution, free_mixture, free_density, fit_opts, verbose = FALSE, global_opts = default_global_opts_unipartite()) {
+  function(
+    model_list,
+    netlist,
+    Q_min,
+    distribution,
+    free_mixture,
+    free_density,
+    fit_opts,
+    verbose = FALSE,
+    global_opts = default_global_opts_unipartite()
+  ) {
     M <- length(netlist)
     # Get the maximum number of clusters from the model list
     Q_max <- length(model_list)
 
     if (global_opts[["verbosity"]] >= 2) {
       say(
-        "Starting backward phase from Q=", Q_max, " down to Q=", Q_min,
+        "Starting backward phase from Q=",
+        Q_max,
+        " down to Q=",
+        Q_min,
         level = 1L
       )
     }
@@ -359,9 +506,11 @@ cpp_backward <-
       }
 
       # Compute merges using merge_clust function
-      Z_merges <- purrr::transpose(colsbm_lapply(seq(M),
+      Z_merges <- purrr::transpose(colsbm_lapply(
+        seq(M),
         function(m) merge_clust(Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q),
-        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+        backend = global_opts[["backend"]],
+        nb_cores = global_opts[["nb_cores"]]
       ))
 
       # Fit models for each merge
@@ -386,18 +535,26 @@ cpp_backward <-
 
           # Optimize the model
           tmp_fit$optimize()
-          tmp_fit
+          # Propose empty-block variants of this merged fit (free mixture only)
+          propose_empty_blocks(tmp_fit)
         },
-        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+        backend = global_opts[["backend"]],
+        nb_cores = global_opts[["nb_cores"]]
       )
+      merged_models <- unlist(merged_models, recursive = FALSE)
 
       # Select the best model among the merged ones
-      best_model_idx <- which.max(sapply(merged_models, function(model) model[["BICL"]]))
+      best_model_idx <- which.max(sapply(merged_models, function(model) {
+        model[["BICL"]]
+      }))
 
       if (global_opts[["verbosity"]] >= 2) {
         bicl <- merged_models[[best_model_idx]][["BICL"]]
         say(
-          "Best merged model index is ", best_model_idx, " with BICL = ", bicl,
+          "Best merged model index is ",
+          best_model_idx,
+          " with BICL = ",
+          bicl,
           level = 1L
         )
       }
@@ -415,9 +572,15 @@ cpp_backward <-
 #' @param model_list2 a second list of fit...SBM with a BICL
 #' attribute
 #'
+#' @keywords internal
+#'
 #' @return a list of fit...SBM merged by selecting the best BICL
 #' for each model size Q provided
-compare_model_lists <- function(model_list1, model_list2, global_opts = default_global_opts_unipartite()) {
+compare_model_lists <- function(
+  model_list1,
+  model_list2,
+  global_opts = default_global_opts_unipartite()
+) {
   # --- Normalise each list: keep the best model per Q ---------------------
   # A list may hold several models fitted at the same Q (e.g. from different
   # splits/merges). Only the best BICL per Q matters for the comparison, so
@@ -431,7 +594,9 @@ compare_model_lists <- function(model_list1, model_list2, global_opts = default_
     BICLs <- vapply(model_list, function(mod) mod[["BICL"]], numeric(1))
     # For each Q, keep the index of the model with the highest BICL.
     # In case of a tie, the first occurrence wins (stable order).
-    best_idx <- tapply(seq_along(Qs), Qs, function(idx) idx[which.max(BICLs[idx])])
+    best_idx <- tapply(seq_along(Qs), Qs, function(idx) {
+      idx[which.max(BICLs[idx])]
+    })
     model_list[best_idx]
   }
 
@@ -461,7 +626,10 @@ compare_model_lists <- function(model_list1, model_list2, global_opts = default_
     if (global_opts[["verbosity"]] >= 2) {
       print_bicl <- merged[[i]][["BICL"]]
       say(
-        "Best model for Q=", k, " has BICL = ", print_bicl,
+        "Best model for Q=",
+        k,
+        " has BICL = ",
+        print_bicl,
         level = 1L
       )
     }
@@ -544,22 +712,27 @@ compare_model_lists <- function(model_list1, model_list2, global_opts = default_
 #'   colsbm_model = "iid"
 #' )
 #' }
-clusterize_unipartite_networks_cpp <- function(netlist,
-                                               colsbm_model,
-                                               directed = FALSE,
-                                               net_id = NULL,
-                                               distribution = "bernoulli",
-                                               nb_run = 3L,
-                                               global_opts = list(),
-                                               fit_opts = list(),
-                                               fit_init = NULL,
-                                               full_inference = FALSE,
-                                               verbose = TRUE,
-                                               temp_save_path = tempfile(fileext = ".Rds")) {
+clusterize_unipartite_networks_cpp <- function(
+  netlist,
+  colsbm_model,
+  directed = FALSE,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  fit_init = NULL,
+  full_inference = FALSE,
+  verbose = TRUE,
+  temp_save_path = tempfile(fileext = ".Rds")
+) {
   check_unipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
   netlist <- check_networks_list(networks_list = netlist)
-  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  net_id <- check_net_id_and_initialize(
+    net_id = net_id,
+    networks_list = netlist
+  )
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
     networks_list = netlist,
@@ -576,7 +749,9 @@ clusterize_unipartite_networks_cpp <- function(netlist,
   # Fit the initial model on the full collection
   if (verbose) {
     if (!is.null(temp_save_path)) {
-      cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
+      cli::cli_alert_info(
+        "A save file will be created at {.val {temp_save_path}} and updated after each step"
+      )
     }
     cli::cli_h1("Fitting the full collection")
   }
@@ -599,18 +774,20 @@ clusterize_unipartite_networks_cpp <- function(netlist,
 
   clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
 
-
   if (verbose) {
     cli::cli_h1("Beginning clustering")
   }
   # Process the clustering queue
   while (length(clustering_queue) > 0) {
     if (!is.null(temp_save_path)) {
-      saveRDS(list(
-        clustering_queue = clustering_queue,
-        list_model_binary = list_model_binary,
-        clustering_history = clustering_history
-      ), temp_save_path)
+      saveRDS(
+        list(
+          clustering_queue = clustering_queue,
+          list_model_binary = list_model_binary,
+          clustering_history = clustering_history
+        ),
+        temp_save_path
+      )
     }
     fit <- clustering_queue[[1]]
     clustering_queue <- clustering_queue[-1]
@@ -651,7 +828,9 @@ clusterize_unipartite_networks_cpp <- function(netlist,
         )
 
         if (verbose) {
-          cli::cli_alert_info("Fitting a sub collection with : {.val {fit$net_id[cl == k]}}")
+          cli::cli_alert_info(
+            "Fitting a sub collection with : {.val {fit$net_id[cl == k]}}"
+          )
         }
 
         return(
@@ -672,16 +851,20 @@ clusterize_unipartite_networks_cpp <- function(netlist,
       nb_cores = global_opts[["nb_cores"]]
     )
 
-
-    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL >
+      fit$best_fit$BICL)
     # Decide whether to continue splitting or add to final list
     if (full_inference || bicl_increased) {
       clustering_queue <- append(clustering_queue, fits)
       if (verbose && bicl_increased) {
-        cli::cli_alert_success("Splitting collections improved the BIC-L criterion")
+        cli::cli_alert_success(
+          "Splitting collections improved the BIC-L criterion"
+        )
       }
       if (verbose && full_inference) {
-        cli::cli_alert_info("Full inference mode enabled, continuing to split collections")
+        cli::cli_alert_info(
+          "Full inference mode enabled, continuing to split collections"
+        )
       }
       prev_cluster <- unique(cluster[fit$net_id])
 
@@ -690,11 +873,16 @@ clusterize_unipartite_networks_cpp <- function(netlist,
 
       # Assign the new cluster to the networks
       cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
-      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
+      clustering_history <- rbind(
+        clustering_history,
+        matrix(unname(cluster), nrow = 1)
+      )
     } else {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       if (verbose) {
-        cli::cli_alert_danger("Splitting collections {.emph decreased} the BIC-L criterion")
+        cli::cli_alert_danger(
+          "Splitting collections {.emph decreased} the BIC-L criterion"
+        )
       }
     }
   }
@@ -715,7 +903,9 @@ clusterize_unipartite_networks_cpp <- function(netlist,
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
     if (verbose) {
-      cli::cli_alert_info("The final results are saved at {.val {temp_save_path}}")
+      cli::cli_alert_info(
+        "The final results are saved at {.val {temp_save_path}}"
+      )
     }
   }
   return(output_list)
