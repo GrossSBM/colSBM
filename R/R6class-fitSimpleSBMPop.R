@@ -1302,6 +1302,8 @@ fitSimpleSBMPop <- R6::R6Class(
         cat("Took ", info$iterations, " steps of VEM\n")
       }
       self$alpha <- info[["alpha"]]
+      self$delta <- info[["delta"]]
+      self$alpham <- info[["alpham"]]
       self$pim <- info[["pim"]]
       self$pi <- info[["pi"]]
       self$tau <- info[["tau"]]
