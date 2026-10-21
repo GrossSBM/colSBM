@@ -42,3 +42,4 @@ A list of fitted models for Q from 2 to Q_max
 \description{
 Forward phase estimation for colSBM
 }
+\keyword{internal}

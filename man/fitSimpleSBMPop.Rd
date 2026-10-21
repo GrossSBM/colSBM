@@ -843,8 +843,8 @@ Perform the whole initialization and VEM algorithm}
   }
   \subsection{Returns}{
     nothing; stores values
-To reorder the parameters according to diag(alpha) decreasing order
-The message printed when one prints the object
+To reorder the parameters according to diag(alpha)
+decreasing order
   }
 }
 
@@ -856,6 +856,10 @@ The message printed when one prints the object
     \if{html}{\out{<div class="r">}}
     \preformatted{fitSimpleSBMPop$reorder_parameters()}
     \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing
+Used to compute with C++ reimplementation
   }
 }
 
@@ -869,6 +873,17 @@ The message printed when one prints the object
   max_step = self$fit_opts$max_vem_steps,
   tol = self$fit_opts$tolerance
 )}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{max_step}}{the maximum number of steps for the VEM
+Defaults to \code{fit_opts$max_vem_steps}.}
+      \item{\code{tol}}{the tolerance for the stopping criterion.
+Defaults to \code{fit_opts$tolerance}.
+The message printed when one prints the object}
+    }
     \if{html}{\out{</div>}}
   }
 }

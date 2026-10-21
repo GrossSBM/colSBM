@@ -39,3 +39,4 @@ A list of fitted models for Q from Q_max down to Q_min
 \description{
 Backward phase estimation for colSBM
 }
+\keyword{internal}

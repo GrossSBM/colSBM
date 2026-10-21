@@ -17,3 +17,4 @@ t(x)\%\emph{\% y \%}\% x, but faster I hope
 \description{
 Reimplementation of quadratic form in C++
 }
+\keyword{internal}

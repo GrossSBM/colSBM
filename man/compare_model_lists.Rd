@@ -23,3 +23,4 @@ for each model size Q provided
 \description{
 Compare two list of models to merge them by the best BICL
 }
+\keyword{internal}

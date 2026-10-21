@@ -22,6 +22,8 @@ colsbm_info <- function(ptr) {
 #' @param x the quadratic form
 #' @param y the matrix on which x is applied
 #'
+#' @keywords internal
+#'
 #' @return t(x)%*% y %*% x, but faster I hope
 tquadform_cpp <- function(x, y) {
     .Call('_colSBM_tquadform_cpp', PACKAGE = 'colSBM', x, y)

@@ -6,6 +6,7 @@ reference:
   - title: User functions
     contents:
       - "`estimate_colSBM`"
+      - "`cpp_estimate_colSBM`"
       - "`dist_bmpop_max`"
       - "`adjust_colBiSBM`"
       - starts_with("clusterize")
