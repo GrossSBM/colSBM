@@ -169,6 +169,50 @@ void ColSBM::update_alpha() {
   }
 }
 
+// Fixed-point M step for the delta models (Poisson with free_density, and
+// Bernoulli with approx_pois in R). Mirrors R's fixed_point_alpha_delta:
+//   delta[m] = sum(emqr[m]) / sum(alpha * nmqr[m])   (delta[1] = 1)
+//   alpha    = sum_m emqr[m]    / sum_m delta[m] * nmqr[m]
+// iterated until mean((a-a_old)^2) + mean((d-d_old)^2) <= 2*tol.
+void ColSBM::fixed_point_alpha_delta(double tol, int max_iter) {
+  mat a = alpha;
+  vec d(M);
+  for (int m = 0; m < M; ++m) {
+    d[m] = delta[m];
+  }
+
+  for (int it = 0; it < max_iter; ++it) {
+    const mat a_old = a;
+    const vec d_old = d;
+
+    for (int m = 0; m < M; ++m) {
+      const double num = arma::accu(emqr.slice(m));
+      const double den = arma::accu(a % nmqr.slice(m));
+      d[m] = (den > 0.0) ? num / den : 0.0;
+    }
+    d[0] = 1.0;
+
+    mat num(Q, Q, arma::fill::zeros);
+    mat den(Q, Q, arma::fill::zeros);
+    for (int m = 0; m < M; ++m) {
+      num += emqr.slice(m);
+      den += d[m] * nmqr.slice(m);
+    }
+    a = nan_to_zero(num / den);
+
+    const double diff = arma::mean(arma::mean(arma::square(a - a_old))) +
+                        arma::mean(arma::square(d - d_old));
+    if (diff <= 2.0 * tol) {
+      break;
+    }
+  }
+
+  alpha = a;
+  for (int m = 0; m < M; ++m) {
+    delta[m] = d[m];
+  }
+}
+
 // The VE step
 mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
   mat tau_old = tau[m];

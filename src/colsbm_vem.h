@@ -51,6 +51,7 @@ public:
   void compute_vbound(bool store_vloss);
   void update_pi();
   void update_alpha();
+  void fixed_point_alpha_delta(double tol = 1e-6, int max_iter = 50);
   mat fixed_point_tau(int m, int max_iter, double tol = TOL);
   double compute_network_vloss(int m) const;
   void step();
