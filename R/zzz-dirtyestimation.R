@@ -125,7 +125,9 @@ cpp_estimate_colSBM <-
       if (global_opts[["verbosity"]] >= 1) {
         say("Initialising spectral clustering")
       }
-      spectral_inits <- lapply(netlist, spectral_clustering, K = 2) |> futurize::futurize(seed = TRUE)
+      spectral_inits <- colsbm_lapply(netlist, spectral_clustering,
+        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]],
+        K = 2)
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
       spectral_taus <- lapply(spectral_taus, function(mat) {
         mat[mat < 1e-6] <- 1e-6
@@ -272,30 +274,37 @@ cpp_forward <-
     }
 
     # Compute splits from the initial model
-    next_splits <- purrr::transpose(lapply(seq(M), function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start)) |> futurize::futurize(seed = TRUE))
+    next_splits <- purrr::transpose(colsbm_lapply(seq(M),
+      function(m) split_clust(X = netlist[[m]], Z = start_model[["Z"]][[m]], Q = Q_start),
+      backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+    ))
     model_list <- list(start_model)
     for (Q in seq(3, Q_max)) {
       if (global_opts[["verbosity"]] >= 2) {
         say("Fitting models at Q=", Q, level = 1L)
       }
-      models <- lapply(seq_along(next_splits), function(split_idx) {
-        tmp_fit <- fitSimpleSBMPop$new(
-          A = netlist,
-          Q = Q,
-          Z = next_splits[[split_idx]],
-          net_id = names(netlist),
-          distribution = distribution,
-          free_mixture = free_mixture,
-          free_density = free_density,
-          init_method = "spectral",
-          Cpi = NULL,
-          Calpha = NULL,
-          logfactA = NULL,
-          fit_opts = fit_opts
-        )
-        tmp_fit$optimize()
-        tmp_fit
-      }) |> futurize::futurize(seed = TRUE)
+      models <- colsbm_lapply(
+        seq_along(next_splits),
+        function(split_idx) {
+          tmp_fit <- fitSimpleSBMPop$new(
+            A = netlist,
+            Q = Q,
+            Z = next_splits[[split_idx]],
+            net_id = names(netlist),
+            distribution = distribution,
+            free_mixture = free_mixture,
+            free_density = free_density,
+            init_method = "spectral",
+            Cpi = NULL,
+            Calpha = NULL,
+            logfactA = NULL,
+            fit_opts = fit_opts
+          )
+          tmp_fit$optimize()
+          tmp_fit
+        },
+        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+      )
       best_model_idx <- which.max(sapply(models, function(model) model[["BICL"]]))
       if (global_opts[["verbosity"]] >= 2) {
         bicl <- models[[best_model_idx]][["BICL"]]
@@ -349,30 +358,37 @@ cpp_backward <-
       }
 
       # Compute merges using merge_clust function
-      Z_merges <- purrr::transpose(lapply(seq(M), function(m) merge_clust(Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q)) |> futurize::futurize(seed = TRUE))
+      Z_merges <- purrr::transpose(colsbm_lapply(seq(M),
+        function(m) merge_clust(Z = model_list[[Q - 1]][["Z"]][[m]], Q = Q),
+        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+      ))
 
       # Fit models for each merge
-      merged_models <- lapply(seq_along(Z_merges), function(merge_idx) {
-        # Create a new model with merged clusters
-        tmp_fit <- fitSimpleSBMPop$new(
-          A = netlist,
-          Q = Q - 1,
-          Z = Z_merges[[merge_idx]],
-          net_id = names(netlist),
-          distribution = distribution,
-          free_mixture = free_mixture,
-          free_density = free_density,
-          init_method = "spectral",
-          Cpi = NULL,
-          Calpha = NULL,
-          logfactA = NULL,
-          fit_opts = fit_opts
-        )
+      merged_models <- colsbm_lapply(
+        seq_along(Z_merges),
+        function(merge_idx) {
+          # Create a new model with merged clusters
+          tmp_fit <- fitSimpleSBMPop$new(
+            A = netlist,
+            Q = Q - 1,
+            Z = Z_merges[[merge_idx]],
+            net_id = names(netlist),
+            distribution = distribution,
+            free_mixture = free_mixture,
+            free_density = free_density,
+            init_method = "spectral",
+            Cpi = NULL,
+            Calpha = NULL,
+            logfactA = NULL,
+            fit_opts = fit_opts
+          )
 
-        # Optimize the model
-        tmp_fit$optimize()
-        tmp_fit
-      }) |> futurize::futurize(seed = TRUE)
+          # Optimize the model
+          tmp_fit$optimize()
+          tmp_fit
+        },
+        backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]]
+      )
 
       # Select the best model among the merged ones
       best_model_idx <- which.max(sapply(merged_models, function(model) model[["BICL"]]))

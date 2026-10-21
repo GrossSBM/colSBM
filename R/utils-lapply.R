@@ -48,7 +48,7 @@ colsbm_lapply <- function(X, FUN, backend = "future",
   }
 
   if (backend == "no_mc") {
-    result <- lapply(X, FUN)
+    result <- lapply(X, FUN, ...)
     return(result)
   }
 }
