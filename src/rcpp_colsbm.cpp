@@ -5,12 +5,15 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-XPtr<ColSBM> colsbm_create(List A, int Q, List tau, bool directed = false,
-                           std::string distribution = "bernoulli",
-                           bool free_mixture = true, bool free_density = true) {
+XPtr<ColSBM> colsbm_create(
+    List A, int Q, List tau, bool directed = false,
+    std::string distribution = "bernoulli", bool free_mixture = true,
+    bool free_density = true,
+    Rcpp::Nullable<Rcpp::LogicalMatrix> Cpi = R_NilValue,
+    Rcpp::Nullable<Rcpp::LogicalMatrix> Calpha = R_NilValue) {
   return colsbm_xptr_from_list(
       A, Q, tau, directed = directed, distribution = distribution,
-      free_mixture = free_mixture, free_density = free_density);
+      free_mixture = free_mixture, free_density = free_density, Cpi, Calpha);
 }
 
 // [[Rcpp::export]]
@@ -57,6 +60,8 @@ List colsbm_info(XPtr<ColSBM> ptr) {
   out["emqr"] = ptr->emqr;
   out["nmqr"] = ptr->nmqr;
   out["alpha"] = ptr->alpha;
+  out["Cpi"] = ptr->Cpi;
+  out["Calpha"] = ptr->Calpha;
   List alpham_out(ptr->alpham.size());
   for (std::size_t i = 0; i < ptr->alpham.size(); ++i) {
     alpham_out[i] = wrap(ptr->alpham[i]);

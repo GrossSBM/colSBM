@@ -34,15 +34,17 @@ public:
   std::vector<mat> alpham;
   std::vector<double> delta;
   Rcpp::List vloss;
-  // TODO USE Will be used later to implement free mixture computation
-  // this is the support of size QxM indicating which block q
-  // is populated by network m
-  std::vector<mat> Cpi;
-  std::vector<mat> Calpha;
+  // Support masks for free-mixture models (pi, deltapi).
+  // Cpi is Q x M: 1 if block q is populated in network m.
+  // Calpha is Q x Q: 1 if the pair of blocks is populated in at least one
+  // network (the union of the per-network outer products of Cpi columns).
+  mat Cpi;
+  mat Calpha;
 
   ColSBM(const std::vector<mat> &A_, int Q_, std::vector<mat> &tau_,
          bool directed_ = false, std::string distribution_ = "bernoulli",
-         bool free_mixture_ = true, bool free_density_ = true);
+         bool free_mixture_ = true, bool free_density_ = true,
+         const mat &Cpi_ = arma::mat(), const mat &Calpha_ = arma::mat());
   ~ColSBM();
 
   void initialize_state();
@@ -63,6 +65,8 @@ public:
 Rcpp::XPtr<ColSBM> colsbm_xptr_from_list(const Rcpp::List &A, int Q,
                                          const Rcpp::List &tau, bool directed,
                                          std::string distribution,
-                                         bool free_mixture, bool free_density);
+                                         bool free_mixture, bool free_density,
+                                         const Rcpp::Nullable<Rcpp::LogicalMatrix> &Cpi = R_NilValue,
+                                         const Rcpp::Nullable<Rcpp::LogicalMatrix> &Calpha = R_NilValue);
 
 #endif // COLSBM_VEM_H

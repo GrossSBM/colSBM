@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // colsbm_create
-XPtr<ColSBM> colsbm_create(List A, int Q, List tau, bool directed, std::string distribution, bool free_mixture, bool free_density);
-RcppExport SEXP _colSBM_colsbm_create(SEXP ASEXP, SEXP QSEXP, SEXP tauSEXP, SEXP directedSEXP, SEXP distributionSEXP, SEXP free_mixtureSEXP, SEXP free_densitySEXP) {
+XPtr<ColSBM> colsbm_create(List A, int Q, List tau, bool directed, std::string distribution, bool free_mixture, bool free_density, Rcpp::Nullable<Rcpp::LogicalMatrix> Cpi, Rcpp::Nullable<Rcpp::LogicalMatrix> Calpha);
+RcppExport SEXP _colSBM_colsbm_create(SEXP ASEXP, SEXP QSEXP, SEXP tauSEXP, SEXP directedSEXP, SEXP distributionSEXP, SEXP free_mixtureSEXP, SEXP free_densitySEXP, SEXP CpiSEXP, SEXP CalphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -24,7 +24,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type distribution(distributionSEXP);
     Rcpp::traits::input_parameter< bool >::type free_mixture(free_mixtureSEXP);
     Rcpp::traits::input_parameter< bool >::type free_density(free_densitySEXP);
-    rcpp_result_gen = Rcpp::wrap(colsbm_create(A, Q, tau, directed, distribution, free_mixture, free_density));
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::LogicalMatrix> >::type Cpi(CpiSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::LogicalMatrix> >::type Calpha(CalphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(colsbm_create(A, Q, tau, directed, distribution, free_mixture, free_density, Cpi, Calpha));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -76,7 +78,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_colSBM_colsbm_create", (DL_FUNC) &_colSBM_colsbm_create, 7},
+    {"_colSBM_colsbm_create", (DL_FUNC) &_colSBM_colsbm_create, 9},
     {"_colSBM_colsbm_optimize", (DL_FUNC) &_colSBM_colsbm_optimize, 3},
     {"_colSBM_colsbm_vbound", (DL_FUNC) &_colSBM_colsbm_vbound, 1},
     {"_colSBM_colsbm_info", (DL_FUNC) &_colSBM_colsbm_info, 1},

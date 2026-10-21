@@ -5,10 +5,11 @@
 
 ColSBM::ColSBM(const std::vector<mat> &A_, int Q_, std::vector<mat> &tau_,
                bool directed_, std::string distribution_, bool free_mixture_,
-               bool free_density_)
+               bool free_density_, const mat &Cpi_, const mat &Calpha_)
     : A(A_), M((int)A_.size()), Q(Q_), tau(tau_), iterations(0), vbound(0.0),
       directed(directed_), free_mixture(free_mixture_),
-      free_density(free_density_), distribution(std::move(distribution_)) {
+      free_density(free_density_), distribution(std::move(distribution_)),
+      Cpi(Cpi_), Calpha(Calpha_) {
 
   initialize_state();
 }
@@ -27,6 +28,25 @@ void ColSBM::initialize_state() {
 
   // Checking if distribution is implemented
   check_emission_distribution_unipartite(distribution);
+
+  // Support masks, mirroring the R constructor: non-free-mixture models or
+  // missing masks force full support. When Calpha is not provided it is the
+  // union of the per-network outer products of the Cpi columns.
+  if (!free_mixture || Cpi.n_elem == 0) {
+    Cpi = arma::ones<mat>(Q, M);
+    Calpha = arma::ones<mat>(Q, Q);
+  } else {
+    Cpi = arma::conv_to<mat>::from(Cpi > 0.5);
+    if (Calpha.n_elem == 0) {
+      Calpha = arma::zeros<mat>(Q, Q);
+      for (int m = 0; m < M; ++m) {
+        Calpha += Cpi.col(m) * Cpi.col(m).t();
+      }
+      Calpha = arma::conv_to<mat>::from(Calpha > 0.5);
+    } else {
+      Calpha = arma::conv_to<mat>::from(Calpha > 0.5);
+    }
+  }
 
   for (int m = 0; m < M; ++m) {
     // There we initialize the mask to mask the  diagonal at least
@@ -92,8 +112,10 @@ void ColSBM::compute_aggregates() {
     mat emqr_m = tau_t * (X % Um) * tau_m;
     mat nmqr_m = tau_t * Um * tau_m;
 
-    emqr.slice(m) = emqr_m;
-    nmqr.slice(m) = nmqr_m;
+    // Mask out the blocks that are empty in network m, as R's update_mqr.
+    const mat mask_m = Cpi.col(m) * Cpi.col(m).t();
+    emqr.slice(m) = mask_m % emqr_m;
+    nmqr.slice(m) = mask_m % nmqr_m;
   }
 }
 
@@ -101,9 +123,9 @@ void ColSBM::update_pi() {
   for (int m = 0; m < M; ++m) {
     // Get tau_m
     const mat &tau_m = tau[m];
-    rowvec pi_m(Q, arma::fill::ones);
+    rowvec pi_m(Q, arma::fill::zeros);
     for (int q = 0; q < Q; ++q) {
-      pi_m[q] = arma::mean(tau_m.col(q));
+      pi_m[q] = Cpi(q, m) * arma::mean(tau_m.col(q));
     }
     pim[m] = pi_m;
   }
@@ -153,30 +175,44 @@ void ColSBM::update_alpha() {
   }
   if (distribution == "bernoulli") {
     for (int m = 0; m < M; ++m) {
-      alpham[m] = clamp_matrix(emqr.slice(m) / nmqr.slice(m), TOL, 1.0);
+      const mat mask_m = Cpi.col(m) * Cpi.col(m).t();
+      mat ratio = emqr.slice(m) / nmqr.slice(m);
+      // Clamp, then map NaN (empty blocks) to 0, then mask, mirroring R's
+      // update_alpham where empty blocks yield exactly 0.
+      ratio = clamp_matrix(ratio, TOL, 1.0);
+      ratio = nan_to_zero(ratio);
+      alpham[m] = mask_m % ratio;
     }
     if (free_density) {
       // Delta model for Bernoulli: same fixed-point on the rates and network
       // densities as the (approx-Poisson) R path, then clamp the rates back
       // into the probability range.
       fixed_point_alpha_delta();
-      alpha = clamp_matrix(alpha, TOL, 1.0);
+      alpha = Calpha % clamp_matrix(alpha, TOL, 1.0);
     } else {
-      alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
+      mat ratio = arma::sum(emqr, 2) / arma::sum(nmqr, 2);
+      ratio = nan_to_zero(ratio);
+      ratio = clamp_matrix(ratio, TOL, 1.0);
+      alpha = Calpha % ratio;
     }
   } else {
     // Poisson: per-network rates (used for block reordering) are the
     // empirical rates emqr[m] / nmqr[m] with NaN mapped to 0 as in R.
     for (int m = 0; m < M; ++m) {
-      alpham[m] = nan_to_zero(emqr.slice(m) / nmqr.slice(m));
+      const mat mask_m = Cpi.col(m) * Cpi.col(m).t();
+      mat ratio = emqr.slice(m) / nmqr.slice(m);
+      ratio = nan_to_zero(ratio);
+      alpham[m] = mask_m % ratio;
     }
     if (free_density) {
       // The delta-model M step: alternate updates of the shared rates alpha
       // and the network densities delta until convergence.
       fixed_point_alpha_delta();
+      alpha = Calpha % alpha;
     } else {
       // iid: pooled rates over all networks, NaN mapped to 0 as in R.
-      alpha = nan_to_zero(arma::sum(emqr, 2) / arma::sum(nmqr, 2));
+      alpha = Calpha %
+              nan_to_zero(arma::sum(emqr, 2) / arma::sum(nmqr, 2));
     }
   }
 
@@ -238,6 +274,12 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
   const mat Um = 1.0 - mask[m];
   const mat Am = A[m] % Um;
 
+  // Support of network m: only these blocks can receive variational mass.
+  const arma::uvec supp = arma::find(Cpi.col(m) > 0.5);
+  const arma::uvec not_supp = arma::find(Cpi.col(m) < 0.5);
+  // As in R: tau_old <- t(Cpi[, m] * t(tau[[m]]))
+  tau_old.cols(not_supp).zeros();
+
   double prev_vloss = compute_network_vloss(m);
 
   for (int it = 0; it < max_iter; ++it) {
@@ -265,9 +307,17 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
       }
     }
 
-    tau_new = clamp_matrix(softmax_rows(score), TAU_EPS, 1 - TAU_EPS);
+    // Mask then softmax over the support only, as in R's fixed_point_tau:
+    // tau_new[, !Cpi] <- 0 ; tau_new[, Cpi] <- softmax(...) ; clamp ;
+    // renormalize over the support ; zero the empty blocks again.
+    mat tau_supp = score.cols(supp);
+    tau_supp = softmax_rows(tau_supp);
+    tau_supp = clamp_matrix(tau_supp, TAU_EPS, 1 - TAU_EPS);
     // To renormalize after clamping
-    tau_new = tau_new / arma::repmat(arma::sum(tau_new, 1), 1, tau_new.n_cols);
+    tau_supp =
+        tau_supp / arma::repmat(arma::sum(tau_supp, 1), 1, tau_supp.n_cols);
+    tau_new.cols(supp) = tau_supp;
+    tau_new.cols(not_supp).zeros();
     tau[m] = tau_new;
 
     const double new_vloss = compute_network_vloss(m);
@@ -339,7 +389,21 @@ void ColSBM::reorder_parameters() {
     }
     // Turning back pim to rowvec
     pim[m] = pim[m](ord_m).t();
+
+    // Permute the support of network m the same way, as R's
+    // reorder_parameters: Cpi[, m] <- Cpi[ord_m, m]
+    vec cpi_m = Cpi.col(m);
+    Cpi.col(m) = cpi_m(ord_m);
   }
+
+  // Recompute Calpha from the reordered Cpi so it stays consistent with the
+  // new block ordering (R permutes Cpi then relies on Calpha; recomputing is
+  // the identity on the full-support case and correct otherwise).
+  Calpha = arma::zeros<mat>(Q, Q);
+  for (int m = 0; m < M; ++m) {
+    Calpha += Cpi.col(m) * Cpi.col(m).t();
+  }
+  Calpha = arma::conv_to<mat>::from(Calpha > 0.5);
 }
 
 double ColSBM::compute_network_vloss(int m) const {
@@ -349,26 +413,37 @@ double ColSBM::compute_network_vloss(int m) const {
   const mat &nm = nmqr.slice(m);
   const double delta_m = delta[m];
   const rowvec pi_m = pi[m];
+  // Support of network m: pi and entropy terms are restricted to it, and the
+  // alpha terms only count supported pairs (mirroring R's vb_tau_alpha,
+  // vb_tau_pi and entropy_tau).
+  const arma::uvec supp = arma::find(Cpi.col(m) > 0.5);
+  const mat mask_m = Cpi.col(m) * Cpi.col(m).t();
 
   double obj = 0.0;
   double dircoef = directed ? 1 : 0.5;
 
   // Vbound tau and alpha
   if (distribution == "bernoulli") {
-    obj += dircoef * arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS) +
-                                (nm - em) % log_clamped(1 - delta_m * alpha,
-                                                        POISSON_EPS));
+    obj += dircoef *
+           arma::accu(Calpha %
+                      (mask_m % em % log_clamped(delta_m * alpha, POISSON_EPS) +
+                       mask_m % (nm - em) %
+                           log_clamped(1 - delta_m * alpha, POISSON_EPS)));
   } else if (distribution == "poisson") {
-    obj +=
-        dircoef * (arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS)) -
-                   arma::accu(nm % (delta_m * alpha)) - logfactA[m]);
+    obj += dircoef *
+           (arma::accu(Calpha % (mask_m % em) %
+                       log_clamped(delta_m * alpha, POISSON_EPS)) -
+            arma::accu(Calpha % (mask_m % nm) % (delta_m * alpha)) -
+            logfactA[m]);
   }
   // Vbound tau and pi (plain log as in R's vb_tau_pi)
-  obj += arma::accu(tau_m * arma::log(pi_m.t()));
+  obj += arma::accu(tau_m.cols(supp) * arma::log(pi_m.cols(supp).t()));
 
   // Vbound entropy (R's entropy_tau uses x*log(x), zero when x is null)
-  const mat log_tau = arma::log(arma::clamp(tau_m, 1e-300, arma::datum::inf));
-  obj += -arma::accu(tau_m % log_tau);
+  const mat tau_supp = tau_m.cols(supp);
+  const mat log_tau =
+      arma::log(arma::clamp(tau_supp, 1e-300, arma::datum::inf));
+  obj += -arma::accu(tau_supp % log_tau);
 
   return obj;
 }
@@ -472,12 +547,11 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
 std::vector<double> ColSBM::get_vbound() const { return vbound; }
 
 // Convert an R list of matrices to an XPtr<ColSBM>
-Rcpp::XPtr<ColSBM> colsbm_xptr_from_list(const Rcpp::List &A, int Q,
-                                         const Rcpp::List &tau,
-                                         bool directed = false,
-                                         std::string distribution = "bernoulli",
-                                         bool free_mixture = true,
-                                         bool free_density = true) {
+Rcpp::XPtr<ColSBM> colsbm_xptr_from_list(
+    const Rcpp::List &A, int Q, const Rcpp::List &tau, bool directed,
+    std::string distribution, bool free_mixture, bool free_density,
+    const Rcpp::Nullable<Rcpp::LogicalMatrix> &Cpi,
+    const Rcpp::Nullable<Rcpp::LogicalMatrix> &Calpha) {
   std::vector<mat> mats;
   mats.reserve(A.size());
   for (Rcpp::List::const_iterator it = A.begin(); it != A.end(); ++it) {
@@ -491,9 +565,32 @@ Rcpp::XPtr<ColSBM> colsbm_xptr_from_list(const Rcpp::List &A, int Q,
     m = clamp_matrix(m);
     taus.push_back(m);
   }
+
+  // Support masks: empty matrix marks "not provided" -> full support.
+  mat Cpi_m, Calpha_m;
+  if (Cpi.isNotNull()) {
+    const Rcpp::LogicalMatrix Cp = Rcpp::as<Rcpp::LogicalMatrix>(Cpi);
+    Cpi_m = arma::mat(Cp.nrow(), Cp.ncol(), arma::fill::zeros);
+    for (int j = 0; j < Cp.ncol(); ++j) {
+      for (int i = 0; i < Cp.nrow(); ++i) {
+        Cpi_m(i, j) = (Cp(i, j) == TRUE) ? 1.0 : 0.0;
+      }
+    }
+  }
+  if (Calpha.isNotNull()) {
+    const Rcpp::LogicalMatrix Ca = Rcpp::as<Rcpp::LogicalMatrix>(Calpha);
+    Calpha_m = arma::mat(Ca.nrow(), Ca.ncol(), arma::fill::zeros);
+    for (int j = 0; j < Ca.ncol(); ++j) {
+      for (int i = 0; i < Ca.nrow(); ++i) {
+        Calpha_m(i, j) = (Ca(i, j) == TRUE) ? 1.0 : 0.0;
+      }
+    }
+  }
+
   ColSBM *ptr = new ColSBM(
       mats, Q, taus, directed = directed, distribution = distribution,
-      free_mixture = free_mixture, free_density = free_density);
+      free_mixture = free_mixture, free_density = free_density, Cpi_m,
+      Calpha_m);
   Rcpp::XPtr<ColSBM> xp(ptr, true);
   return xp;
 }
