@@ -168,7 +168,7 @@ estimate_colSBM <-
             return(tmp_fit)
           },
           backend = global_opts$backend,
-          nb_cores = min(nb_run, nb_cores),
+          nb_cores = min(nb_run, nb_cores)
         )
       my_bmpop <- tmp_fits[[which.max(vapply(tmp_fits, function(fit) fit$best_fit$BICL,
         FUN.VALUE = .1
