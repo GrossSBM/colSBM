@@ -1,3 +1,5 @@
+#ifndef UTILS_H
+#define UTILS_H
 #include <RcppArmadillo.h>
 #include <algorithm>
 #include <cmath>
@@ -26,6 +28,13 @@ inline arma::mat softmax_rows(const arma::mat &x) {
 inline arma::mat log_clamped(const arma::mat &x, double eps = TOL) {
   return arma::log(arma::clamp(x, eps, arma::datum::inf));
 }
+//' Set NaN entries to 0, leaving infinite values untouched, mirroring the R
+//' `x[is.nan(x)] <- 0` convention used for the Poisson emission.
+inline arma::mat nan_to_zero(const arma::mat &x) {
+  arma::mat out = x;
+  out.elem(arma::find(out != out)).zeros();
+  return out;
+}
 //' @param hi a double specifying the max value to clamp, defaults to 1-TOL
 //' for the bernoulli distribution
 inline arma::mat clamp_matrix(const arma::mat &x, double lo = TOL,
@@ -51,3 +60,5 @@ inline void check_emission_distribution_unipartite(std::string distribution) {
                " not implemented ! Should be one of " + result + ".");
   }
 }
+
+#endif // UTILS_H

@@ -1,5 +1,5 @@
 #include "colsbm_vem.h"
-#include "utils.cpp"
+#include "utils.h"
 #include <cmath>
 #include <string>
 
