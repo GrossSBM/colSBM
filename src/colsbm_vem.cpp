@@ -155,7 +155,15 @@ void ColSBM::update_alpha() {
     for (int m = 0; m < M; ++m) {
       alpham[m] = clamp_matrix(emqr.slice(m) / nmqr.slice(m), TOL, 1.0);
     }
-    alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
+    if (free_density) {
+      // Delta model for Bernoulli: same fixed-point on the rates and network
+      // densities as the (approx-Poisson) R path, then clamp the rates back
+      // into the probability range.
+      fixed_point_alpha_delta();
+      alpha = clamp_matrix(alpha, TOL, 1.0);
+    } else {
+      alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
+    }
   } else {
     // Poisson: per-network rates (used for block reordering) are the
     // empirical rates emqr[m] / nmqr[m] with NaN mapped to 0 as in R.
@@ -347,8 +355,9 @@ double ColSBM::compute_network_vloss(int m) const {
 
   // Vbound tau and alpha
   if (distribution == "bernoulli") {
-    obj += dircoef * arma::accu(em % log_clamped(delta_m * alpha) +
-                                (nm - em) % log_clamped(1 - delta_m * alpha));
+    obj += dircoef * arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS) +
+                                (nm - em) % log_clamped(1 - delta_m * alpha,
+                                                        POISSON_EPS));
   } else if (distribution == "poisson") {
     obj +=
         dircoef * (arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS)) -
