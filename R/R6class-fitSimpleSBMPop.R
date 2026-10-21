@@ -1442,7 +1442,9 @@ fitSimpleSBMPop <- R6::R6Class(
         directed = self$directed,
         distribution = self$distribution,
         free_mixture = self$free_mixture,
-        free_density = self$free_density
+        free_density = self$free_density,
+        Cpi = self$Cpi,
+        Calpha = self$Calpha
       )
       if (self$fit_opts$verbosity >= 2) {
         cat("Starting C++ VEM\n")
@@ -1466,7 +1468,10 @@ fitSimpleSBMPop <- R6::R6Class(
       self$vbound <- info$vbound
       self$vloss <- info$vloss
 
-      # TODO Cpi still to implement
+      # The C++ reorders blocks (and thus Cpi) during optimization; read the
+      # support back so it matches the final block ordering.
+      self$Cpi <- info$Cpi > 0
+      self$Calpha <- info$Calpha > 0
     },
     #' The message printed when one prints the object
     #' @param type The title above the message.
