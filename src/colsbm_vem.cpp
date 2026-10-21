@@ -257,7 +257,7 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
       }
     }
 
-    tau_new = clamp_matrix(softmax_rows(score));
+    tau_new = clamp_matrix(softmax_rows(score), TAU_EPS, 1 - TAU_EPS);
     // To renormalize after clamping
     tau_new = tau_new / arma::repmat(arma::sum(tau_new, 1), 1, tau_new.n_cols);
     tau[m] = tau_new;
@@ -354,11 +354,12 @@ double ColSBM::compute_network_vloss(int m) const {
         dircoef * (arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS)) -
                    arma::accu(nm % (delta_m * alpha)) - logfactA[m]);
   }
-  // Vbound tau and pi
-  obj += arma::accu(tau_m * log_clamped(pi_m.t()));
+  // Vbound tau and pi (plain log as in R's vb_tau_pi)
+  obj += arma::accu(tau_m * arma::log(pi_m.t()));
 
-  // Vbound entropy
-  obj += -arma::accu(tau_m % log_clamped(tau_m));
+  // Vbound entropy (R's entropy_tau uses x*log(x), zero when x is null)
+  const mat log_tau = arma::log(arma::clamp(tau_m, 1e-300, arma::datum::inf));
+  obj += -arma::accu(tau_m % log_tau);
 
   return obj;
 }
