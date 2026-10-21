@@ -127,7 +127,8 @@ cpp_estimate_colSBM <-
       }
       spectral_inits <- colsbm_lapply(netlist, spectral_clustering,
         backend = global_opts[["backend"]], nb_cores = global_opts[["nb_cores"]],
-        K = 2)
+        K = 2
+      )
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
       spectral_taus <- lapply(spectral_taus, function(mat) {
         mat[mat < 1e-6] <- 1e-6
