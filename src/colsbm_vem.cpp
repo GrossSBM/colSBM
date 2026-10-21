@@ -157,12 +157,19 @@ void ColSBM::update_alpha() {
     }
     alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL, 1.0);
   } else {
+    // Poisson: per-network rates (used for block reordering) are the
+    // empirical rates emqr[m] / nmqr[m] with NaN mapped to 0 as in R.
     for (int m = 0; m < M; ++m) {
-      alpham[m] =
-          clamp_matrix(emqr.slice(m) / nmqr.slice(m), TOL, arma::datum::inf);
+      alpham[m] = nan_to_zero(emqr.slice(m) / nmqr.slice(m));
     }
-    alpha = clamp_matrix(arma::sum(emqr, 2) / arma::sum(nmqr, 2), TOL,
-                         arma::datum::inf);
+    if (free_density) {
+      // The delta-model M step: alternate updates of the shared rates alpha
+      // and the network densities delta until convergence.
+      fixed_point_alpha_delta();
+    } else {
+      // iid: pooled rates over all networks, NaN mapped to 0 as in R.
+      alpha = nan_to_zero(arma::sum(emqr, 2) / arma::sum(nmqr, 2));
+    }
   }
 
   if (!std::isfinite(arma::accu(alpha))) {
@@ -228,15 +235,26 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
   for (int it = 0; it < max_iter; ++it) {
     mat tau_new(tau_old.n_rows, tau_old.n_cols, arma::fill::zeros);
     const mat log_pi = arma::repmat(log_clamped(pi[m]), tau_old.n_rows, 1);
-    const mat log_alpha = log_clamped(alpha * delta[m]);
-    const mat logit_alpha =
-        log_clamped(alpha * delta[m] / (1.0 - alpha * delta[m]));
-    const mat log_1m_alpha = log_clamped(1.0 - alpha * delta[m]);
 
-    mat score = log_pi + Am * tau_old * logit_alpha.t() +
-                Um * tau_old * log_1m_alpha.t();
-    if (directed) {
-      score += Am.t() * tau_old * logit_alpha + Um.t() * tau_old * log_1m_alpha;
+    mat score;
+    if (distribution == "bernoulli") {
+      const mat logit_alpha =
+          log_clamped(alpha * delta[m] / (1.0 - alpha * delta[m]));
+      const mat log_1m_alpha = log_clamped(1.0 - alpha * delta[m]);
+      score = log_pi + Am * tau_old * logit_alpha.t() +
+              Um * tau_old * log_1m_alpha.t();
+      if (directed) {
+        score +=
+            Am.t() * tau_old * logit_alpha + Um.t() * tau_old * log_1m_alpha;
+      }
+    } else { // poisson
+      const mat lambda = alpha * delta[m];
+      const mat log_lambda = log_clamped(lambda, POISSON_EPS);
+      score =
+          log_pi + Am * tau_old * log_lambda.t() - Um * tau_old * lambda.t();
+      if (directed) {
+        score += Am.t() * tau_old * log_lambda - Um.t() * tau_old * lambda;
+      }
     }
 
     tau_new = clamp_matrix(softmax_rows(score));
@@ -332,12 +350,12 @@ double ColSBM::compute_network_vloss(int m) const {
     obj += dircoef * arma::accu(em % log_clamped(delta_m * alpha) +
                                 (nm - em) % log_clamped(1 - delta_m * alpha));
   } else if (distribution == "poisson") {
+    obj +=
+        dircoef * (arma::accu(em % log_clamped(delta_m * alpha, POISSON_EPS)) -
+                   arma::accu(nm % (delta_m * alpha)) - logfactA[m]);
   }
   // Vbound tau and pi
-  if (distribution == "bernoulli") {
-    obj += arma::accu(tau_m * log_clamped(pi_m.t()));
-  } else if (distribution == "poisson") {
-  }
+  obj += arma::accu(tau_m * log_clamped(pi_m.t()));
 
   // Vbound entropy
   obj += -arma::accu(tau_m % log_clamped(tau_m));
