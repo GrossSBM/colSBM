@@ -145,26 +145,24 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param greedy_exploration_starting_point Stores the coordinates Q1 & Q2
     #' from the greedy exploration to  keep track of the starting_point
     #' @param fit_opts Fit parameters, used to determine the fitting method/
-    initialize = function(
-      A = NULL,
-      Q = NULL,
-      Z = NULL,
-      mask = NULL,
-      net_id = NULL,
-      distribution = NULL,
-      free_mixture_row = TRUE,
-      free_mixture_col = TRUE,
-      Cpi = NULL,
-      Calpha = NULL,
-      init_method = "spectral",
-      weight = NULL, # A vector of size M, the weight of each network
-      greedy_exploration_starting_point = NULL,
-      fit_opts = list(
-        algo_ve = "fp",
-        minibatch = TRUE,
-        verbosity = 1
-      )
-    ) {
+    initialize = function(A = NULL,
+                          Q = NULL,
+                          Z = NULL,
+                          mask = NULL,
+                          net_id = NULL,
+                          distribution = NULL,
+                          free_mixture_row = TRUE,
+                          free_mixture_col = TRUE,
+                          Cpi = NULL,
+                          Calpha = NULL,
+                          init_method = "spectral",
+                          weight = NULL, # A vector of size M, the weight of each network
+                          greedy_exploration_starting_point = NULL,
+                          fit_opts = list(
+                            algo_ve = "fp",
+                            minibatch = TRUE,
+                            verbosity = 1
+                          )) {
       # if (is.null(directed)) {
       # Bipartite networks have rectangular matrices so no symmetry
       #   directed <- ! isSymmetric.matrix(A[[1]])
@@ -386,8 +384,7 @@ fitBipartiteSBMPop <- R6::R6Class(
         nmqr <- matrix_mqr_to_use * self$nmqr[m, , ]
         alpha <- self$Calpha * self$alpha
       }
-      switch(
-        self$distribution,
+      switch(self$distribution,
         "bernoulli" = {
           sum(
             self$Calpha *
@@ -562,11 +559,9 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param store A boolean indicating if the BICL should be stored in the
     #' object or not, defaults to TRUE.
     #' @return The BICL for the model.
-    compute_BICL = function(
-      MAP = TRUE,
-      penalty_factor = self$fit_opts$penalty_factor,
-      store = TRUE
-    ) {
+    compute_BICL = function(MAP = TRUE,
+                            penalty_factor = self$fit_opts$penalty_factor,
+                            store = TRUE) {
       BICL <- self$compute_vbound() -
         self$compute_penalty(penalty_factor = penalty_factor)
       if (store) {
@@ -635,8 +630,7 @@ fitBipartiteSBMPop <- R6::R6Class(
           self$vloss[[m]],
           self$vb_tau_alpha(m) + self$vb_tau_pi(m) + self$entropy_tau(m)
         )
-      tau_new <- switch(
-        self$distribution,
+      tau_new <- switch(self$distribution,
         "bernoulli" = {
           tau_new <-
             if (d == 1) {
@@ -648,11 +642,11 @@ fitBipartiteSBMPop <- R6::R6Class(
                   self$n[[1]][m]
                 )) +
                 ((self$nonNAs[[m]]) * self$A[[m]]) %*%
-                  t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
-                  t(.logit(self$Calpha * self$alpha, eps = 1e-9)) +
+                t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
+                t(.logit(self$Calpha * self$alpha, eps = 1e-9)) +
                 (self$nonNAs[[m]]) %*%
-                  t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
-                  t(.log(1 - self$Calpha * self$alpha, eps = 1e-9))
+                t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
+                t(.log(1 - self$Calpha * self$alpha, eps = 1e-9))
               # In order to fix NaN appearing in the formula (log(Pi) when Pi
               # = 0), the .xlogy function is used with eps = 1e-9
               # POSSIBLE POINT OF FAILURE
@@ -666,11 +660,11 @@ fitBipartiteSBMPop <- R6::R6Class(
                 self$n[[2]][m]
               )) +
               t((self$nonNAs[[m]]) * self$A[[m]]) %*%
-                t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
-                .logit(self$Calpha * self$alpha, eps = 1e-9) +
+              t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
+              .logit(self$Calpha * self$alpha, eps = 1e-9) +
               t(self$nonNAs[[m]]) %*%
-                t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
-                .log(1 - self$Calpha * self$alpha, eps = 1e-9)
+              t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
+              .log(1 - self$Calpha * self$alpha, eps = 1e-9)
             # In order to fix NaN appearing in the formula (log(Pi) when Pi
             # = 0), the .xlogy function is used with eps = 1e-9
             # POSSIBLE POINT OF FAILURE
@@ -686,11 +680,11 @@ fitBipartiteSBMPop <- R6::R6Class(
                 self$n[[1]][m]
               )) +
               ((self$nonNAs[[m]]) * self$A[[m]]) %*%
-                self$tau[[m]][[2]] %*%
-                t(.log(self$alpha, eps = 1e-9)) -
+              self$tau[[m]][[2]] %*%
+              t(.log(self$alpha, eps = 1e-9)) -
               (self$nonNAs[[m]]) %*%
-                self$tau[[m]][[2]] %*%
-                t(self$alpha)
+              self$tau[[m]][[2]] %*%
+              t(self$alpha)
           }
           if (d == 2) {
             tau_new <-
@@ -700,11 +694,11 @@ fitBipartiteSBMPop <- R6::R6Class(
                 self$n[[2]][m]
               )) +
               t((self$nonNAs[[m]]) * self$A[[m]]) %*%
-                self$tau[[m]][[1]] %*%
-                .log(self$alpha, eps = 1e-9) -
+              self$tau[[m]][[1]] %*%
+              .log(self$alpha, eps = 1e-9) -
               t(self$nonNAs[[m]]) %*%
-                self$tau[[m]][[1]] %*%
-                (self$alpha)
+              self$tau[[m]][[1]] %*%
+              (self$alpha)
           }
           invisible(tau_new)
         }
@@ -799,11 +793,9 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param prop_to_update The proportion of nodes to use for update
     #'
     #' @return The new tau values
-    bernoulli_sve_step = function(
-      m,
-      d,
-      prop_to_update = self$fit_opts$prop_to_update
-    ) {
+    bernoulli_sve_step = function(m,
+                                  d,
+                                  prop_to_update = self$fit_opts$prop_to_update) {
       update_dim <- d
       other_dim <- ifelse(update_dim == 1, 2, 1)
 
@@ -837,7 +829,8 @@ fitBipartiteSBMPop <- R6::R6Class(
       other_tau <- (self$tau[[m]][[other_dim]] * mat_Cpi)[nodes_for_update, ]
       if (update_dim == 1) {
         Y <- ((self$nonNAs[[m]]) * self$A[[m]])[, nodes_for_update]
-        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[,
+        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[
+          ,
           nodes_for_update
         ]
       } else {
@@ -1124,8 +1117,7 @@ fitBipartiteSBMPop <- R6::R6Class(
     init_clust = function() {
       nb_inits <- 5L
       tested_taus <- lapply(seq(1L, nb_inits), function(id) {
-        switch(
-          self$init_method,
+        switch(self$init_method,
           # TODO later : adapt init_clust "random" to bipartite
           "random" = lapply(
             X = seq_along(self$A),
@@ -1461,11 +1453,9 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @importFrom matrixStats rowMeans2
     #'
     #' @return nothing
-    optimize = function(
-      max_step = self$fit_opts$max_vem_steps,
-      tol = self$fit_opts$tolerance,
-      ...
-    ) {
+    optimize = function(max_step = self$fit_opts$max_vem_steps,
+                        tol = self$fit_opts$tolerance,
+                        ...) {
       if (all(self$Q == c(1, 1))) {
         self$tau <- lapply(
           seq(self$M),
@@ -1541,8 +1531,7 @@ fitBipartiteSBMPop <- R6::R6Class(
             # Minibatch or not
             ifelse(self$fit_opts$minibatch, seq_m_minibatch, seq(self$M)),
             function(m) {
-              switch(
-                self$fit_opts$algo_ve,
+              switch(self$fit_opts$algo_ve,
                 "fp" = {
                   self$fixed_point_tau(m, d = 1)
                   self$update_mqr(m)

@@ -91,8 +91,7 @@ estimate_colSBM <-
       min_length = 1L
     )
 
-    switch(
-      colsbm_model,
+    switch(colsbm_model,
       "iid" = {
         free_density <- FALSE
         free_mixture <- FALSE
@@ -458,8 +457,7 @@ estimate_colBiSBM <-
       thresh = 1L
     )
 
-    switch(
-      colsbm_model,
+    switch(colsbm_model,
       "iid" = {
         free_mixture_row <- FALSE
         free_mixture_col <- FALSE

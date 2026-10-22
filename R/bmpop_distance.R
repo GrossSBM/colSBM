@@ -45,19 +45,16 @@ dist_bmpop_max <- function(
     alpha[[2]][upper.tri(alpha[[2]])] <- 0
   }
   if (missing(pi)) {
-    d <- switch(
-      norm,
+    d <- switch(norm,
       "L1" = sum(abs(alpha[[1]] / delta[1] - alpha[[2]] / delta[2])),
       "L2" = sum((alpha[[1]] / delta[1] - alpha[[2]] / delta[2])**2)
     )
   } else {
-    w <- switch(
-      weight,
+    w <- switch(weight,
       "max" = pmax(pi[[1]], pi[[2]]),
       "mean" = .5 * (pi[[1]] + pi[[2]])
     )
-    d <- switch(
-      norm,
+    d <- switch(norm,
       "L1" = sum(
         w %*%
           (abs(alpha[[1]] / delta[1] - alpha[[2]] / delta[2])) %*%
@@ -115,24 +112,20 @@ dist_bisbmpop_max <- function(
   norm = "L2"
 ) {
   if (missing(pi) || missing(rho)) {
-    distance <- switch(
-      norm,
+    distance <- switch(norm,
       "L1" = sum(abs(alpha[[1]] - alpha[[2]])),
       "L2" = sum((alpha[[1]] - alpha[[2]])**2)
     )
   } else {
-    w_pi <- switch(
-      weight,
+    w_pi <- switch(weight,
       "max" = pmax(pi[[1]], pi[[2]]),
       "mean" = .5 * (pi[[1]] + pi[[2]])
     )
-    w_rho <- switch(
-      weight,
+    w_rho <- switch(weight,
       "max" = pmax(rho[[1]], rho[[2]]),
       "mean" = .5 * (rho[[1]] + rho[[2]])
     )
-    distance <- switch(
-      norm,
+    distance <- switch(norm,
       "L1" = sum(
         as.vector(w_pi) %*%
           (abs(alpha[[1]] - alpha[[2]])) %*%
