@@ -691,7 +691,8 @@ default_fit_opts_unipartite <- function() {
     verbosity = 0L,
     use_cpp = FALSE,
     tolerance = 1e-3,
-    max_vem_steps = 1000L
+    max_vem_steps = 1000L,
+    nlopt_algo = "NLOPT_LD_MMA"
   )
 }
 
