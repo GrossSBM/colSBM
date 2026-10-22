@@ -57,7 +57,8 @@ plot.fitSimpleSBMPop <- function(
   if (is.null(ord)) {
     ord <- order(diag(x$alpha), decreasing = TRUE)
   }
-  p <- switch(type,
+  p <- switch(
+    type,
     graphon = {
       if (x$Q == 1) {
         ymin <- rep(0, each = x$Q)
@@ -437,7 +438,8 @@ plot.fitBipartiteSBMPop <- function(
   ...
 ) {
   stopifnot(inherits(x, "fitBipartiteSBMPop"))
-  p <- switch(type,
+  p <- switch(
+    type,
     graphon = {
       # The below order use net_id parameters
       if (x$Q[2] == 1) {

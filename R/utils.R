@@ -12,31 +12,39 @@
 #' @noMd
 #' @noRd
 generate_unipartite_network <- function(
-  n, pi, alpha,
+  n,
+  pi,
+  alpha,
   distribution = "bernoulli",
   return_memberships = FALSE
 ) {
   stopifnot(
     "All alpha coefficients must be positive" = all(alpha >= 0),
-    "With bernoulli, the alpha must be between 0 and 1" = (
-      distribution == "poisson" |
-        (distribution == "bernoulli" & all(alpha >= 0L & alpha <= 1L))),
+    "With bernoulli, the alpha must be between 0 and 1" = (distribution ==
+      "poisson" |
+      (distribution == "bernoulli" & all(alpha >= 0L & alpha <= 1L))),
     "All pi must be between 0 and 1" = all(pi >= 0L & pi <= 1L),
     "Pi must sum to one" = all.equal(sum(pi), 1L)
   )
   cluster_memberships <- rmultinom(n, size = 1, prob = pi)
-  node_node_interaction_parameter <- t(cluster_memberships) %*% alpha %*% cluster_memberships
+  node_node_interaction_parameter <- t(cluster_memberships) %*%
+    alpha %*%
+    cluster_memberships
 
   # Here we switch on the distributions
   adjacency_matrix <- matrix(
-    switch(distribution,
+    switch(
+      distribution,
       "bernoulli" = {
-        rbinom(length(node_node_interaction_parameter),
-          size = 1, prob = node_node_interaction_parameter
+        rbinom(
+          length(node_node_interaction_parameter),
+          size = 1,
+          prob = node_node_interaction_parameter
         )
       },
       "poisson" = {
-        rpois(length(node_node_interaction_parameter),
+        rpois(
+          length(node_node_interaction_parameter),
           lambda = node_node_interaction_parameter
         )
       },
@@ -73,7 +81,10 @@ generate_unipartite_network <- function(
 #'
 #' @export
 generate_unipartite_collection <- function(
-  n, pi, alpha, M,
+  n,
+  pi,
+  alpha,
+  M,
   distribution = "bernoulli",
   return_memberships = FALSE
 ) {
@@ -85,7 +96,9 @@ generate_unipartite_collection <- function(
   if (length(n) != M) {
     stop(
       "The length of n is not correct ! It should be : ",
-      M, " values and it is ", length(n)
+      M,
+      " values and it is ",
+      length(n)
     )
   }
   # Generate the networks
@@ -114,14 +127,19 @@ generate_unipartite_collection <- function(
 #' @noMd
 #' @noRd
 generate_bipartite_network <- function(
-  nr, nc, pi, rho, alpha, distribution = "bernoulli",
+  nr,
+  nc,
+  pi,
+  rho,
+  alpha,
+  distribution = "bernoulli",
   return_memberships = FALSE
 ) {
   stopifnot(
     "All alpha coefficients must be positive" = all(alpha >= 0L),
-    "With bernoulli, the alpha must be between 0 and 1" = (
-      distribution == "poisson" |
-        (distribution == "bernoulli" & all(alpha >= 0L & alpha <= 1L))),
+    "With bernoulli, the alpha must be between 0 and 1" = (distribution ==
+      "poisson" |
+      (distribution == "bernoulli" & all(alpha >= 0L & alpha <= 1L))),
     "All pi must be between 0 and 1" = all(pi >= 0L & pi <= 1L),
     "Pi must sum to one" = all.equal(sum(pi), 1L),
     "All rho must be between 0 and 1" = all(rho >= 0L & rho <= 1L),
@@ -134,15 +152,19 @@ generate_bipartite_network <- function(
     alpha %*%
     colblocks_memberships
   incidence_matrix <- matrix(
-    switch(distribution,
+    switch(
+      distribution,
       "poisson" = {
-        rpois(length(node_node_interaction_parameter),
+        rpois(
+          length(node_node_interaction_parameter),
           lambda = node_node_interaction_parameter
         )
       },
       "bernoulli" = {
-        rbinom(length(node_node_interaction_parameter),
-          size = 1, prob = node_node_interaction_parameter
+        rbinom(
+          length(node_node_interaction_parameter),
+          size = 1,
+          prob = node_node_interaction_parameter
         )
       },
       stop("distribution must be one of either 'bernoulli' or 'poisson'")
@@ -193,7 +215,12 @@ generate_bipartite_network <- function(
 #'
 #' @export
 generate_bipartite_collection <- function(
-  nr, nc, pi, rho, alpha, M,
+  nr,
+  nc,
+  pi,
+  rho,
+  alpha,
+  M,
   model = "iid",
   distribution = "bernoulli",
   return_memberships = FALSE
@@ -212,23 +239,32 @@ generate_bipartite_collection <- function(
   if (length(nr) != M) {
     stop(
       "The length of nr is not correct ! It should be : ",
-      M, " values and it is ", length(nr)
+      M,
+      " values and it is ",
+      length(nr)
     )
   }
   if (length(nc) != M) {
     stop(
       "The length of nc is not correct ! It should be : ",
-      M, " values and it is ", length(nc)
+      M,
+      " values and it is ",
+      length(nc)
     )
   }
 
-  switch(model,
+  switch(
+    model,
     "iid" = {
       if (rlang::is_list(pi)) {
-        cli::cli_abort("{.var pi} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {pi}}")
+        cli::cli_abort(
+          "{.var pi} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {pi}}"
+        )
       }
       if (rlang::is_list(rho)) {
-        cli::cli_abort("{.var rho} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {rho}}")
+        cli::cli_abort(
+          "{.var rho} must be a vector of block proportions for the iid model but you provided {.obj_type_friendly {rho}}"
+        )
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -244,10 +280,14 @@ generate_bipartite_collection <- function(
     },
     "pi" = {
       if (!rlang::is_list(pi)) {
-        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} for the pi model but you provided {.obj_type_friendly {pi}}")
+        cli::cli_abort(
+          "{.var pi} must be a list of block proportions of size {.val M} for the pi model but you provided {.obj_type_friendly {pi}}"
+        )
       }
       if (rlang::is_list(rho)) {
-        cli::cli_abort("{.var rho} must be a vector of block proportions for the pi model but you provided {.obj_type_friendly {rho}}")
+        cli::cli_abort(
+          "{.var rho} must be a vector of block proportions for the pi model but you provided {.obj_type_friendly {rho}}"
+        )
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -263,10 +303,14 @@ generate_bipartite_collection <- function(
     },
     "rho" = {
       if (rlang::is_list(pi)) {
-        cli::cli_abort("{.var pi} must be a vector of block proportions for the rho model but you provided {.obj_type_friendly {pi}}")
+        cli::cli_abort(
+          "{.var pi} must be a vector of block proportions for the rho model but you provided {.obj_type_friendly {pi}}"
+        )
       }
       if (!rlang::is_list(rho)) {
-        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} for the rho model but you provided {.obj_type_friendly {rho}}")
+        cli::cli_abort(
+          "{.var rho} must be a list of block proportions of size {.val M} for the rho model but you provided {.obj_type_friendly {rho}}"
+        )
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -282,10 +326,14 @@ generate_bipartite_collection <- function(
     },
     "pirho" = {
       if (!rlang::is_list(pi)) {
-        cli::cli_abort("{.var pi} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {pi}}")
+        cli::cli_abort(
+          "{.var pi} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {pi}}"
+        )
       }
       if (!rlang::is_list(rho)) {
-        cli::cli_abort("{.var rho} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {rho}}")
+        cli::cli_abort(
+          "{.var rho} must be a list of block proportions of size {.val M} but you provided {.obj_type_friendly {rho}}"
+        )
       }
       out <- lapply(seq.int(M), function(m) {
         generate_bipartite_network(
@@ -321,7 +369,12 @@ generate_bipartite_collection <- function(
 #' @keywords internal
 #'
 #' @return A vector : The clusters labels
-spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 1000L) {
+spectral_clustering <- function(
+  X,
+  K,
+  kmeans.nstart = 400L,
+  kmeans.iter.max = 1000L
+) {
   X <- as.matrix(X)
   n <- nrow(X)
   if (K == 1) {
@@ -355,7 +408,9 @@ spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 10
     U[is.infinite(U)] <- 0
     cl <- try(
       expr = {
-        stats::kmeans(U, K,
+        stats::kmeans(
+          U,
+          K,
           iter.max = kmeans.iter.max,
           nstart = kmeans.nstart
         )$cluster
@@ -365,7 +420,9 @@ spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 10
     while (inherits(cl, "try-error")) {
       cl <- try(
         expr = {
-          stats::kmeans(U, K,
+          stats::kmeans(
+            U,
+            K,
             iter.max = kmeans.iter.max,
             nstart = kmeans.nstart
           )$cluster
@@ -401,7 +458,12 @@ spectral_clustering <- function(X, K, kmeans.nstart = 400L, kmeans.iter.max = 10
 #'
 #' @keywords internal
 #'
-spectral_biclustering <- function(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 1000L) {
+spectral_biclustering <- function(
+  A,
+  Q,
+  kmeans.nstart = 400L,
+  kmeans.iter.max = 1000L
+) {
   # Trivial clustering : everyone is part of the cluster
   if (all(Q == c(1, 1))) {
     return(list(
@@ -415,14 +477,16 @@ spectral_biclustering <- function(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 
   K2 <- Q[2] # Column clusters
 
   row_adjacency_matrix <- tcrossprod(A)
-  row_clustering <- spectral_clustering(row_adjacency_matrix,
+  row_clustering <- spectral_clustering(
+    row_adjacency_matrix,
     K1,
     kmeans.nstart = kmeans.nstart,
     kmeans.iter.max = kmeans.iter.max
   )
 
   col_adjacency_matrix <- crossprod(A)
-  col_clustering <- spectral_clustering(col_adjacency_matrix,
+  col_clustering <- spectral_clustering(
+    col_adjacency_matrix,
     K2,
     kmeans.nstart = kmeans.nstart,
     kmeans.iter.max = kmeans.iter.max
@@ -487,10 +551,7 @@ hierarClust <- function(X, K) {
 #'
 #' @return A list of Q clustering of Q+1 clusters
 split_clust <- function(X, Z, Q, is_bipartite = FALSE) {
-  X <- matrix(X,
-    nrow = nrow(X),
-    ncol = ncol(X)
-  )
+  X <- matrix(X, nrow = nrow(X), ncol = ncol(X))
   Z_split <- lapply(
     seq(Q),
     FUN = function(q) {
@@ -498,7 +559,11 @@ split_clust <- function(X, Z, Q, is_bipartite = FALSE) {
         return(Z)
       }
       Z_new <- Z
-      mx <- ifelse(is_bipartite, mean(X[Z == q, ], na.rm = TRUE), mean(X[Z == q, Z == q], na.rm = TRUE))
+      mx <- ifelse(
+        is_bipartite,
+        mean(X[Z == q, ], na.rm = TRUE),
+        mean(X[Z == q, Z == q], na.rm = TRUE)
+      )
       X[is.na(X)] <- mx
       if (isSymmetric.matrix(X) || is_bipartite) {
         Xsub <- X[Z == q, , drop = FALSE]
@@ -531,7 +596,9 @@ split_clust <- function(X, Z, Q, is_bipartite = FALSE) {
         }
         c <- which.max(abs(p1 - p2))
         md <- sample(
-          x = 2, size = 2, replace = FALSE,
+          x = 2,
+          size = 2,
+          replace = FALSE,
           prob = c(
             max(1 / ncol(Xsub), p1[c]),
             max(1 / ncol(Xsub), p2[c])
@@ -579,8 +646,12 @@ merge_clust <- function(Z, Q) {
 #
 
 F.bern <- function(X, alpha, tau) {
-  return(X %*% tau %*% log(alpha) +
-    (1 - X - diag(1, nrow(X))) %*% tau %*% log(1 - alpha))
+  return(
+    X %*%
+      tau %*%
+      log(alpha) +
+      (1 - X - diag(1, nrow(X))) %*% tau %*% log(1 - alpha)
+  )
 }
 
 rotate <- function(x) t(apply(x, 2, rev))
@@ -694,7 +765,11 @@ build_fold_matrix <- function(X, K) {
 #'
 #' @return A numeric value, the BIC-L of the partition
 #' @noRd
-compute_bicl_partition <- function(partition, penalty_factor = 0.5, verbose = TRUE) {
+compute_bicl_partition <- function(
+  partition,
+  penalty_factor = 0.5,
+  verbose = TRUE
+) {
   if (inherits(partition, "bmpop") | inherits(partition, "bisbmpop")) {
     if (verbose) {
       cli::cli_alert_info(
@@ -706,14 +781,22 @@ compute_bicl_partition <- function(partition, penalty_factor = 0.5, verbose = TR
       store = FALSE
     ))
   }
-  if (inherits(partition, "fitBipartiteSBMPop") | inherits(partition, "fitSimpleSBMPop")) {
+  if (
+    inherits(partition, "fitBipartiteSBMPop") |
+      inherits(partition, "fitSimpleSBMPop")
+  ) {
     return(partition$compute_BICL(
       penalty_factor = penalty_factor,
       store = FALSE
     ))
   }
   if (inherits(partition, "list")) {
-    if (all(sapply(partition, inherits, "bmpop") | sapply(partition, inherits, "bisbmpop"))) {
+    if (
+      all(
+        sapply(partition, inherits, "bmpop") |
+          sapply(partition, inherits, "bisbmpop")
+      )
+    ) {
       if (verbose) {
         cli::cli_alert_info(
           "A list of {.type {partition[[1]]}} objects was provided. The BIC-L is computed from the best fit."
@@ -726,7 +809,12 @@ compute_bicl_partition <- function(partition, penalty_factor = 0.5, verbose = TR
         )
       })))
     }
-    if (all(sapply(partition, inherits, "fitBipartiteSBMPop") | sapply(partition, inherits, "fitSimpleSBMPop"))) {
+    if (
+      all(
+        sapply(partition, inherits, "fitBipartiteSBMPop") |
+          sapply(partition, inherits, "fitSimpleSBMPop")
+      )
+    ) {
       return(sum(sapply(partition, function(col) {
         col$compute_BICL(
           penalty_factor = penalty_factor,

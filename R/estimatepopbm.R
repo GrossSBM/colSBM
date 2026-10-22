@@ -62,22 +62,27 @@
 #'   colsbm_model = "iid"
 #' )
 #' }
-clusterize_unipartite_networks <- function(netlist,
-                                           colsbm_model,
-                                           directed = FALSE,
-                                           net_id = NULL,
-                                           distribution = "bernoulli",
-                                           nb_run = 3L,
-                                           global_opts = list(),
-                                           fit_opts = list(),
-                                           fit_init = NULL,
-                                           full_inference = FALSE,
-                                           verbose = TRUE,
-                                           temp_save_path = tempfile(fileext = ".Rds")) {
+clusterize_unipartite_networks <- function(
+  netlist,
+  colsbm_model,
+  directed = FALSE,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  fit_init = NULL,
+  full_inference = FALSE,
+  verbose = TRUE,
+  temp_save_path = tempfile(fileext = ".Rds")
+) {
   check_unipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
   netlist <- check_networks_list(networks_list = netlist)
-  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  net_id <- check_net_id_and_initialize(
+    net_id = net_id,
+    networks_list = netlist
+  )
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
     networks_list = netlist,
@@ -94,7 +99,9 @@ clusterize_unipartite_networks <- function(netlist,
   # Fit the initial model on the full collection
   if (verbose) {
     if (!is.null(temp_save_path)) {
-      cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
+      cli::cli_alert_info(
+        "A save file will be created at {.val {temp_save_path}} and updated after each step"
+      )
     }
     cli::cli_h1("Fitting the full collection")
   }
@@ -117,18 +124,20 @@ clusterize_unipartite_networks <- function(netlist,
 
   clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
 
-
   if (verbose) {
     cli::cli_h1("Beginning clustering")
   }
   # Process the clustering queue
   while (length(clustering_queue) > 0) {
     if (!is.null(temp_save_path)) {
-      saveRDS(list(
-        clustering_queue = clustering_queue,
-        list_model_binary = list_model_binary,
-        clustering_history = clustering_history
-      ), temp_save_path)
+      saveRDS(
+        list(
+          clustering_queue = clustering_queue,
+          list_model_binary = list_model_binary,
+          clustering_history = clustering_history
+        ),
+        temp_save_path
+      )
     }
     fit <- clustering_queue[[1]]
     clustering_queue <- clustering_queue[-1]
@@ -174,7 +183,9 @@ clusterize_unipartite_networks <- function(netlist,
         )
 
         if (verbose) {
-          cli::cli_alert_info("Fitting a sub collection with : {.val {fit$net_id[cl == k]}}")
+          cli::cli_alert_info(
+            "Fitting a sub collection with : {.val {fit$net_id[cl == k]}}"
+          )
         }
 
         return(
@@ -195,16 +206,20 @@ clusterize_unipartite_networks <- function(netlist,
       nb_cores = global_opts[["nb_cores"]]
     )
 
-
-    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL >
+      fit$best_fit$BICL)
     # Decide whether to continue splitting or add to final list
     if (full_inference || bicl_increased) {
       clustering_queue <- append(clustering_queue, fits)
       if (verbose && bicl_increased) {
-        cli::cli_alert_success("Splitting collections improved the BIC-L criterion")
+        cli::cli_alert_success(
+          "Splitting collections improved the BIC-L criterion"
+        )
       }
       if (verbose && full_inference) {
-        cli::cli_alert_info("Full inference mode enabled, continuing to split collections")
+        cli::cli_alert_info(
+          "Full inference mode enabled, continuing to split collections"
+        )
       }
       prev_cluster <- unique(cluster[fit$net_id])
 
@@ -213,11 +228,16 @@ clusterize_unipartite_networks <- function(netlist,
 
       # Assign the new cluster to the networks
       cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
-      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
+      clustering_history <- rbind(
+        clustering_history,
+        matrix(unname(cluster), nrow = 1)
+      )
     } else {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       if (verbose) {
-        cli::cli_alert_danger("Splitting collections {.emph decreased} the BIC-L criterion")
+        cli::cli_alert_danger(
+          "Splitting collections {.emph decreased} the BIC-L criterion"
+        )
       }
     }
   }
@@ -238,7 +258,9 @@ clusterize_unipartite_networks <- function(netlist,
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
     if (verbose) {
-      cli::cli_alert_info("The final results are saved at {.val {temp_save_path}}")
+      cli::cli_alert_info(
+        "The final results are saved at {.val {temp_save_path}}"
+      )
     }
   }
   return(output_list)
@@ -312,23 +334,28 @@ clusterize_unipartite_networks <- function(netlist,
 #'   global_opts = list(nb_cores = parallelly::availableCores(omit = 1L))
 #' )
 #' }
-clusterize_bipartite_networks <- function(netlist,
-                                          colsbm_model,
-                                          net_id = NULL,
-                                          distribution = "bernoulli",
-                                          nb_run = 3L,
-                                          global_opts = list(),
-                                          fit_opts = list(),
-                                          partition_init = NULL,
-                                          full_collection_init = NULL,
-                                          full_inference = FALSE,
-                                          method = "single",
-                                          verbose = TRUE,
-                                          temp_save_path = tempfile(fileext = ".Rds")) {
+clusterize_bipartite_networks <- function(
+  netlist,
+  colsbm_model,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  partition_init = NULL,
+  full_collection_init = NULL,
+  full_inference = FALSE,
+  method = "single",
+  verbose = TRUE,
+  temp_save_path = tempfile(fileext = ".Rds")
+) {
   check_bipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
   netlist <- check_networks_list(networks_list = netlist)
-  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  net_id <- check_net_id_and_initialize(
+    net_id = net_id,
+    networks_list = netlist
+  )
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
     networks_list = netlist,
@@ -343,7 +370,9 @@ clusterize_bipartite_networks <- function(netlist,
 
   # Fit the initial model on the full collection
   if (verbose & !is.null(temp_save_path)) {
-    cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
+    cli::cli_alert_info(
+      "A save file will be created at {.val {temp_save_path}} and updated after each step"
+    )
   }
   start_time <- Sys.time()
   if (is.null(partition_init)) {
@@ -361,10 +390,18 @@ clusterize_bipartite_networks <- function(netlist,
       )
     } else {
       # If a full collection is provided, use it to initialize the clustering
-      cli::cli_h1("Using a provided full collection to initialize the clustering")
+      cli::cli_h1(
+        "Using a provided full collection to initialize the clustering"
+      )
       stopifnot(
-        "full_collection_init should be a bisbmpop object" = inherits(full_collection_init, "bisbmpop"),
-        "full_collection$A should be identical to netlist" = identical(full_collection_init$A, netlist)
+        "full_collection_init should be a bisbmpop object" = inherits(
+          full_collection_init,
+          "bisbmpop"
+        ),
+        "full_collection$A should be identical to netlist" = identical(
+          full_collection_init$A,
+          netlist
+        )
       )
       my_bisbmpop <- full_collection_init
     }
@@ -375,16 +412,26 @@ clusterize_bipartite_networks <- function(netlist,
     clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
   } else {
     if (verbose) {
-      cli::cli_inform("A list of fits was provided, the clustering will start from this list")
+      cli::cli_inform(
+        "A list of fits was provided, the clustering will start from this list"
+      )
     }
     # Starting from a list of fits
-    stopifnot("partition_init should be a list of fitBipartite objects" = inherits(partition_init, "list"))
+    stopifnot(
+      "partition_init should be a list of fitBipartite objects" = inherits(
+        partition_init,
+        "list"
+      )
+    )
     clustering_queue <- partition_init
     list_model_binary <- list()
     cluster <- unlist(lapply(seq_along(clustering_queue), function(i) {
       rep(i, length(clustering_queue[[i]]$net_id))
     }))
-    stopifnot("Cluster vector should be the same length as net_id" = length(cluster) == length(net_id))
+    stopifnot(
+      "Cluster vector should be the same length as net_id" = length(cluster) ==
+        length(net_id)
+    )
     names(cluster) <- net_id
     clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
   }
@@ -395,11 +442,14 @@ clusterize_bipartite_networks <- function(netlist,
   # Process the clustering queue
   while (length(clustering_queue) > 0) {
     if (!is.null(temp_save_path)) {
-      saveRDS(list(
-        clustering_queue = clustering_queue,
-        list_model_binary = list_model_binary,
-        clustering_history = clustering_history
-      ), temp_save_path)
+      saveRDS(
+        list(
+          clustering_queue = clustering_queue,
+          list_model_binary = list_model_binary,
+          clustering_history = clustering_history
+        ),
+        temp_save_path
+      )
     }
     fit <- clustering_queue[[1]]
     clustering_queue <- clustering_queue[-1]
@@ -409,7 +459,9 @@ clusterize_bipartite_networks <- function(netlist,
       list_model_binary <- append(list_model_binary, list(fit))
       next
     } else {
-      stopifnot("The fit should be a bisbmpop object" = inherits(fit, "bisbmpop"))
+      stopifnot(
+        "The fit should be a bisbmpop object" = inherits(fit, "bisbmpop")
+      )
     }
 
     # Compute the dissimilarity matrix
@@ -442,7 +494,9 @@ clusterize_bipartite_networks <- function(netlist,
         dim(Z_init) <- c(fit$global_opts$Q1_max, fit$global_opts$Q2_max)
 
         if (verbose) {
-          cli::cli_alert_info("Fitting a sub collection with : {.val {fit$net_id[cl == k]}}")
+          cli::cli_alert_info(
+            "Fitting a sub collection with : {.val {fit$net_id[cl == k]}}"
+          )
         }
 
         filtered_sep_BiSBM <- vector("list")
@@ -468,16 +522,20 @@ clusterize_bipartite_networks <- function(netlist,
       nb_cores = global_opts[["nb_cores"]]
     )
 
-
-    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL >
+      fit$best_fit$BICL)
     # Decide whether to continue splitting or add to final list
     if (full_inference || bicl_increased) {
       clustering_queue <- append(clustering_queue, fits)
       if (verbose && bicl_increased) {
-        cli::cli_alert_success("Splitting collections improved the BIC-L criterion")
+        cli::cli_alert_success(
+          "Splitting collections improved the BIC-L criterion"
+        )
       }
       if (verbose && full_inference) {
-        cli::cli_alert_info("Full inference mode enabled, continuing to split collections")
+        cli::cli_alert_info(
+          "Full inference mode enabled, continuing to split collections"
+        )
       }
       prev_cluster <- unique(cluster[fit$net_id])
 
@@ -486,11 +544,16 @@ clusterize_bipartite_networks <- function(netlist,
 
       # Assign the new cluster to the networks
       cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
-      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
+      clustering_history <- rbind(
+        clustering_history,
+        matrix(unname(cluster), nrow = 1)
+      )
     } else {
       list_model_binary <- append(list_model_binary, list(fit))
       if (verbose) {
-        cli::cli_alert_danger("Splitting collections {.emph decreased} the BIC-L criterion")
+        cli::cli_alert_danger(
+          "Splitting collections {.emph decreased} the BIC-L criterion"
+        )
       }
     }
   }
@@ -507,12 +570,16 @@ clusterize_bipartite_networks <- function(netlist,
     clustering_history = clustering_history
   )
   if (verbose) {
-    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}")
+    cli::cli_alert_info(
+      "After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}"
+    )
   }
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
     if (verbose) {
-      cli::cli_alert_info("The final results are saved at {.val {temp_save_path}}")
+      cli::cli_alert_info(
+        "The final results are saved at {.val {temp_save_path}}"
+      )
     }
   }
   return(output_list)
@@ -528,7 +595,6 @@ clusterize_bipartite_networks <- function(netlist,
 # If the sum of BICL > BICL:
 # 5.a. Go back to step 2 for all sub collections
 # 5.b This partition is currently the best
-
 
 #' Computes a dissimilarity matrix between networks of the collections
 #'
@@ -550,31 +616,40 @@ compute_dissimilarity_matrix <- function(
   norm = "L2"
 ) {
   stopifnot(
-    "Can't build the distance matrix, this is not a bmpop or bisbmpop object" =
-      (inherits(collection, "bisbmpop") | inherits(collection, "bmpop") | inherits(collection, "fitBipartiteSBMPop") | inherits(collection, "fitSimpleSBMPop"))
+    "Can't build the distance matrix, this is not a bmpop or bisbmpop object" = (inherits(
+      collection,
+      "bisbmpop"
+    ) |
+      inherits(collection, "bmpop") |
+      inherits(collection, "fitBipartiteSBMPop") |
+      inherits(collection, "fitSimpleSBMPop"))
   )
 
   if (inherits(collection, "bisbmpop")) {
-    dist_matrix <- compute_dissimilarity_matrix.bisbmpop(collection$best_fit,
+    dist_matrix <- compute_dissimilarity_matrix.bisbmpop(
+      collection$best_fit,
       weight = weight,
       norm = norm
     )
   }
   if (inherits(collection, "bmpop")) {
-    dist_matrix <- compute_dissimilarity_matrix.bmpop(collection$best_fit,
+    dist_matrix <- compute_dissimilarity_matrix.bmpop(
+      collection$best_fit,
       weight = weight,
       norm = norm
     )
   }
 
   if (inherits(collection, "fitBipartiteSBMPop")) {
-    dist_matrix <- compute_dissimilarity_matrix.bisbmpop(collection,
+    dist_matrix <- compute_dissimilarity_matrix.bisbmpop(
+      collection,
       weight = weight,
       norm = norm
     )
   }
   if (inherits(collection, "fitSimpleSBMPop")) {
-    dist_matrix <- compute_dissimilarity_matrix.bmpop(collection,
+    dist_matrix <- compute_dissimilarity_matrix.bmpop(
+      collection,
       weight = weight,
       norm = norm
     )
@@ -595,7 +670,8 @@ compute_dissimilarity_matrix.bisbmpop <- function(
   dist_matrix <- matrix(0, nrow = M, ncol = M)
 
   dist_matrix <- outer(
-    1:M, 1:M,
+    1:M,
+    1:M,
     Vectorize(function(i, j) {
       if (i == j) {
         return(0)
@@ -604,7 +680,8 @@ compute_dissimilarity_matrix.bisbmpop <- function(
       rhos <- lapply(collection$pim[c(i, j)], function(list) list[[2]])
 
       return(dist_bisbmpop_max(
-        pi = pis, rho = rhos,
+        pi = pis,
+        rho = rhos,
         alpha = collection$alpham[c(i, j)],
         weight = weight,
         norm = norm
@@ -627,7 +704,8 @@ compute_dissimilarity_matrix.bmpop <- function(
   dist_matrix <- matrix(0, nrow = M, ncol = M)
 
   dist_matrix <- outer(
-    1:M, 1:M,
+    1:M,
+    1:M,
     Vectorize(function(i, j) {
       if (i == j) {
         return(0)
@@ -644,7 +722,6 @@ compute_dissimilarity_matrix.bmpop <- function(
       )
     })
   )
-
 
   return(dist_matrix)
 }
@@ -677,19 +754,25 @@ partition_networks_list_from_dissimilarity <- function(
 
   # Checking correspondance of args
   if (nrow(dissimilarity_matrix) != M || ncol(dissimilarity_matrix) != M) {
-    cli::cli_abort(c("{.arg dissimilarity_matrix} has incorrect dimensions.",
-      "i" = "It should be ({toString(c(M,M))}) to match {.arg networks_list} length.",
-      "x" = "And it is of size ({toString(dim(dissimilarity_matrix))})"
-    ), call = rlang::caller_env())
+    cli::cli_abort(
+      c(
+        "{.arg dissimilarity_matrix} has incorrect dimensions.",
+        "i" = "It should be ({toString(c(M,M))}) to match {.arg networks_list} length.",
+        "x" = "And it is of size ({toString(dim(dissimilarity_matrix))})"
+      ),
+      call = rlang::caller_env()
+    )
   }
-
 
   if (M == 1L) {
     cl <- 1L
   } else if (M >= 3L) {
     # If there is more than 3 networks they are splitted using partition around
     # K-medioids
-    cl <- cutree(hclust(as.dist(sqrt(dissimilarity_matrix)), method = method), k = nb_groups)
+    cl <- cutree(
+      hclust(as.dist(sqrt(dissimilarity_matrix)), method = method),
+      k = nb_groups
+    )
   } else {
     cl <- c(1L, 2L)
   }
@@ -752,7 +835,10 @@ clusterize_bipartite_networks_graphon <- function(
   stopifnot("Only iid model is implemented" = colsbm_model == "iid")
   # Check if a netlist is provided, try to cast it if not
   check_networks_list(networks_list = netlist)
-  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  net_id <- check_net_id_and_initialize(
+    net_id = net_id,
+    networks_list = netlist
+  )
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
     networks_list = netlist,
@@ -766,30 +852,34 @@ clusterize_bipartite_networks_graphon <- function(
   fit_opts <- fo
 
   if (verbose && keep_history) {
-    cli::cli_text("Temporary results will be saved as {.val {temp_save_path}} after each step")
+    cli::cli_text(
+      "Temporary results will be saved as {.val {temp_save_path}} after each step"
+    )
   }
   if (is.null(partition_init)) {
     # Initializing separated collections
     cli::cli_h1("Beginning the clustering")
     cli::cli_h2("Fitting separated BiSBM models")
     p <- progressr::progressor(along = netlist)
-    collections <- colsbm_lapply(seq_along(netlist), function(i) {
-      col <- estimate_colBiSBM(
-        netlist = list(netlist[[i]]),
-        net_id = c(net_id[[i]]),
-        colsbm_model = colsbm_model,
-        nb_run = nb_run,
-        distribution = distribution,
-        global_opts = global_opts,
-        fit_opts = fit_opts
-      )
-      if (exists("p")) {
-        p(sprintf("Fitted network %s", paste0(col$net_id)))
-      }
-      col
-    },
-    backend = global_opts$backend,
-    nb_cores = global_opts$nb_cores
+    collections <- colsbm_lapply(
+      seq_along(netlist),
+      function(i) {
+        col <- estimate_colBiSBM(
+          netlist = list(netlist[[i]]),
+          net_id = c(net_id[[i]]),
+          colsbm_model = colsbm_model,
+          nb_run = nb_run,
+          distribution = distribution,
+          global_opts = global_opts,
+          fit_opts = fit_opts
+        )
+        if (exists("p")) {
+          p(sprintf("Fitted network %s", paste0(col$net_id)))
+        }
+        col
+      },
+      backend = global_opts$backend,
+      nb_cores = global_opts$nb_cores
     )
     cluster <- seq_len(length(netlist))
     names(cluster) <- net_id
@@ -797,23 +887,35 @@ clusterize_bipartite_networks_graphon <- function(
     collections <- partition_init
     # A partition_init must be homogeneous: mixing bisbmpop and
     # fitBipartiteSBMPop objects would leave the graphon distances undefined.
-    collection_classes <- vapply(collections, function(col) {
-      if (inherits(col, "bisbmpop")) {
-        "bisbmpop"
-      } else if (inherits(col, "fitBipartiteSBMPop")) {
-        "fitBipartiteSBMPop"
-      } else {
-        "unsupported"
-      }
-    }, character(1))
+    collection_classes <- vapply(
+      collections,
+      function(col) {
+        if (inherits(col, "bisbmpop")) {
+          "bisbmpop"
+        } else if (inherits(col, "fitBipartiteSBMPop")) {
+          "fitBipartiteSBMPop"
+        } else {
+          "unsupported"
+        }
+      },
+      character(1)
+    )
     stopifnot(
-      "All elements of partition_init must be objects of the same class (bisbmpop or fitBipartiteSBMPop)" =
-        all(collection_classes == collection_classes[1]) && collection_classes[1] != "unsupported"
+      "All elements of partition_init must be objects of the same class (bisbmpop or fitBipartiteSBMPop)" = all(
+        collection_classes == collection_classes[1]
+      ) &&
+        collection_classes[1] != "unsupported"
     )
     cluster <- unlist(lapply(seq_along(collections), function(idx) {
-      setNames(rep(idx, length(collections[[idx]]$net_id)), nm = collections[[idx]]$net_id)
+      setNames(
+        rep(idx, length(collections[[idx]]$net_id)),
+        nm = collections[[idx]]$net_id
+      )
     }))
-    stopifnot("Cluster vector should be the same length as net_id" = length(cluster) == length(net_id))
+    stopifnot(
+      "Cluster vector should be the same length as net_id" = length(cluster) ==
+        length(net_id)
+    )
     cluster <- cluster[match(net_id, names(cluster))]
     if (verbose) {
       cli::cli_alert_info("Starting from a list of fits")
@@ -822,7 +924,9 @@ clusterize_bipartite_networks_graphon <- function(
 
   # Historique des fusions
   if (verbose) {
-    cli::cli_alert_info("Fully separated BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}")
+    cli::cli_alert_info(
+      "Fully separated BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}"
+    )
   }
   bicl_history <- c(compute_bicl_partition(collections, verbose = FALSE))
   fusion_history <- list(collections)
@@ -833,17 +937,41 @@ clusterize_bipartite_networks_graphon <- function(
     dist_matrix <- matrix(Inf, nrow = M, ncol = M)
     for (i in seq_len(M)) {
       for (j in seq_len(i - 1)) {
-        if (inherits(collections[[i]], "fitBipartiteSBMPop") && inherits(collections[[j]], "fitBipartiteSBMPop")) {
+        if (
+          inherits(collections[[i]], "fitBipartiteSBMPop") &&
+            inherits(collections[[j]], "fitBipartiteSBMPop")
+        ) {
           dist_matrix[i, j] <- dist_graphon_bipartite_all_permutations(
-            pis = list(collections[[i]]$parameters$pi[[1]], collections[[j]]$parameters$pi[[1]]),
-            rhos = list(collections[[i]]$parameters$rho[[1]], collections[[j]]$parameters$rho[[1]]),
-            alphas = list(collections[[i]]$parameters$alpha, collections[[j]]$parameters$alpha)
+            pis = list(
+              collections[[i]]$parameters$pi[[1]],
+              collections[[j]]$parameters$pi[[1]]
+            ),
+            rhos = list(
+              collections[[i]]$parameters$rho[[1]],
+              collections[[j]]$parameters$rho[[1]]
+            ),
+            alphas = list(
+              collections[[i]]$parameters$alpha,
+              collections[[j]]$parameters$alpha
+            )
           )
-        } else if (inherits(collections[[i]], "bisbmpop") && inherits(collections[[j]], "bisbmpop")) {
+        } else if (
+          inherits(collections[[i]], "bisbmpop") &&
+            inherits(collections[[j]], "bisbmpop")
+        ) {
           dist_matrix[i, j] <- dist_graphon_bipartite_all_permutations(
-            pis = list(collections[[i]]$best_fit$parameters$pi[[1]], collections[[j]]$best_fit$parameters$pi[[1]]),
-            rhos = list(collections[[i]]$best_fit$parameters$rho[[1]], collections[[j]]$best_fit$parameters$rho[[1]]),
-            alphas = list(collections[[i]]$best_fit$parameters$alpha, collections[[j]]$best_fit$parameters$alpha)
+            pis = list(
+              collections[[i]]$best_fit$parameters$pi[[1]],
+              collections[[j]]$best_fit$parameters$pi[[1]]
+            ),
+            rhos = list(
+              collections[[i]]$best_fit$parameters$rho[[1]],
+              collections[[j]]$best_fit$parameters$rho[[1]]
+            ),
+            alphas = list(
+              collections[[i]]$best_fit$parameters$alpha,
+              collections[[j]]$best_fit$parameters$alpha
+            )
           )
         }
 
@@ -868,7 +996,10 @@ clusterize_bipartite_networks_graphon <- function(
   # Loop to merge collections
   while (length(collections) > 1 && (has_bicl_increased || full_inference)) {
     if (!is.null(temp_save_path)) {
-      saveRDS(list(fusion_history = fusion_history, bicl_history = bicl_history), temp_save_path)
+      saveRDS(
+        list(fusion_history = fusion_history, bicl_history = bicl_history),
+        temp_save_path
+      )
     }
     if (verbose) {
       cli::cli_h2("Step {.val {step}} on a max of {.val {max_steps}} step{?s}")
@@ -880,7 +1011,9 @@ clusterize_bipartite_networks_graphon <- function(
     i <- sorted_pairs[1, 1]
     j <- sorted_pairs[1, 2]
     if (verbose) {
-      cli::cli_alert_info("Try merging{cli::qty({length(collections[[i]]$net_id)})} network{?s} {.val {collections[[i]]$net_id}} with{cli::qty({length(collections[[j]]$net_id)})} network{?s} {.val {collections[[j]]$net_id}}")
+      cli::cli_alert_info(
+        "Try merging{cli::qty({length(collections[[i]]$net_id)})} network{?s} {.val {collections[[i]]$net_id}} with{cli::qty({length(collections[[j]]$net_id)})} network{?s} {.val {collections[[j]]$net_id}}"
+      )
     }
     candidate_collection <- estimate_colBiSBM(
       netlist = c(collections[[i]]$A, collections[[j]]$A),
@@ -896,33 +1029,50 @@ clusterize_bipartite_networks_graphon <- function(
     remaining_collections <- collections[-c(i, j)]
     has_bicl_increased <-
       # Test if there are remaining collections and compute their BICL or output 0
-      ifelse(length(remaining_collections) >= 1,
+      ifelse(
+        length(remaining_collections) >= 1,
         compute_bicl_partition(collections[-c(i, j)]),
         0
       ) +
-        new_collection$best_fit$BICL > bicl_history[step]
+        new_collection$best_fit$BICL >
+        bicl_history[step]
     if (has_bicl_increased || full_inference) {
       # Mettre à jour les collections
       collections <- collections[-c(i, j)]
       collections <- c(collections, list(new_collection))
-      bicl_history <- c(bicl_history, compute_bicl_partition(collections, verbose = FALSE))
-      cli::cli_alert_info("Current collection BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}")
+      bicl_history <- c(
+        bicl_history,
+        compute_bicl_partition(collections, verbose = FALSE)
+      )
+      cli::cli_alert_info(
+        "Current collection BIC-L is {.val {compute_bicl_partition(collections, verbose = FALSE)}}"
+      )
       if (!has_bicl_increased && full_inference && verbose) {
-        cli::cli_alert_info("Full inference requested, clustering will continue, but BIC-L has not improved")
+        cli::cli_alert_info(
+          "Full inference requested, clustering will continue, but BIC-L has not improved"
+        )
       }
 
       net_id_to_merge <- new_collection$net_id
       cluster_to_merge <- cluster[which(names(cluster) %in% net_id_to_merge)]
 
-      cluster[which(names(cluster) %in% net_id_to_merge)] <- rep(min(cluster_to_merge), length(cluster_to_merge))
+      cluster[which(names(cluster) %in% net_id_to_merge)] <- rep(
+        min(cluster_to_merge),
+        length(cluster_to_merge)
+      )
 
-      cluster[cluster > max(cluster_to_merge)] <- cluster[cluster > max(cluster_to_merge)] - 1
+      cluster[cluster > max(cluster_to_merge)] <- cluster[
+        cluster > max(cluster_to_merge)
+      ] -
+        1
 
       # Ajouter à l'historique des fusions
       fusion_history <- c(fusion_history, list(collections))
       step <- step + 1
       if (verbose) {
-        cli::cli_alert_info("Collections updated, {length(collections)} remaining")
+        cli::cli_alert_info(
+          "Collections updated, {length(collections)} remaining"
+        )
       }
     } else {
       if (verbose) {
@@ -979,10 +1129,14 @@ clusterize_bipartite_networks_d_a <- function(
   while (bicl_increased && clust_step <= max_nb_steps) {
     # Call the clustering function with the current step
     if (verbose) {
-      cli::cli_h2("Step {.val {clust_step}} on a max of {.val {max_nb_steps}} steps")
+      cli::cli_h2(
+        "Step {.val {clust_step}} on a max of {.val {max_nb_steps}} steps"
+      )
       cli::cli_h3("Descending order clustering")
       if (!is.null(partition_init) && clust_step == 1L) {
-        cli::cli_alert_info("Using a provided partition_init to initialize the clustering")
+        cli::cli_alert_info(
+          "Using a provided partition_init to initialize the clustering"
+        )
       } else {
         cli::cli_alert_info("No partition_init provided, starting from scratch")
       }
@@ -999,14 +1153,25 @@ clusterize_bipartite_networks_d_a <- function(
       full_collection_init = full_collection_init,
       full_inference = full_inference,
       verbose = verbose,
-      temp_save_path = file.path(temp_save_path, paste0("descending_step_", clust_step, ".Rds"))
+      temp_save_path = file.path(
+        temp_save_path,
+        paste0("descending_step_", clust_step, ".Rds")
+      )
     )
     if (verbose) {
-      cli::cli_alert_info("Desc clustering completed for step {.val {clust_step}}")
-      cli::cli_alert_info("BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition, verbose = FALSE)}}")
+      cli::cli_alert_info(
+        "Desc clustering completed for step {.val {clust_step}}"
+      )
+      cli::cli_alert_info(
+        "BIC-L for descending step {.val {clust_step}} is {.val {compute_bicl_partition(desc_res$partition, verbose = FALSE)}}"
+      )
     }
 
-    desc_increased_BICL <- compute_bicl_partition(desc_res$partition, verbose = FALSE) > old_asc_BICL
+    desc_increased_BICL <- compute_bicl_partition(
+      desc_res$partition,
+      verbose = FALSE
+    ) >
+      old_asc_BICL
 
     partition_init <- desc_res$partition
 
@@ -1024,19 +1189,32 @@ clusterize_bipartite_networks_d_a <- function(
       partition_init = partition_init,
       full_inference = full_inference,
       verbose = verbose,
-      temp_save_path = file.path(temp_save_path, paste0("ascending_step_", clust_step, ".Rds"))
+      temp_save_path = file.path(
+        temp_save_path,
+        paste0("ascending_step_", clust_step, ".Rds")
+      )
     )
     if (verbose) {
-      cli::cli_alert_info("Asc clustering completed for step {.val {clust_step}}")
-      cli::cli_alert_info("BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition, verbose = FALSE)}}")
+      cli::cli_alert_info(
+        "Asc clustering completed for step {.val {clust_step}}"
+      )
+      cli::cli_alert_info(
+        "BIC-L for ascending step {.val {clust_step}} is {.val {compute_bicl_partition(asc_res$partition, verbose = FALSE)}}"
+      )
     }
     # Check if the BIC-L has increased
-    asc_increased_BICL <- (compute_bicl_partition(asc_res$partition, verbose = FALSE) > compute_bicl_partition(desc_res$partition, verbose = FALSE))
+    asc_increased_BICL <- (compute_bicl_partition(
+      asc_res$partition,
+      verbose = FALSE
+    ) >
+      compute_bicl_partition(desc_res$partition, verbose = FALSE))
 
     bicl_increased <- asc_increased_BICL || desc_increased_BICL
     if (bicl_increased) {
       if (verbose) {
-        cli::cli_alert_success("BIC-L increased at {ifelse(asc_increased_BICL, 'ascending', 'descending')} step, continuing to the next step")
+        cli::cli_alert_success(
+          "BIC-L increased at {ifelse(asc_increased_BICL, 'ascending', 'descending')} step, continuing to the next step"
+        )
       }
       partition_init <- asc_res$partition
       old_asc_BICL <- compute_bicl_partition(asc_res$partition, verbose = FALSE)
@@ -1053,23 +1231,28 @@ clusterize_bipartite_networks_d_a <- function(
   return(asc_res)
 }
 
-clusterize_bipartite_networks_low_penalty_first <- function(netlist,
-                                                            colsbm_model,
-                                                            net_id = NULL,
-                                                            distribution = "bernoulli",
-                                                            nb_run = 3L,
-                                                            global_opts = list(),
-                                                            fit_opts = list(),
-                                                            partition_init = NULL,
-                                                            full_collection_init = NULL,
-                                                            full_inference = FALSE,
-                                                            method = "single",
-                                                            verbose = TRUE,
-                                                            temp_save_path = tempfile(fileext = ".Rds")) {
+clusterize_bipartite_networks_low_penalty_first <- function(
+  netlist,
+  colsbm_model,
+  net_id = NULL,
+  distribution = "bernoulli",
+  nb_run = 3L,
+  global_opts = list(),
+  fit_opts = list(),
+  partition_init = NULL,
+  full_collection_init = NULL,
+  full_inference = FALSE,
+  method = "single",
+  verbose = TRUE,
+  temp_save_path = tempfile(fileext = ".Rds")
+) {
   check_bipartite_colsbm_models(colsbm_model = colsbm_model)
   # Check if a netlist is provided, try to cast it if not
   check_networks_list(networks_list = netlist)
-  net_id <- check_net_id_and_initialize(net_id = net_id, networks_list = netlist)
+  net_id <- check_net_id_and_initialize(
+    net_id = net_id,
+    networks_list = netlist
+  )
   check_colsbm_emission_distribution(emission_distribution = distribution)
   check_networks_list_match_emission_distribution(
     networks_list = netlist,
@@ -1085,10 +1268,11 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
   fit_opts_no_pen <- fit_opts
   fit_opts_no_pen$penalty_factor <- 0.0
 
-
   # Fit the initial model on the full collection
   if (verbose & !is.null(temp_save_path)) {
-    cli::cli_alert_info("A save file will be created at {.val {temp_save_path}} and updated after each step")
+    cli::cli_alert_info(
+      "A save file will be created at {.val {temp_save_path}} and updated after each step"
+    )
   }
   start_time <- Sys.time()
   if (is.null(full_collection_init)) {
@@ -1106,7 +1290,16 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
   } else {
     # If a full collection is provided, use it to initialize the clustering
     cli::cli_h1("Using a provided full collection to initialize the clustering")
-    stopifnot("full_collection_init should be a bisbmpop object" = inherits(full_collection_init, "bisbmpop"), "full_collection$A should be identical to netlist" = identical(full_collection_init$A, netlist))
+    stopifnot(
+      "full_collection_init should be a bisbmpop object" = inherits(
+        full_collection_init,
+        "bisbmpop"
+      ),
+      "full_collection$A should be identical to netlist" = identical(
+        full_collection_init$A,
+        netlist
+      )
+    )
     my_bisbmpop <- full_collection_init
   }
 
@@ -1118,16 +1311,26 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
     clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
   } else {
     if (verbose) {
-      cli::cli_inform("A list of fits was provided, the clustering will start from this list")
+      cli::cli_inform(
+        "A list of fits was provided, the clustering will start from this list"
+      )
     }
     # Starting from a list of fits
-    stopifnot("partition_init should be a list of bisbmpop objects" = inherits(partition_init, "list"))
+    stopifnot(
+      "partition_init should be a list of bisbmpop objects" = inherits(
+        partition_init,
+        "list"
+      )
+    )
     clustering_queue <- partition_init
     list_model_binary <- list()
     cluster <- unlist(lapply(seq_along(clustering_queue), function(i) {
       rep(i, length(clustering_queue[[i]]$net_id))
     }))
-    stopifnot("Cluster vector should be the same length as net_id" = length(cluster) == length(net_id))
+    stopifnot(
+      "Cluster vector should be the same length as net_id" = length(cluster) ==
+        length(net_id)
+    )
     names(cluster) <- net_id
     clustering_history <- as.data.frame(matrix(cluster, nrow = 1L))
   }
@@ -1138,11 +1341,14 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
   # Process the clustering queue
   while (length(clustering_queue) > 0) {
     if (!is.null(temp_save_path)) {
-      saveRDS(list(
-        clustering_queue = clustering_queue,
-        list_model_binary = list_model_binary,
-        clustering_history = clustering_history
-      ), temp_save_path)
+      saveRDS(
+        list(
+          clustering_queue = clustering_queue,
+          list_model_binary = list_model_binary,
+          clustering_history = clustering_history
+        ),
+        temp_save_path
+      )
     }
     fit <- clustering_queue[[1]]
     clustering_queue <- clustering_queue[-1]
@@ -1183,7 +1389,9 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
         dim(Z_init) <- c(fit$global_opts$Q1_max, fit$global_opts$Q2_max)
 
         if (verbose) {
-          cli::cli_alert_info("Fitting a sub collection with : {.val {fit$net_id[cl == k]}}")
+          cli::cli_alert_info(
+            "Fitting a sub collection with : {.val {fit$net_id[cl == k]}}"
+          )
         }
 
         filtered_sep_BiSBM <- vector("list")
@@ -1209,16 +1417,20 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
       nb_cores = global_opts[["nb_cores"]]
     )
 
-
-    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL > fit$best_fit$BICL)
+    bicl_increased <- (fits[[1]]$best_fit$BICL + fits[[2]]$best_fit$BICL >
+      fit$best_fit$BICL)
     # Decide whether to continue splitting or add to final list
     if (full_inference || bicl_increased) {
       clustering_queue <- append(clustering_queue, fits)
       if (verbose && bicl_increased) {
-        cli::cli_alert_success("Splitting collections improved the BIC-L criterion")
+        cli::cli_alert_success(
+          "Splitting collections improved the BIC-L criterion"
+        )
       }
       if (verbose && full_inference) {
-        cli::cli_alert_info("Full inference mode enabled, continuing to split collections")
+        cli::cli_alert_info(
+          "Full inference mode enabled, continuing to split collections"
+        )
       }
       prev_cluster <- unique(cluster[fit$net_id])
 
@@ -1227,11 +1439,16 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
 
       # Assign the new cluster to the networks
       cluster[fit$net_id[cl == 2]] <- prev_cluster + 1
-      clustering_history <- rbind(clustering_history, matrix(unname(cluster), nrow = 1))
+      clustering_history <- rbind(
+        clustering_history,
+        matrix(unname(cluster), nrow = 1)
+      )
     } else {
       list_model_binary <- append(list_model_binary, list(fit$best_fit))
       if (verbose) {
-        cli::cli_alert_danger("Splitting collections {.emph decreased} the BIC-L criterion")
+        cli::cli_alert_danger(
+          "Splitting collections {.emph decreased} the BIC-L criterion"
+        )
       }
     }
   }
@@ -1249,12 +1466,16 @@ clusterize_bipartite_networks_low_penalty_first <- function(netlist,
     full_collection = my_bisbmpop
   )
   if (verbose) {
-    cli::cli_alert_info("After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}")
+    cli::cli_alert_info(
+      "After clustering the partition has a BIC-L of {.val {compute_bicl_partition(output_list$partition, verbose = FALSE)}}"
+    )
   }
   if (!is.null(temp_save_path)) {
     saveRDS(output_list, temp_save_path)
     if (verbose) {
-      cli::cli_alert_info("The final results are saved at {.val {temp_save_path}}")
+      cli::cli_alert_info(
+        "The final results are saved at {.val {temp_save_path}}"
+      )
     }
   }
   return(output_list)

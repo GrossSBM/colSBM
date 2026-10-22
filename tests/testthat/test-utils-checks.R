@@ -2,7 +2,10 @@
 test_that("check_is_integer_over_thresh() detects incorrect type input", {
   expect_error(check_is_integer_over_thresh("a", 1L), "must be an integer")
   expect_error(check_is_integer_over_thresh(1.5, 1L), "must be an integer")
-  expect_error(check_is_integer_over_thresh(matrix(1, 2), 1L), "must be an integer")
+  expect_error(
+    check_is_integer_over_thresh(matrix(1, 2), 1L),
+    "must be an integer"
+  )
 })
 
 test_that("check_is_integer_over_thresh() detects input below threshold", {
@@ -22,17 +25,29 @@ test_that("check_networks_list() detects empty input", {
 test_that("check_networks_list() detects incorrect type input", {
   expect_error(check_networks_list("a"), "must be a list of matrices")
   expect_error(check_networks_list(list()), "must be a list of matrices")
-  expect_error(check_networks_list(list(matrix(1, 2), 1)), "must be a list of matrices")
+  expect_error(
+    check_networks_list(list(matrix(1, 2), 1)),
+    "must be a list of matrices"
+  )
 })
 
 test_that("check_networks_list() detects input below threshold", {
-  expect_error(check_networks_list(list(matrix(1, 2)), 2L), "must be of length at least 2")
-  expect_error(check_networks_list(list(matrix(1, 2), matrix(1, 2)), 3L), "must be of length at least 3")
+  expect_error(
+    check_networks_list(list(matrix(1, 2)), 2L),
+    "must be of length at least 2"
+  )
+  expect_error(
+    check_networks_list(list(matrix(1, 2), matrix(1, 2)), 3L),
+    "must be of length at least 3"
+  )
 })
 
 test_that("check_networks_list() works correctly", {
   expect_no_error(check_networks_list(list(matrix(1, 2), matrix(1, 2)), 2L))
-  expect_no_error(check_networks_list(list(matrix(1, 2), matrix(1, 2), matrix(1, 2)), 2L))
+  expect_no_error(check_networks_list(
+    list(matrix(1, 2), matrix(1, 2), matrix(1, 2)),
+    2L
+  ))
 })
 
 # check_dissimilarity_matrix
@@ -41,15 +56,28 @@ test_that("check_dissimilarity_matrix() detects empty input", {
 })
 
 test_that("check_dissimilarity_matrix() detects incorrect type input", {
-  expect_error(check_dissimilarity_matrix("a"), "must be a dissimilarity matrix")
-  expect_error(check_dissimilarity_matrix(matrix(c("a", "b"), 2)), "must be a dissimilarity matrix")
-  expect_error(check_dissimilarity_matrix(matrix(c(TRUE, FALSE))), "must be a dissimilarity matrix")
+  expect_error(
+    check_dissimilarity_matrix("a"),
+    "must be a dissimilarity matrix"
+  )
+  expect_error(
+    check_dissimilarity_matrix(matrix(c("a", "b"), 2)),
+    "must be a dissimilarity matrix"
+  )
+  expect_error(
+    check_dissimilarity_matrix(matrix(c(TRUE, FALSE))),
+    "must be a dissimilarity matrix"
+  )
 })
 
 test_that("check_dissimilarity_matrix() works correctly", {
   expect_no_error(check_dissimilarity_matrix(matrix(1, 2)))
   expect_no_error(check_dissimilarity_matrix(matrix(c(1, 2, 3, 4), 2)))
-  expect_no_error(check_dissimilarity_matrix(matrix(c(1, 2, 3, 4), 2, dimnames = list(letters[1:2], letters[1:2]))))
+  expect_no_error(check_dissimilarity_matrix(matrix(
+    c(1, 2, 3, 4),
+    2,
+    dimnames = list(letters[1:2], letters[1:2])
+  )))
 })
 
 # check_bipartite_colsbm_models
@@ -90,13 +118,22 @@ test_that("check_unipartite_colsbm_models() works correctly", {
 
 # check_colsbm_emission_distribution
 test_that("check_colsbm_emission_distribution() detects empty input", {
-  expect_error(check_colsbm_emission_distribution(arg = NULL), "must be supplied")
+  expect_error(
+    check_colsbm_emission_distribution(arg = NULL),
+    "must be supplied"
+  )
 })
 
 test_that("check_colsbm_emission_distribution() detects incorrect choice", {
   expect_error(check_colsbm_emission_distribution("a"), "must be one of")
-  expect_error(check_colsbm_emission_distribution(1), "must be a character vector")
-  expect_error(check_colsbm_emission_distribution(c("a", "b")), "must be one of")
+  expect_error(
+    check_colsbm_emission_distribution(1),
+    "must be a character vector"
+  )
+  expect_error(
+    check_colsbm_emission_distribution(c("a", "b")),
+    "must be one of"
+  )
 })
 
 test_that("check_colsbm_emission_distribution() works correctly", {
@@ -106,64 +143,167 @@ test_that("check_colsbm_emission_distribution() works correctly", {
 
 # check_networks_list_match_emission_distribution
 test_that("check_networks_list_match_emission_distribution() detects empty input", {
-  expect_error(check_networks_list_match_emission_distribution(arg = NULL, distrib_arg = NULL), "must be supplied")
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      arg = NULL,
+      distrib_arg = NULL
+    ),
+    "must be supplied"
+  )
 })
 
 test_that("check_networks_list_match_emission_distribution() detects incorrect choice", {
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1))), emission_distribution = "a"), "must be one of")
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1))),
+      emission_distribution = "a"
+    ),
+    "must be one of"
+  )
 })
 
 #  Bernoulli
 ## Non matching networks matrices
 test_that("check_networks_list_match_emission_distribution() detects non matching networks matrices for bernoulli", {
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0.5, 1))), emission_distribution = "bernoulli"), "Non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1.5))), emission_distribution = "bernoulli"), "Non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1, "0"))), emission_distribution = "bernoulli"), "Non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1, 2))), emission_distribution = "bernoulli"), "either 0 or 1")
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0.5, 1))),
+      emission_distribution = "bernoulli"
+    ),
+    "Non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1.5))),
+      emission_distribution = "bernoulli"
+    ),
+    "Non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1, "0"))),
+      emission_distribution = "bernoulli"
+    ),
+    "Non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1, 2))),
+      emission_distribution = "bernoulli"
+    ),
+    "either 0 or 1"
+  )
 })
 
 ## Matching networks matrices
 test_that("check_networks_list_match_emission_distribution() detects matching networks matrices for bernoulli", {
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1))), emission_distribution = "bernoulli"))
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1), c(1, 0))), emission_distribution = "bernoulli"))
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1), c(1, 0)), matrix(c(0, 1), c(1, 0))), emission_distribution = "bernoulli"))
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, NA), c(1, 0)), matrix(c(0, 1), c(1, 0)), matrix(c(0, 1), c(1, 0))), emission_distribution = "bernoulli"))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 1))),
+    emission_distribution = "bernoulli"
+  ))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 1), c(1, 0))),
+    emission_distribution = "bernoulli"
+  ))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 1), c(1, 0)), matrix(c(0, 1), c(1, 0))),
+    emission_distribution = "bernoulli"
+  ))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(
+      matrix(c(0, NA), c(1, 0)),
+      matrix(c(0, 1), c(1, 0)),
+      matrix(c(0, 1), c(1, 0))
+    ),
+    emission_distribution = "bernoulli"
+  ))
 })
 
 
 # Poisson
 ## Non matching networks matrices
 test_that("check_networks_list_match_emission_distribution() detects non matching networks matrices for poisson", {
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0.5, 1))), emission_distribution = "poisson"), "non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1.5))), emission_distribution = "poisson"), "non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1, "0"))), emission_distribution = "poisson"), "non integer entries")
-  expect_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, -1, 2))), emission_distribution = "poisson"), "non-negative integer entries")
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0.5, 1))),
+      emission_distribution = "poisson"
+    ),
+    "non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1.5))),
+      emission_distribution = "poisson"
+    ),
+    "non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, 1, "0"))),
+      emission_distribution = "poisson"
+    ),
+    "non integer entries"
+  )
+  expect_error(
+    check_networks_list_match_emission_distribution(
+      networks_list = list(matrix(c(0, -1, 2))),
+      emission_distribution = "poisson"
+    ),
+    "non-negative integer entries"
+  )
 })
 
 ## Matching networks matrices
 test_that("check_networks_list_match_emission_distribution() detects matching networks matrices for poisson", {
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 5))), emission_distribution = "poisson"))
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 10), c(2, 3))), emission_distribution = "poisson"))
-  expect_no_error(check_networks_list_match_emission_distribution(networks_list = list(matrix(c(0, 1), c(1, 5)), matrix(c(0, 1), c(1, 0))), emission_distribution = "poisson"))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 5))),
+    emission_distribution = "poisson"
+  ))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 10), c(2, 3))),
+    emission_distribution = "poisson"
+  ))
+  expect_no_error(check_networks_list_match_emission_distribution(
+    networks_list = list(matrix(c(0, 1), c(1, 5)), matrix(c(0, 1), c(1, 0))),
+    emission_distribution = "poisson"
+  ))
 })
 
 # check_net_id
 test_that("check_net_id() detects incorrect type input", {
-  expect_error(check_net_id(TRUE, list(matrix(1, 2))), "must be a character or an integer vector.")
+  expect_error(
+    check_net_id(TRUE, list(matrix(1, 2))),
+    "must be a character or an integer vector."
+  )
 })
 
 test_that("check_net_id() detects length mismatch", {
-  expect_error(check_net_id(c("id1"), list(matrix(1, 2), matrix(1, 2))), "must have the same length as")
-  expect_error(check_net_id(c("id1", "id2", "id3"), list(matrix(1, 2), matrix(1, 2))), "must have the same length as")
+  expect_error(
+    check_net_id(c("id1"), list(matrix(1, 2), matrix(1, 2))),
+    "must have the same length as"
+  )
+  expect_error(
+    check_net_id(c("id1", "id2", "id3"), list(matrix(1, 2), matrix(1, 2))),
+    "must have the same length as"
+  )
 })
 
 test_that("check_net_id() detects duplicated ids", {
-  expect_error(check_net_id(c("id1", "id1"), list(matrix(1, 2), matrix(1, 2))), "must have unique values.")
+  expect_error(
+    check_net_id(c("id1", "id1"), list(matrix(1, 2), matrix(1, 2))),
+    "must have unique values."
+  )
 })
 
 test_that("check_net_id() works correctly", {
-  expect_no_error(check_net_id(c("id1", "id2"), list(matrix(1, 2), matrix(1, 2))))
-  expect_no_error(check_net_id(c("id1", "id2", "id3"), list(matrix(1, 2), matrix(1, 2), matrix(1, 2))))
+  expect_no_error(check_net_id(
+    c("id1", "id2"),
+    list(matrix(1, 2), matrix(1, 2))
+  ))
+  expect_no_error(check_net_id(
+    c("id1", "id2", "id3"),
+    list(matrix(1, 2), matrix(1, 2), matrix(1, 2))
+  ))
 })
 
 # Initializing default global options
@@ -346,7 +486,11 @@ test_that("check_global_opts() detects incorrect verbosity", {
 
 test_that("check_global_opts() works correctly", {
   expect_no_error(check_global_opts(default_go))
-  expect_no_error(check_global_opts(list(nb_cores = 2L, Q1_max = 3L, Q2_max = 4L)))
+  expect_no_error(check_global_opts(list(
+    nb_cores = 2L,
+    Q1_max = 3L,
+    Q2_max = 4L
+  )))
 })
 
 # check_fit_opts
@@ -406,21 +550,48 @@ test_that("check_net_id_and_initialize() initializes net_id correctly", {
 
 test_that("check_net_id_and_initialize() detects incorrect type input", {
   networks_list <- list(matrix(1, 2), matrix(1, 2))
-  expect_error(check_net_id_and_initialize(TRUE, networks_list), "must be a character or an integer vector")
-  expect_error(check_net_id_and_initialize(c(NA, 1), networks_list), "must be a character or an integer vector")
-  expect_error(check_net_id_and_initialize(c(NA, "a"), networks_list), "must be a character or an integer vector")
+  expect_error(
+    check_net_id_and_initialize(TRUE, networks_list),
+    "must be a character or an integer vector"
+  )
+  expect_error(
+    check_net_id_and_initialize(c(NA, 1), networks_list),
+    "must be a character or an integer vector"
+  )
+  expect_error(
+    check_net_id_and_initialize(c(NA, "a"), networks_list),
+    "must be a character or an integer vector"
+  )
 })
 
 test_that("check_net_id_and_initialize() detects length mismatch", {
   networks_list <- list(matrix(1, 2), matrix(1, 2))
-  expect_error(check_net_id_and_initialize(c("id1"), networks_list), "must have the same length as")
-  expect_error(check_net_id_and_initialize(c("id1", "id2", "id3"), networks_list), "must have the same length as")
+  expect_error(
+    check_net_id_and_initialize(c("id1"), networks_list),
+    "must have the same length as"
+  )
+  expect_error(
+    check_net_id_and_initialize(c("id1", "id2", "id3"), networks_list),
+    "must have the same length as"
+  )
 })
 
 test_that("check_net_id_and_initialize() works correctly", {
   networks_list <- list("id1" = matrix(1, 2), "id2" = matrix(1, 2))
-  expect_identical(check_net_id_and_initialize(c("id1", "id2"), networks_list), c("id1", "id2"))
-  expect_identical(check_net_id_and_initialize(c("id1", "id2", "id3"), list(matrix(1, 2), matrix(1, 2), matrix(1, 2))), c("id1", "id2", "id3"))
+  expect_identical(
+    check_net_id_and_initialize(c("id1", "id2"), networks_list),
+    c("id1", "id2")
+  )
+  expect_identical(
+    check_net_id_and_initialize(
+      c("id1", "id2", "id3"),
+      list(matrix(1, 2), matrix(1, 2), matrix(1, 2))
+    ),
+    c("id1", "id2", "id3")
+  )
   # Initialize net_id retrieves the ids from the networks_list
-  expect_identical(check_net_id_and_initialize(NULL, networks_list), c("id1", "id2"))
+  expect_identical(
+    check_net_id_and_initialize(NULL, networks_list),
+    c("id1", "id2")
+  )
 })

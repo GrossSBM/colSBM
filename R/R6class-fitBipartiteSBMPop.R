@@ -118,7 +118,6 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' VEM converged or not
     has_converged = FALSE,
 
-
     #' @description
     #' Initializes the fitBipartiteSBMPop object
     #'
@@ -146,29 +145,30 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param greedy_exploration_starting_point Stores the coordinates Q1 & Q2
     #' from the greedy exploration to  keep track of the starting_point
     #' @param fit_opts Fit parameters, used to determine the fitting method/
-    initialize = function(A = NULL,
-                          Q = NULL,
-                          Z = NULL,
-                          mask = NULL,
-                          net_id = NULL,
-                          distribution = NULL,
-                          free_mixture_row = TRUE,
-                          free_mixture_col = TRUE,
-                          Cpi = NULL,
-                          Calpha = NULL,
-                          init_method = "spectral",
-                          weight = NULL, # A vector of size M, the weight of each network
-                          greedy_exploration_starting_point = NULL,
-                          fit_opts = list(
-                            algo_ve = "fp",
-                            minibatch = TRUE,
-                            verbosity = 1
-                          )) {
+    initialize = function(
+      A = NULL,
+      Q = NULL,
+      Z = NULL,
+      mask = NULL,
+      net_id = NULL,
+      distribution = NULL,
+      free_mixture_row = TRUE,
+      free_mixture_col = TRUE,
+      Cpi = NULL,
+      Calpha = NULL,
+      init_method = "spectral",
+      weight = NULL, # A vector of size M, the weight of each network
+      greedy_exploration_starting_point = NULL,
+      fit_opts = list(
+        algo_ve = "fp",
+        minibatch = TRUE,
+        verbosity = 1
+      )
+    ) {
       # if (is.null(directed)) {
       # Bipartite networks have rectangular matrices so no symmetry
       #   directed <- ! isSymmetric.matrix(A[[1]])
       # }
-
 
       # TODO : implement sanity checks
 
@@ -177,15 +177,19 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$A <- A
       self$M <- length(A)
       self$n <- vector("list", 2)
-      self$n[[1]] <- vapply(seq_along(A),
+      self$n[[1]] <- vapply(
+        seq_along(A),
         function(m) nrow(A[[m]]),
         FUN.VALUE = .1
       )
-      self$n[[2]] <- vapply(seq_along(A),
+      self$n[[2]] <- vapply(
+        seq_along(A),
         function(m) ncol(A[[m]]),
         FUN.VALUE = .1
       )
-      self$e <- vapply(seq_along(A), function(m) sum(A[[m]], na.rm = TRUE),
+      self$e <- vapply(
+        seq_along(A),
+        function(m) sum(A[[m]], na.rm = TRUE),
         FUN.VALUE = .1
       )
 
@@ -253,8 +257,13 @@ fitBipartiteSBMPop <- R6::R6Class(
       self$free_mixture_col <- free_mixture_col
 
       # Setting the needed matrices for free mixture models
-      if (is.null(Cpi[[1]]) | is.null(Cpi[[2]]) |
-        is.null(Calpha) | !self$free_mixture_row | !self$free_mixture_col) {
+      if (
+        is.null(Cpi[[1]]) |
+          is.null(Cpi[[2]]) |
+          is.null(Calpha) |
+          !self$free_mixture_row |
+          !self$free_mixture_col
+      ) {
         if (is.null(Cpi[[1]])) {
           self$Cpi[[1]] <- matrix(TRUE, self$Q[1], self$M)
         }
@@ -269,7 +278,8 @@ fitBipartiteSBMPop <- R6::R6Class(
             paste(
               "Wrong dimensions for Cpi[[1]] ! Should be nrow = ",
               self$Q[1],
-              ", ncol = ", self$M
+              ", ncol = ",
+              self$M
             )
           )
         }
@@ -278,15 +288,20 @@ fitBipartiteSBMPop <- R6::R6Class(
             paste(
               "Wrong dimensions for Cpi[[2]] ! Should be nrow = ",
               self$Q[2],
-              ", ncol = ", self$M
+              ", ncol = ",
+              self$M
             )
           )
         }
-        self$Cpi[[1]] <- matrix(Cpi[[1]],
-          nrow = nrow(Cpi[[1]]), ncol = ncol(Cpi[[1]])
+        self$Cpi[[1]] <- matrix(
+          Cpi[[1]],
+          nrow = nrow(Cpi[[1]]),
+          ncol = ncol(Cpi[[1]])
         )
-        self$Cpi[[2]] <- matrix(Cpi[[2]],
-          nrow = nrow(Cpi[[2]]), ncol = ncol(Cpi[[2]])
+        self$Cpi[[2]] <- matrix(
+          Cpi[[2]],
+          nrow = nrow(Cpi[[2]]),
+          ncol = ncol(Cpi[[2]])
         )
 
         if (all(dim(Calpha) != self$Q)) {
@@ -327,7 +342,11 @@ fitBipartiteSBMPop <- R6::R6Class(
 
       self$alpha <- matrix(.5, Q[1], Q[2])
       self$init_method <- init_method
-      self$nb_inter <- vapply(seq(self$M), function(m) sum(self$nonNAs[[m]]), FUN.VALUE = .1)
+      self$nb_inter <- vapply(
+        seq(self$M),
+        function(m) sum(self$nonNAs[[m]]),
+        FUN.VALUE = .1
+      )
       self$vbound <- vector("list", self$M)
     },
     #' Method to compute the maximum a posteriori for Z clustering
@@ -367,10 +386,12 @@ fitBipartiteSBMPop <- R6::R6Class(
         nmqr <- matrix_mqr_to_use * self$nmqr[m, , ]
         alpha <- self$Calpha * self$alpha
       }
-      switch(self$distribution,
+      switch(
+        self$distribution,
         "bernoulli" = {
           sum(
-            self$Calpha * .xlogy(emqr, alpha, eps = 1e-12) +
+            self$Calpha *
+              .xlogy(emqr, alpha, eps = 1e-12) +
               self$Calpha * .xlogy(nmqr - emqr, 1 - alpha, eps = 1e-12)
           )
         },
@@ -381,9 +402,13 @@ fitBipartiteSBMPop <- R6::R6Class(
 
           logfactA <- self$logfactA[[m]]
 
-          sum(self$Calpha * (-alpha) * nmqr +
-            .xlogy(emqr, self$Calpha * alpha) -
-            t(tau_1) %*% logfactA %*% tau_2)
+          sum(
+            self$Calpha *
+              (-alpha) *
+              nmqr +
+              .xlogy(emqr, self$Calpha * alpha) -
+              t(tau_1) %*% logfactA %*% tau_2
+          )
         }
       )
     },
@@ -394,10 +419,14 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @return The computed quantity.
     vb_tau_pi = function(m, MAP = FALSE) {
       if (!MAP) {
-        sum(self$tau[[m]][[1]][, which(self$Cpi[[1]][, m])] %*%
-          matrix(log(self$pi[[m]][[1]][which(self$Cpi[[1]][, m])]))) +
-          sum(self$tau[[m]][[2]][, which(self$Cpi[[2]][, m])] %*%
-            matrix(log(self$pi[[m]][[2]][which(self$Cpi[[2]][, m])])))
+        sum(
+          self$tau[[m]][[1]][, which(self$Cpi[[1]][, m])] %*%
+            matrix(log(self$pi[[m]][[1]][which(self$Cpi[[1]][, m])]))
+        ) +
+          sum(
+            self$tau[[m]][[2]][, which(self$Cpi[[2]][, m])] %*%
+              matrix(log(self$pi[[m]][[2]][which(self$Cpi[[2]][, m])]))
+          )
       } else {
         sum(.xlogy(
           tabulate(self$Z[[m]][[1]], self$Q[1]),
@@ -424,7 +453,8 @@ fitBipartiteSBMPop <- R6::R6Class(
         seq_along(self$A),
         function(m) {
           self$entropy_tau(m) +
-            self$vb_tau_pi(m) + self$vb_tau_alpha(m)
+            self$vb_tau_pi(m) +
+            self$vb_tau_alpha(m)
         },
         FUN.VALUE = .1
       ))
@@ -440,9 +470,11 @@ fitBipartiteSBMPop <- R6::R6Class(
       if (self$free_mixture_row) {
         Cpi[[1]] <- self$Cpi[[1]]
         pi1_penalty <- sum((colSums(Cpi[[1]]) - 1) * log(self$n[[1]]))
-        log_p_Q1 <- -self$M * log(self$Q[1]) -
+        log_p_Q1 <- -self$M *
+          log(self$Q[1]) -
           sum(log(choose(
-            rep(self$Q[1], self$M), colSums(Cpi[[1]])
+            rep(self$Q[1], self$M),
+            colSums(Cpi[[1]])
           )))
         S1_penalty <- -2 * log_p_Q1
       } else {
@@ -457,9 +489,12 @@ fitBipartiteSBMPop <- R6::R6Class(
       if (self$free_mixture_col) {
         Cpi[[2]] <- self$Cpi[[2]]
         pi2_penalty <- sum((colSums(Cpi[[2]]) - 1) * log(self$n[[2]]))
-        log_p_Q2 <- -self$M * log(self$Q[2]) - sum(log(choose(
-          rep(self$Q[2], self$M), colSums(Cpi[[2]])
-        )))
+        log_p_Q2 <- -self$M *
+          log(self$Q[2]) -
+          sum(log(choose(
+            rep(self$Q[2], self$M),
+            colSums(Cpi[[2]])
+          )))
         S2_penalty <- -2 * log_p_Q2
       } else {
         # If there is no free mixture on the cols
@@ -478,9 +513,8 @@ fitBipartiteSBMPop <- R6::R6Class(
         # iid
         alpha_penalty <- self$Q[1] * self$Q[2] * log(N_M)
       }
-      self$penalty <- penalty_factor * (pi1_penalty + pi2_penalty +
-        alpha_penalty +
-        S1_penalty + S2_penalty)
+      self$penalty <- penalty_factor *
+        (pi1_penalty + pi2_penalty + alpha_penalty + S1_penalty + S2_penalty)
       if (is.infinite(self$penalty)) {
         stop("Infinite penalty !")
       }
@@ -494,9 +528,12 @@ fitBipartiteSBMPop <- R6::R6Class(
       ICL <-
         sum(vapply(
           seq_along(self$A),
-          function(m) self$vb_tau_pi(m, MAP = MAP) + self$vb_tau_alpha(m, MAP = MAP),
+          function(m) {
+            self$vb_tau_pi(m, MAP = MAP) + self$vb_tau_alpha(m, MAP = MAP)
+          },
           FUN.VALUE = .1
-        )) - self$compute_penalty()
+        )) -
+        self$compute_penalty()
       if (MAP) {
         self$MAP$ICL <- ICL
       } else {
@@ -525,10 +562,13 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param store A boolean indicating if the BICL should be stored in the
     #' object or not, defaults to TRUE.
     #' @return The BICL for the model.
-    compute_BICL = function(MAP = TRUE,
-                            penalty_factor = self$fit_opts$penalty_factor,
-                            store = TRUE) {
-      BICL <- self$compute_vbound() - self$compute_penalty(penalty_factor = penalty_factor)
+    compute_BICL = function(
+      MAP = TRUE,
+      penalty_factor = self$fit_opts$penalty_factor,
+      store = TRUE
+    ) {
+      BICL <- self$compute_vbound() -
+        self$compute_penalty(penalty_factor = penalty_factor)
       if (store) {
         self$BICL <- BICL
       }
@@ -591,31 +631,28 @@ fitBipartiteSBMPop <- R6::R6Class(
       it <- 0
       # reup_counter <- 0
       self$vloss[[m]] <-
-        c(self$vloss[[m]], self$vb_tau_alpha(m) + self$vb_tau_pi(m) +
-          self$entropy_tau(m))
-      tau_new <- switch(self$distribution,
+        c(
+          self$vloss[[m]],
+          self$vb_tau_alpha(m) + self$vb_tau_pi(m) + self$entropy_tau(m)
+        )
+      tau_new <- switch(
+        self$distribution,
         "bernoulli" = {
           tau_new <-
             if (d == 1) {
               # n[[1]] * Q1
               tau_new <-
                 t(matrix(
-                  .xlogy(self$Cpi[[1]][, m],
-                    self$pi[[m]][[d]],
-                    eps = NULL
-                  ),
-                  self$Q[d], self$n[[1]][m]
+                  .xlogy(self$Cpi[[1]][, m], self$pi[[m]][[d]], eps = NULL),
+                  self$Q[d],
+                  self$n[[1]][m]
                 )) +
                 ((self$nonNAs[[m]]) * self$A[[m]]) %*%
-                t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
-                t(.logit(self$Calpha * self$alpha,
-                  eps = 1e-9
-                )) +
+                  t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
+                  t(.logit(self$Calpha * self$alpha, eps = 1e-9)) +
                 (self$nonNAs[[m]]) %*%
-                t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
-                t(.log(1 - self$Calpha * self$alpha,
-                  eps = 1e-9
-                ))
+                  t(self$Cpi[[2]][, m] * t(self$tau[[m]][[2]])) %*%
+                  t(.log(1 - self$Calpha * self$alpha, eps = 1e-9))
               # In order to fix NaN appearing in the formula (log(Pi) when Pi
               # = 0), the .xlogy function is used with eps = 1e-9
               # POSSIBLE POINT OF FAILURE
@@ -624,18 +661,16 @@ fitBipartiteSBMPop <- R6::R6Class(
             # n[[2]] * Q2
             tau_new <-
               t(matrix(
-                .xlogy(self$Cpi[[2]][, m],
-                  self$pi[[m]][[d]],
-                  eps = NULL
-                ),
-                self$Q[d], self$n[[2]][m]
+                .xlogy(self$Cpi[[2]][, m], self$pi[[m]][[d]], eps = NULL),
+                self$Q[d],
+                self$n[[2]][m]
               )) +
               t((self$nonNAs[[m]]) * self$A[[m]]) %*%
-              t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
-              .logit(self$Calpha * self$alpha, eps = 1e-9) +
+                t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
+                .logit(self$Calpha * self$alpha, eps = 1e-9) +
               t(self$nonNAs[[m]]) %*%
-              t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
-              .log(1 - self$Calpha * self$alpha, eps = 1e-9)
+                t(self$Cpi[[1]][, m] * t(self$tau[[m]][[1]])) %*%
+                .log(1 - self$Calpha * self$alpha, eps = 1e-9)
             # In order to fix NaN appearing in the formula (log(Pi) when Pi
             # = 0), the .xlogy function is used with eps = 1e-9
             # POSSIBLE POINT OF FAILURE
@@ -645,23 +680,31 @@ fitBipartiteSBMPop <- R6::R6Class(
         "poisson" = {
           if (d == 1) {
             tau_new <-
-              t(matrix(.log(self$pi[[m]][[d]], eps = 1e-9), self$Q[d], self$n[[1]][m])) +
+              t(matrix(
+                .log(self$pi[[m]][[d]], eps = 1e-9),
+                self$Q[d],
+                self$n[[1]][m]
+              )) +
               ((self$nonNAs[[m]]) * self$A[[m]]) %*%
-              self$tau[[m]][[2]] %*%
-              t(.log(self$alpha, eps = 1e-9)) -
+                self$tau[[m]][[2]] %*%
+                t(.log(self$alpha, eps = 1e-9)) -
               (self$nonNAs[[m]]) %*%
-              self$tau[[m]][[2]] %*%
-              t(self$alpha)
+                self$tau[[m]][[2]] %*%
+                t(self$alpha)
           }
           if (d == 2) {
             tau_new <-
-              t(matrix(.log(self$pi[[m]][[d]], eps = 1e-9), self$Q[d], self$n[[2]][m])) +
+              t(matrix(
+                .log(self$pi[[m]][[d]], eps = 1e-9),
+                self$Q[d],
+                self$n[[2]][m]
+              )) +
               t((self$nonNAs[[m]]) * self$A[[m]]) %*%
-              self$tau[[m]][[1]] %*%
-              .log(self$alpha, eps = 1e-9) -
+                self$tau[[m]][[1]] %*%
+                .log(self$alpha, eps = 1e-9) -
               t(self$nonNAs[[m]]) %*%
-              self$tau[[m]][[1]] %*%
-              (self$alpha)
+                self$tau[[m]][[1]] %*%
+                (self$alpha)
           }
           invisible(tau_new)
         }
@@ -683,13 +726,15 @@ fitBipartiteSBMPop <- R6::R6Class(
       # OPTIM
       tau_cols_to_use <- which(self$Cpi[[d]][, m])
       tau_new[, tau_cols_to_use] <- .softmax(
-        matrix(tau_new[, tau_cols_to_use],
+        matrix(
+          tau_new[, tau_cols_to_use],
           nrow = self$n[[d]][m],
           ncol = sum(self$Cpi[[d]][, m])
         )
       )
       tau_new[, tau_cols_to_use][tau_new[, tau_cols_to_use] < 1e-9] <- 1e-9
-      tau_new[, tau_cols_to_use][tau_new[, tau_cols_to_use] > 1 - 1e-9] <- 1 - 1e-9
+      tau_new[, tau_cols_to_use][tau_new[, tau_cols_to_use] > 1 - 1e-9] <- 1 -
+        1e-9
 
       tau_new <- tau_new / rowSums(tau_new)
       self$tau[[m]][[d]] <- tau_new
@@ -708,16 +753,20 @@ fitBipartiteSBMPop <- R6::R6Class(
       # Replicate the mixture for each row of the variational posterior
       #  probabilities
       log_mixture <- t(matrix(
-        .xlogy(self$Cpi[[update_dim]][, m],
+        .xlogy(
+          self$Cpi[[update_dim]][, m],
           self$pi[[m]][[update_dim]],
           eps = NULL
         ),
-        self$Q[update_dim], self$n[[update_dim]][m]
+        self$Q[update_dim],
+        self$n[[update_dim]][m]
       ))
 
       # The support to set to 0 the unused block
-      mat_Cpi <- t(matrix(self$Cpi[[other_dim]][, m],
-        nrow = self$Q[other_dim], ncol = self$n[[other_dim]][m]
+      mat_Cpi <- t(matrix(
+        self$Cpi[[other_dim]][, m],
+        nrow = self$Q[other_dim],
+        ncol = self$n[[other_dim]][m]
       ))
       other_tau <- (self$tau[[m]][[other_dim]] * mat_Cpi)
 
@@ -733,9 +782,11 @@ fitBipartiteSBMPop <- R6::R6Class(
           one_minus_Y %*% other_tau %*% log_one_minus_alpha
       } else {
         # We transpose the transpose of the actual rule to extract some variables at top
-        log_tau <- t(t(log_mixture) +
-          log_alpha %*% t(other_tau) %*% Y +
-          log_one_minus_alpha %*% t(other_tau) %*% one_minus_Y)
+        log_tau <- t(
+          t(log_mixture) +
+            log_alpha %*% t(other_tau) %*% Y +
+            log_one_minus_alpha %*% t(other_tau) %*% one_minus_Y
+        )
       }
       return(.softmax(x = log_tau))
     },
@@ -748,7 +799,11 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param prop_to_update The proportion of nodes to use for update
     #'
     #' @return The new tau values
-    bernoulli_sve_step = function(m, d, prop_to_update = self$fit_opts$prop_to_update) {
+    bernoulli_sve_step = function(
+      m,
+      d,
+      prop_to_update = self$fit_opts$prop_to_update
+    ) {
       update_dim <- d
       other_dim <- ifelse(update_dim == 1, 2, 1)
 
@@ -764,24 +819,32 @@ fitBipartiteSBMPop <- R6::R6Class(
       # Replicate the mixture for each row of the variational posterior
       #  probabilities
       log_mixture <- t(matrix(
-        .xlogy(self$Cpi[[update_dim]][, m],
+        .xlogy(
+          self$Cpi[[update_dim]][, m],
           self$pi[[m]][[update_dim]],
           eps = NULL
         ),
-        self$Q[update_dim], self$n[[update_dim]][m]
+        self$Q[update_dim],
+        self$n[[update_dim]][m]
       ))
 
       # The support to set to 0 the unused block
-      mat_Cpi <- t(matrix(self$Cpi[[other_dim]][, m],
-        nrow = self$Q[other_dim], ncol = self$n[[other_dim]][m]
+      mat_Cpi <- t(matrix(
+        self$Cpi[[other_dim]][, m],
+        nrow = self$Q[other_dim],
+        ncol = self$n[[other_dim]][m]
       ))
       other_tau <- (self$tau[[m]][[other_dim]] * mat_Cpi)[nodes_for_update, ]
       if (update_dim == 1) {
         Y <- ((self$nonNAs[[m]]) * self$A[[m]])[, nodes_for_update]
-        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[, nodes_for_update]
+        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[,
+          nodes_for_update
+        ]
       } else {
         Y <- ((self$nonNAs[[m]]) * self$A[[m]])[nodes_for_update, ]
-        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[nodes_for_update, ]
+        one_minus_Y <- ((self$nonNAs[[m]]) * (1 - self$A[[m]]))[
+          nodes_for_update,
+        ]
       }
 
       log_alpha <- t(.log(self$Calpha * self$alpha))
@@ -794,9 +857,11 @@ fitBipartiteSBMPop <- R6::R6Class(
           one_minus_Y %*% other_tau %*% log_one_minus_alpha
       } else {
         # We transpose the transpose of the actual rule to extract some variables at top
-        log_tau <- t(t(log_mixture) +
-          log_alpha %*% t(other_tau) %*% Y +
-          log_one_minus_alpha %*% t(other_tau) %*% one_minus_Y)
+        log_tau <- t(
+          t(log_mixture) +
+            log_alpha %*% t(other_tau) %*% Y +
+            log_one_minus_alpha %*% t(other_tau) %*% one_minus_Y
+        )
       }
       return(.softmax(x = log_tau))
     },
@@ -812,14 +877,24 @@ fitBipartiteSBMPop <- R6::R6Class(
       # So those are the "pim"
       if (!MAP) {
         # The pim are the mean of all the tau for each column, ie the mean tau per block
-        pim1 <- self$Cpi[[1]][, m] * matrix(.colMeans(
-          self$tau[[m]][[1]],
-          self$n[[1]][m], self$Q[1]
-        ), nrow = 1)
-        pim2 <- self$Cpi[[2]][, m] * matrix(.colMeans(
-          self$tau[[m]][[2]],
-          self$n[[2]][m], self$Q[2]
-        ), nrow = 1)
+        pim1 <- self$Cpi[[1]][, m] *
+          matrix(
+            .colMeans(
+              self$tau[[m]][[1]],
+              self$n[[1]][m],
+              self$Q[1]
+            ),
+            nrow = 1
+          )
+        pim2 <- self$Cpi[[2]][, m] *
+          matrix(
+            .colMeans(
+              self$tau[[m]][[2]],
+              self$n[[2]][m],
+              self$Q[2]
+            ),
+            nrow = 1
+          )
         self$pim[[m]] <- list(pim1, pim2)
       } else {
         # The MAP Pi are obtained by counting the number of nodes in each block and dividing by the total (n[[1]] or n[[2]])
@@ -849,9 +924,18 @@ fitBipartiteSBMPop <- R6::R6Class(
             }
           } else {
             # No free_mixture on row so averaging on pi[[m]][[1]]
-            pi1 <- matrix(self$n[[1]] * vapply(seq(self$M), function(m) {
-              self$pim[[m]][[1]]
-            }, FUN.VALUE = rep(.1, self$Q[1])), ncol = self$M, nrow = self$Q[1])
+            pi1 <- matrix(
+              self$n[[1]] *
+                vapply(
+                  seq(self$M),
+                  function(m) {
+                    self$pim[[m]][[1]]
+                  },
+                  FUN.VALUE = rep(.1, self$Q[1])
+                ),
+              ncol = self$M,
+              nrow = self$Q[1]
+            )
             pi1 <- matrix(rowSums(pi1) / sum(pi1), nrow = 1)
             for (m in seq.int(self$M)) {
               self$pi[[m]][[1]] <- pi1
@@ -864,9 +948,18 @@ fitBipartiteSBMPop <- R6::R6Class(
             }
           } else {
             # No free_mixture on col so averaging on pi[[m]][[2]]
-            pi2 <- matrix(self$n[[2]] * vapply(seq(self$M), function(m) {
-              self$pim[[m]][[2]]
-            }, FUN.VALUE = rep(.1, self$Q[2])), ncol = self$M, nrow = self$Q[2])
+            pi2 <- matrix(
+              self$n[[2]] *
+                vapply(
+                  seq(self$M),
+                  function(m) {
+                    self$pim[[m]][[2]]
+                  },
+                  FUN.VALUE = rep(.1, self$Q[2])
+                ),
+              ncol = self$M,
+              nrow = self$Q[2]
+            )
             pi2 <- matrix(rowSums(pi2) / sum(pi2), nrow = 1)
             for (m in seq.int(self$M)) {
               self$pi[[m]][[2]] <- pi2
@@ -875,16 +968,34 @@ fitBipartiteSBMPop <- R6::R6Class(
         } else {
           # Otherwise we need to ponder based on the size for
           # Rows
-          pi1 <- matrix(self$n[[1]] * vapply(seq(self$M), function(m) {
-            self$pim[[m]][[1]]
-          }, FUN.VALUE = rep(.1, self$Q[1])), ncol = self$M, nrow = self$Q[1])
+          pi1 <- matrix(
+            self$n[[1]] *
+              vapply(
+                seq(self$M),
+                function(m) {
+                  self$pim[[m]][[1]]
+                },
+                FUN.VALUE = rep(.1, self$Q[1])
+              ),
+            ncol = self$M,
+            nrow = self$Q[1]
+          )
           pi1 <- matrix(rowSums(pi1) / sum(pi1), nrow = 1)
           # Need matrix() because there is a dot product in the vb_tau_pi
 
           # And columns
-          pi2 <- matrix(self$n[[2]] * vapply(seq(self$M), function(m) {
-            self$pim[[m]][[2]]
-          }, FUN.VALUE = rep(.1, self$Q[2])), ncol = self$M, nrow = self$Q[2])
+          pi2 <- matrix(
+            self$n[[2]] *
+              vapply(
+                seq(self$M),
+                function(m) {
+                  self$pim[[m]][[2]]
+                },
+                FUN.VALUE = rep(.1, self$Q[2])
+              ),
+            ncol = self$M,
+            nrow = self$Q[2]
+          )
           pi2 <- matrix(rowSums(pi2) / sum(pi2), nrow = 1)
           # Need matrix() because there is a dot product in the vb_tau_pi
 
@@ -897,19 +1008,34 @@ fitBipartiteSBMPop <- R6::R6Class(
         } else {
           # Otherwise we need to ponder based on the size for
           # Rows
-          pi1 <- matrix(self$n[[1]] * vapply(seq(self$M), function(m) {
-            self$MAP$pim[[m]][[1]]
-          }, FUN.VALUE = rep(.1, self$Q[1])), ncol = self$M, nrow = self$Q[1])
+          pi1 <- matrix(
+            self$n[[1]] *
+              vapply(
+                seq(self$M),
+                function(m) {
+                  self$MAP$pim[[m]][[1]]
+                },
+                FUN.VALUE = rep(.1, self$Q[1])
+              ),
+            ncol = self$M,
+            nrow = self$Q[1]
+          )
 
           pi1 <- rowSums(pi1) / sum(pi1)
 
           # And columns
-          pi2 <- matrix(self$n[[2]] * vapply(seq(self$M),
-            function(m) {
-              self$MAP$pim[[m]][[2]]
-            },
-            FUN.VALUE = rep(.1, self$Q[2])
-          ), ncol = self$M, nrow = self$Q[2])
+          pi2 <- matrix(
+            self$n[[2]] *
+              vapply(
+                seq(self$M),
+                function(m) {
+                  self$MAP$pim[[m]][[2]]
+                },
+                FUN.VALUE = rep(.1, self$Q[2])
+              ),
+            ncol = self$M,
+            nrow = self$Q[2]
+          )
 
           pi2 <- rowSums(pi2) / sum(pi2)
 
@@ -949,12 +1075,16 @@ fitBipartiteSBMPop <- R6::R6Class(
       # For iid and pi-colSBM
       if (!MAP) {
         # Sums over the M networks (dims = 1)
-        alpha <- self$Calpha * colSums(self$emqr, dims = 1) / colSums(self$nmqr, dims = 1)
+        alpha <- self$Calpha *
+          colSums(self$emqr, dims = 1) /
+          colSums(self$nmqr, dims = 1)
         alpha[is.nan(alpha)] <- 0
         self$alpha <- alpha
       } else {
         # Sums over the M networks (dims = 1)
-        alpha <- self$Calpha * colSums(self$MAP$emqr, dims = 1) / colSums(self$MAP$nmqr, dims = 1)
+        alpha <- self$Calpha *
+          colSums(self$MAP$emqr, dims = 1) /
+          colSums(self$MAP$nmqr, dims = 1)
         alpha[is.nan(alpha)] <- 0
         self$MAP$alpha <- alpha
       }
@@ -994,14 +1124,18 @@ fitBipartiteSBMPop <- R6::R6Class(
     init_clust = function() {
       nb_inits <- 5L
       tested_taus <- lapply(seq(1L, nb_inits), function(id) {
-        switch(self$init_method,
+        switch(
+          self$init_method,
           # TODO later : adapt init_clust "random" to bipartite
           "random" = lapply(
             X = seq_along(self$A),
             FUN = function(m) {
               tau_1 <- gtools::rdirichlet(self$n[[1]][m], rep(1, self$Q[[1]]))
               tau_2 <- gtools::rdirichlet(self$n[[2]][m], rep(1, self$Q[[2]]))
-              self$emqr[m, , ] <- .tquadform(tau_tmp, self$A[[m]] * (self$nonNAs[[m]]))
+              self$emqr[m, , ] <- .tquadform(
+                tau_tmp,
+                self$A[[m]] * (self$nonNAs[[m]])
+              )
               self$nmqr[m, , ] <- .tquadform(tau_tmp, (self$nonNAs[[m]]))
               a <- self$emqr[m, , ] / self$nmqr[m, , ]
               prob <- self$Q * diag(a) #+ rowSums(a)
@@ -1017,7 +1151,10 @@ fitBipartiteSBMPop <- R6::R6Class(
             FUN = function(m) {
               # The .one_hot performs a one hot encoding of the spectral clustering performed
               # DONE : Adapt this step to handle two taus
-              biclustering <- bipartite_hierarchic_clustering(self$nonNAs[[m]] * self$A[[m]], self$Q)
+              biclustering <- bipartite_hierarchic_clustering(
+                self$nonNAs[[m]] * self$A[[m]],
+                self$Q
+              )
               row_clustering <- biclustering$row_clustering
               col_clustering <- biclustering$col_clustering
 
@@ -1033,7 +1170,9 @@ fitBipartiteSBMPop <- R6::R6Class(
               tau_2[tau_2 > 1 - 1e-6] <- 1 - 1e-6
               tau_2 <- tau_2 / .rowSums(tau_2, self$n[[2]][m], self$Q[[2]])
 
-              self$emqr[m, , ] <- t(tau_1) %*% (self$A[[m]] * (self$nonNAs[[m]])) %*% tau_2
+              self$emqr[m, , ] <- t(tau_1) %*%
+                (self$A[[m]] * (self$nonNAs[[m]])) %*%
+                tau_2
               self$nmqr[m, , ] <- t(tau_1) %*% (self$nonNAs[[m]]) %*% tau_2
 
               # Permuter avec un ordre favorisant plus fortement
@@ -1094,7 +1233,9 @@ fitBipartiteSBMPop <- R6::R6Class(
               tau_2[tau_2 > 1 - 1e-6] <- 1 - 1e-6
               tau_2 <- tau_2 / .rowSums(tau_2, self$n[[2]][m], self$Q[[2]])
 
-              self$emqr[m, , ] <- t(tau_1) %*% (self$A[[m]] * (self$nonNAs[[m]])) %*% tau_2
+              self$emqr[m, , ] <- t(tau_1) %*%
+                (self$A[[m]] * (self$nonNAs[[m]])) %*%
+                tau_2
               self$nmqr[m, , ] <- t(tau_1) %*% (self$nonNAs[[m]]) %*% tau_2
 
               # Permuter avec un ordre favorisant plus fortement
@@ -1137,28 +1278,33 @@ fitBipartiteSBMPop <- R6::R6Class(
           "empty" = lapply(
             seq_along(self$Z),
             function(m) {
-              tau_1 <- matrix(self$tau[[m]][[1]],
+              tau_1 <- matrix(
+                self$tau[[m]][[1]],
                 nrow = self$n[[1]][m],
                 ncol = self$Q[1]
               )
               tau_1[, which(!self$Cpi[[1]][, m])] <- 0
               tau_1[, which(self$Cpi[[1]][, m])] <-
-                .threshold(matrix(tau_1[, which(self$Cpi[[1]][, m])],
+                .threshold(matrix(
+                  tau_1[, which(self$Cpi[[1]][, m])],
                   nrow = self$n[[1]][m]
                 ))
 
-              tau_2 <- matrix(self$tau[[m]][[2]],
+              tau_2 <- matrix(
+                self$tau[[m]][[2]],
                 nrow = self$n[[2]][m],
                 ncol = self$Q[2]
               )
               tau_2[, which(!self$Cpi[[2]][, m])] <- 0
               tau_2[, which(self$Cpi[[2]][, m])] <-
-                .threshold(matrix(tau_2[, which(self$Cpi[[2]][, m])],
+                .threshold(matrix(
+                  tau_2[, which(self$Cpi[[2]][, m])],
                   nrow = self$n[[2]][m]
                 ))
 
               self$emqr[m, , ] <- t(tau_1) %*%
-                (self$A[[m]] * (self$nonNAs[[m]])) %*% tau_2
+                (self$A[[m]] * (self$nonNAs[[m]])) %*%
+                tau_2
               self$nmqr[m, , ] <- t(tau_1) %*% (self$nonNAs[[m]]) %*% tau_2
               list(tau_1, tau_2)
             }
@@ -1166,10 +1312,12 @@ fitBipartiteSBMPop <- R6::R6Class(
           "given" = lapply(
             X = seq_along(self$Z),
             FUN = function(m) {
-              if (is.matrix(self$Z[[m]][[1]]) &&
-                is.matrix(self$Z[[m]][[2]]) &&
-                all(dim(self$Z[[m]][[1]]) == c(self$n[[1]][m], self$Q[1])) &&
-                all(dim(self$Z[[m]][[2]]) == c(self$n[[2]][m], self$Q[2]))) {
+              if (
+                is.matrix(self$Z[[m]][[1]]) &&
+                  is.matrix(self$Z[[m]][[2]]) &&
+                  all(dim(self$Z[[m]][[1]]) == c(self$n[[1]][m], self$Q[1])) &&
+                  all(dim(self$Z[[m]][[2]]) == c(self$n[[2]][m], self$Q[2]))
+              ) {
                 # If Z was already provided as a list of two matrices
                 tau_1 <- self$Z[[m]][[1]]
                 tau_2 <- self$Z[[m]][[2]]
@@ -1187,7 +1335,9 @@ fitBipartiteSBMPop <- R6::R6Class(
                 tau_2 <- tau_2 / .rowSums(tau_2, self$n[[2]][m], self$Q[[2]])
 
                 # update_mqr(m)
-                self$emqr[m, , ] <- t(tau_1) %*% (self$A[[m]] * (self$nonNAs[[m]])) %*% tau_2
+                self$emqr[m, , ] <- t(tau_1) %*%
+                  (self$A[[m]] * (self$nonNAs[[m]])) %*%
+                  tau_2
                 self$nmqr[m, , ] <- t(tau_1) %*% (self$nonNAs[[m]]) %*% tau_2
               }
               return(list(tau_1, tau_2))
@@ -1248,7 +1398,8 @@ fitBipartiteSBMPop <- R6::R6Class(
       tau_m_2 <- self$tau[[m]][[2]]
 
       self$emqr[m, , ] <- t(tau_m_1) %*%
-        (self$A[[m]] * (self$nonNAs[[m]])) %*% tau_m_2
+        (self$A[[m]] * (self$nonNAs[[m]])) %*%
+        tau_m_2
       self$nmqr[m, , ] <- t(tau_m_1) %*% (self$nonNAs[[m]]) %*% tau_m_2
     },
     #' TODO Investigate what its supposed to do
@@ -1310,12 +1461,19 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @importFrom matrixStats rowMeans2
     #'
     #' @return nothing
-    optimize = function(max_step = self$fit_opts$max_vem_steps, tol = self$fit_opts$tolerance, ...) {
+    optimize = function(
+      max_step = self$fit_opts$max_vem_steps,
+      tol = self$fit_opts$tolerance,
+      ...
+    ) {
       if (all(self$Q == c(1, 1))) {
         self$tau <- lapply(
           seq(self$M),
           function(m) {
-            out <- list(row = matrix(1, self$n[[1]][m], 1), col = matrix(1, self$n[[2]][m], 1))
+            out <- list(
+              row = matrix(1, self$n[[1]][m], 1),
+              col = matrix(1, self$n[[2]][m], 1)
+            )
             rownames(out[["row"]]) <- rownames(self$A[[m]])
             rownames(out[["col"]]) <- colnames(self$A[[m]])
             return(out)
@@ -1325,7 +1483,10 @@ fitBipartiteSBMPop <- R6::R6Class(
           seq(self$M),
           function(m) {
             list(
-              row = setNames(rep(1, self$n[[1]][m]), nm = rownames(self$A[[m]])),
+              row = setNames(
+                rep(1, self$n[[1]][m]),
+                nm = rownames(self$A[[m]])
+              ),
               col = setNames(rep(1, self$n[[2]][m]), nm = colnames(self$A[[m]]))
             )
           }
@@ -1348,7 +1509,9 @@ fitBipartiteSBMPop <- R6::R6Class(
           seq(self$M),
           function(m) {
             matrix(
-              sum(self$emqr[m, , ]) / sum(self$nmqr[m, , ]), 1, 1
+              sum(self$emqr[m, , ]) / sum(self$nmqr[m, , ]),
+              1,
+              1
             )
           }
         )
@@ -1378,7 +1541,8 @@ fitBipartiteSBMPop <- R6::R6Class(
             # Minibatch or not
             ifelse(self$fit_opts$minibatch, seq_m_minibatch, seq(self$M)),
             function(m) {
-              switch(self$fit_opts$algo_ve,
+              switch(
+                self$fit_opts$algo_ve,
                 "fp" = {
                   self$fixed_point_tau(m, d = 1)
                   self$update_mqr(m)
@@ -1399,7 +1563,8 @@ fitBipartiteSBMPop <- R6::R6Class(
           step <- step + 1
           step_condition <- (step < max_step &
             (self$vbound[length(self$vbound)] -
-              self$vbound[length(self$vbound) - 1] > tol))
+              self$vbound[length(self$vbound) - 1] >
+              tol))
           if (step %% 5 == 0) {
             if (self$fit_opts$verbosity >= 1) {
               print(paste0(step, ": ", vb))
@@ -1409,7 +1574,12 @@ fitBipartiteSBMPop <- R6::R6Class(
         }
 
         if (step >= max_step) {
-          warning("The VEM failed to converge in ", max_step, " for Q = ", toString(self$Q))
+          warning(
+            "The VEM failed to converge in ",
+            max_step,
+            " for Q = ",
+            toString(self$Q)
+          )
         } else {
           self$has_converged <- TRUE
         }
@@ -1498,7 +1668,8 @@ fitBipartiteSBMPop <- R6::R6Class(
         self$nmqr[m, , ] <- self$nmqr[m, p1, p2, drop = FALSE]
         self$alpham[[m]] <- matrix(
           self$alpham[[m]][p1, p2, drop = FALSE],
-          self$Q[1], self$Q[2]
+          self$Q[1],
+          self$Q[2]
         )
         self$tau[[m]][[1]] <- self$tau[[m]][[1]][, p1, drop = FALSE]
         self$tau[[m]][[2]] <- self$tau[[m]][[2]][, p2, drop = FALSE]
@@ -1513,7 +1684,8 @@ fitBipartiteSBMPop <- R6::R6Class(
         self$MAP$nmqr[m, , ] <- self$MAP$nmqr[m, p1, p2, drop = FALSE]
         self$MAP$alpham[[m]] <- matrix(
           self$MAP$alpham[[m]][p1, p2, drop = FALSE],
-          self$Q[1], self$Q[2]
+          self$Q[1],
+          self$Q[2]
         )
         self$MAP$pim[[m]][[1]] <- self$MAP$pim[[m]][[1]][p1, drop = FALSE]
         self$MAP$pim[[m]][[2]] <- self$MAP$pim[[m]][[2]][p2, drop = FALSE]
@@ -1525,23 +1697,38 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @param type The title above the message.
     show = function(type = "Fitted Collection of Bipartite SBM") {
       cat(type, "--", self$distribution, "variant for", self$M, "networks \n")
-      cat("=====================================================================\n")
+      cat(
+        "=====================================================================\n"
+      )
       cat("net_id = (", self$net_id, ")\n")
       cat(
-        "Dimensions = (", toString(lapply(seq.int(self$M), function(m) {
+        "Dimensions = (",
+        toString(lapply(seq.int(self$M), function(m) {
           c(self$n[[1]][[m]], self$n[[2]][[m]])
-        })), ") - (",
-        toString(self$Q), ") blocks.\n"
+        })),
+        ") - (",
+        toString(self$Q),
+        ") blocks.\n"
       )
       cat(
-        "BICL = ", self$BICL, "penalty factor = ", self$fit_opts$penalty_factor,
-        "\n#Empty row blocks on all networks: ", sum(!self$Cpi[[1]]),
-        " -- #Empty columns blocks on all networks: ", sum(!self$Cpi[[2]]), " \n"
+        "BICL = ",
+        self$BICL,
+        "penalty factor = ",
+        self$fit_opts$penalty_factor,
+        "\n#Empty row blocks on all networks: ",
+        sum(!self$Cpi[[1]]),
+        " -- #Empty columns blocks on all networks: ",
+        sum(!self$Cpi[[2]]),
+        " \n"
       )
       cat("* Useful fields \n")
-      cat("  $distribution, $nb_nodes, $nb_blocks, $support, $prob_memberships \n")
+      cat(
+        "  $distribution, $nb_nodes, $nb_blocks, $support, $prob_memberships \n"
+      )
       cat("  $memberships, $parameters, $BICL, $vbound, $pred_dyads \n")
-      cat("=====================================================================")
+      cat(
+        "====================================================================="
+      )
     },
     #' The print method
     #'

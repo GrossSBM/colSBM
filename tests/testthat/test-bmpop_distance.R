@@ -6,18 +6,30 @@ rho2 <- c(1L / 3L, 1L / 3L, 1L / 3L)
 
 alpha1 <- matrix(
   c(
-    0.9, 0.4, 0.05,
-    0.45, 0.25, 0.05,
-    0.1, 0.05, 0.05
+    0.9,
+    0.4,
+    0.05,
+    0.45,
+    0.25,
+    0.05,
+    0.1,
+    0.05,
+    0.05
   ),
   nrow = 3L
 )
 
 alpha2 <- matrix(
   c(
-    0.9, 0.05, 0.05,
-    0.05, 0.7, 0.05,
-    0.05, 0.05, 0.65
+    0.9,
+    0.05,
+    0.05,
+    0.05,
+    0.7,
+    0.05,
+    0.05,
+    0.05,
+    0.65
   ),
   nrow = 3L
 )
@@ -30,7 +42,8 @@ test_that("SBM : Distance for same parameters is zero", {
       weight = "max",
       norm = "L2",
       directed = TRUE
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bmpop_max(
@@ -39,7 +52,8 @@ test_that("SBM : Distance for same parameters is zero", {
       weight = "max",
       norm = "L1",
       directed = TRUE
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bmpop_max(
@@ -48,7 +62,8 @@ test_that("SBM : Distance for same parameters is zero", {
       weight = "mean",
       norm = "L2",
       directed = TRUE
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bmpop_max(
@@ -57,7 +72,8 @@ test_that("SBM : Distance for same parameters is zero", {
       weight = "mean",
       norm = "L1",
       directed = TRUE
-    ), 0
+    ),
+    0
   )
 })
 
@@ -129,7 +145,8 @@ test_that("BiSBM : Distance for same parameters is zero", {
       alpha = list(alpha1, alpha1),
       weight = "max",
       norm = "L2",
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bisbmpop_max(
@@ -138,7 +155,8 @@ test_that("BiSBM : Distance for same parameters is zero", {
       alpha = list(alpha1, alpha1),
       weight = "max",
       norm = "L1",
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bisbmpop_max(
@@ -147,7 +165,8 @@ test_that("BiSBM : Distance for same parameters is zero", {
       alpha = list(alpha1, alpha1),
       weight = "mean",
       norm = "L2",
-    ), 0
+    ),
+    0
   )
   expect_identical(
     dist_bisbmpop_max(
@@ -156,7 +175,8 @@ test_that("BiSBM : Distance for same parameters is zero", {
       alpha = list(alpha1, alpha1),
       weight = "mean",
       norm = "L1",
-    ), 0
+    ),
+    0
   )
 })
 
@@ -221,56 +241,111 @@ pi1 <- c(0.3, 0.6, 0.1)
 pi2 <- c(0.2, 0.3, 0.5)
 
 # Unipartite compatible
-alpha1 <- matrix(c(
-  0.9, 0.05, 0.05,
-  0.05, 0.7, 0.05,
-  0.05, 0.05, 0.65
-), nrow = 3L)
-alpha2 <- matrix(c(
-  0.9, 0.4, 0.05,
-  0.45, 0.25, 0.05,
-  0.1, 0.05, 0.05
-), nrow = 3L)
+alpha1 <- matrix(
+  c(
+    0.9,
+    0.05,
+    0.05,
+    0.05,
+    0.7,
+    0.05,
+    0.05,
+    0.05,
+    0.65
+  ),
+  nrow = 3L
+)
+alpha2 <- matrix(
+  c(
+    0.9,
+    0.4,
+    0.05,
+    0.45,
+    0.25,
+    0.05,
+    0.1,
+    0.05,
+    0.05
+  ),
+  nrow = 3L
+)
 
 # Bipartite only
 rho1 <- c(0.1, 0.3, 0.2, 0.4)
 rho2 <- c(0.2, 0.3, 0.5)
 
-alpha_bip1 <- matrix(c(
-  0.9, 0.05, 0.05, 0.3,
-  0.05, 0.7, 0.05, 0.05,
-  0.05, 0.05, 0.65, 0.05
-), nrow = 3L)
-alpha_bip2 <- matrix(c(
-  0.9, 0.4, 0.05,
-  0.45, 0.25, 0.05,
-  0.1, 0.05, 0.05
-), nrow = 3L)
+alpha_bip1 <- matrix(
+  c(
+    0.9,
+    0.05,
+    0.05,
+    0.3,
+    0.05,
+    0.7,
+    0.05,
+    0.05,
+    0.05,
+    0.05,
+    0.65,
+    0.05
+  ),
+  nrow = 3L
+)
+alpha_bip2 <- matrix(
+  c(
+    0.9,
+    0.4,
+    0.05,
+    0.45,
+    0.25,
+    0.05,
+    0.1,
+    0.05,
+    0.05
+  ),
+  nrow = 3L
+)
 
 # Tests for graphon_distance_bipartite
 test_that("graphon_distance_bipartite computes correct distance", {
-  result <- graphon_distance_bipartite(list(pi1, pi2), list(rho1, rho2), list(alpha_bip1, alpha_bip2))
+  result <- graphon_distance_bipartite(
+    list(pi1, pi2),
+    list(rho1, rho2),
+    list(alpha_bip1, alpha_bip2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })
 
 # Tests for dist_graphon_bipartite_all_permutations
 test_that("dist_graphon_bipartite_all_permutations computes correct distance", {
-  result <- dist_graphon_bipartite_all_permutations(list(pi1, pi2), list(rho1, rho2), list(alpha_bip1, alpha_bip2))
+  result <- dist_graphon_bipartite_all_permutations(
+    list(pi1, pi2),
+    list(rho1, rho2),
+    list(alpha_bip1, alpha_bip2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })
 
 # Tests for dist_graphon_bipartite_marginals
 test_that("dist_graphon_bipartite_marginals computes correct distance", {
-  result <- dist_graphon_bipartite_marginals(list(pi1, pi2), list(rho1, rho2), list(alpha_bip1, alpha_bip2))
+  result <- dist_graphon_bipartite_marginals(
+    list(pi1, pi2),
+    list(rho1, rho2),
+    list(alpha_bip1, alpha_bip2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })
 
 # Tests for dist_graphon_bipartite_symmetrization
 test_that("dist_graphon_bipartite_symmetrization computes correct distance", {
-  result <- dist_graphon_bipartite_symmetrization(list(pi1, pi2), list(rho1, rho2), list(alpha_bip1, alpha_bip2))
+  result <- dist_graphon_bipartite_symmetrization(
+    list(pi1, pi2),
+    list(rho1, rho2),
+    list(alpha_bip1, alpha_bip2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })
@@ -284,14 +359,20 @@ test_that("graphon_distance_unipartite computes correct distance", {
 
 # Tests for dist_graphon_unipartite_all_permutations
 test_that("dist_graphon_unipartite_all_permutations computes correct distance", {
-  result <- dist_graphon_unipartite_all_permutations(list(pi1, pi2), list(alpha1, alpha2))
+  result <- dist_graphon_unipartite_all_permutations(
+    list(pi1, pi2),
+    list(alpha1, alpha2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })
 
 # Tests for dist_graphon_unipartite_marginals
 test_that("dist_graphon_unipartite_marginals computes correct distance", {
-  result <- dist_graphon_unipartite_marginals(list(pi1, pi2), list(alpha1, alpha2))
+  result <- dist_graphon_unipartite_marginals(
+    list(pi1, pi2),
+    list(alpha1, alpha2)
+  )
   expect_type(result, "double")
   expect_gte(result, 0)
 })

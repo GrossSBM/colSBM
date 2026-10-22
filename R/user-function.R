@@ -73,23 +73,26 @@
 #' )
 #' }
 estimate_colSBM <-
-  function(netlist,
-           colsbm_model,
-           net_id = NULL,
-           directed = NULL,
-           distribution = "bernoulli",
-           fit_sbm = NULL,
-           nb_run = 3L,
-           global_opts = list(),
-           fit_opts = list(),
-           Z_init = NULL,
-           fit_init = NULL) {
+  function(
+    netlist,
+    colsbm_model,
+    net_id = NULL,
+    directed = NULL,
+    distribution = "bernoulli",
+    fit_sbm = NULL,
+    nb_run = 3L,
+    global_opts = list(),
+    fit_opts = list(),
+    Z_init = NULL,
+    fit_init = NULL
+  ) {
     netlist <- check_networks_list(
       networks_list = netlist,
       min_length = 1L
     )
 
-    switch(colsbm_model,
+    switch(
+      colsbm_model,
       "iid" = {
         free_density <- FALSE
         free_mixture <- FALSE
@@ -135,7 +138,8 @@ estimate_colSBM <-
                 netMat = netlist[[m]],
                 estimOptions = list(
                   verbosity = 0,
-                  plot = FALSE, nbCores = 1L,
+                  plot = FALSE,
+                  nbCores = 1L,
                   exploreMin = Q_max
                 )
               )
@@ -151,7 +155,10 @@ estimate_colSBM <-
           #        bettermc::mclapply(
           seq(nb_run),
           function(x) {
-            global_opts$nb_cores <- max(1L, floor(global_opts$nb_cores / nb_run))
+            global_opts$nb_cores <- max(
+              1L,
+              floor(global_opts$nb_cores / nb_run)
+            )
             tmp_fit <- bmpop$new(
               netlist = netlist,
               net_id = net_id,
@@ -170,7 +177,9 @@ estimate_colSBM <-
           backend = global_opts$backend,
           nb_cores = min(nb_run, nb_cores)
         )
-      my_bmpop <- tmp_fits[[which.max(vapply(tmp_fits, function(fit) fit$best_fit$BICL,
+      my_bmpop <- tmp_fits[[which.max(vapply(
+        tmp_fits,
+        function(fit) fit$best_fit$BICL,
         FUN.VALUE = .1
       ))]]
       # Aggregate all runs for all model sizes
@@ -185,33 +194,50 @@ estimate_colSBM <-
             ))]]$model_list[[1]][[q]]
           }
         )
-      my_bmpop$vbound <- vapply(my_bmpop$model_list[[1]],
+      my_bmpop$vbound <- vapply(
+        my_bmpop$model_list[[1]],
         function(fit) rev(fit[[1]]$vbound)[1],
         FUN.VALUE = .1
       )
-      my_bmpop$ICL <- vapply(my_bmpop$model_list[[1]],
+      my_bmpop$ICL <- vapply(
+        my_bmpop$model_list[[1]],
         function(fit) fit[[1]]$ICL,
         FUN.VALUE = .1
       )
-      my_bmpop$BICL <- vapply(my_bmpop$model_list[[1]],
+      my_bmpop$BICL <- vapply(
+        my_bmpop$model_list[[1]],
         function(fit) fit[[1]]$BICL,
         FUN.VALUE = .1
       )
       if (my_bmpop$global_opts$verbosity >= 1) {
-        cat("==== ", colsbm_model, "-colSBM with ", my_bmpop$distribution, " distribution ====\n")
-        cat("==== Optimization finished for networks ", my_bmpop$net_id, " ====\n")
+        cat(
+          "==== ",
+          colsbm_model,
+          "-colSBM with ",
+          my_bmpop$distribution,
+          " distribution ====\n"
+        )
+        cat(
+          "==== Optimization finished for networks ",
+          my_bmpop$net_id,
+          " ====\n"
+        )
         cat("vbound : ", round(my_bmpop$vbound), "\n")
         cat("ICL    : ", round(my_bmpop$ICL), "\n")
         cat("BICL   : ", round(my_bmpop$BICL), "\n")
         cat("Best model for Q = ", which.max(my_bmpop$BICL), "\n")
         if (!is.null(my_bmpop$ICL_sbm)) {
-          icl_sbm <- vapply(seq(my_bmpop$M),
+          icl_sbm <- vapply(
+            seq(my_bmpop$M),
             function(m) {
               max(sapply(
                 seq_along(my_bmpop$fit_sbm[[m]]$storedModels$indexModel),
                 function(q) {
                   my_bmpop$fit_sbm[[m]]$setModel(q)
-                  -0.5 * my_bmpop$fit_sbm[[m]]$penalty + my_bmpop$fit_sbm[[m]]$loglik + my_bmpop$fit_sbm[[m]]$entropy
+                  -0.5 *
+                    my_bmpop$fit_sbm[[m]]$penalty +
+                    my_bmpop$fit_sbm[[m]]$loglik +
+                    my_bmpop$fit_sbm[[m]]$entropy
                 }
               ))
             },
@@ -245,7 +271,12 @@ merge_multiple_runs_bipartite <- function(fits) {
   }
 
   populated_models <- lapply(fits, function(fitbisbmpop) {
-    outer(seq(fitbisbmpop$global_opts$Q1_max), seq(fitbisbmpop$global_opts$Q2_max), Vectorize(is_populated, vectorize.args = c("q1", "q2")), current_bisbmpop = fitbisbmpop)
+    outer(
+      seq(fitbisbmpop$global_opts$Q1_max),
+      seq(fitbisbmpop$global_opts$Q2_max),
+      Vectorize(is_populated, vectorize.args = c("q1", "q2")),
+      current_bisbmpop = fitbisbmpop
+    )
   })
   populated_models <- which(simplify2array(populated_models), arr.ind = TRUE)
   colnames(populated_models) <- c("q1", "q2", "run")
@@ -256,22 +287,37 @@ merge_multiple_runs_bipartite <- function(fits) {
   for (q_idx in seq_len(nrow(unique_populated_models))) {
     q1 <- unique_populated_models[q_idx, "q1"]
     q2 <- unique_populated_models[q_idx, "q2"]
-    current_populated_runs <- populated_models[populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2, "run"]
+    current_populated_runs <- populated_models[
+      populated_models[, "q1"] == q1 & populated_models[, "q2"] == q2,
+      "run"
+    ]
 
     # There are multiple, we must merge them
     models_comparison <- lapply(current_populated_runs, function(run) {
       fits[[run]][["model_list"]][[q1, q2]]
     })
-    compared_models_bicl <- sapply(models_comparison, function(model) model$BICL)
+    compared_models_bicl <- sapply(models_comparison, function(model) {
+      model$BICL
+    })
     out_bisbmpop$model_list[[q1, q2]] <-
       models_comparison[[which.max(
         compared_models_bicl
       )]]
     if (length(current_populated_runs) > 1) {
       # If there are multiple candidates we store the discarded others
-      discarded_models_comparison <- models_comparison[-which.max(compared_models_bicl)]
-      discarded_compared_models_bicl <- compared_models_bicl[-which.max(compared_models_bicl)]
-      out_bisbmpop$discarded_model_list[[q1, q2]] <- discarded_models_comparison[order(discarded_compared_models_bicl, decreasing = TRUE)]
+      discarded_models_comparison <- models_comparison[
+        -which.max(compared_models_bicl)
+      ]
+      discarded_compared_models_bicl <- compared_models_bicl[
+        -which.max(compared_models_bicl)
+      ]
+      out_bisbmpop$discarded_model_list[[
+        q1,
+        q2
+      ]] <- discarded_models_comparison[order(
+        discarded_compared_models_bicl,
+        decreasing = TRUE
+      )]
     }
   }
 
@@ -388,15 +434,17 @@ merge_multiple_runs_bipartite <- function(fits) {
 #' )
 #' }
 estimate_colBiSBM <-
-  function(netlist,
-           colsbm_model,
-           net_id = NULL,
-           distribution = "bernoulli",
-           nb_run = 3L,
-           global_opts = list(),
-           fit_opts = list(),
-           Z_init = NULL,
-           sep_BiSBM = NULL) {
+  function(
+    netlist,
+    colsbm_model,
+    net_id = NULL,
+    distribution = "bernoulli",
+    nb_run = 3L,
+    global_opts = list(),
+    fit_opts = list(),
+    Z_init = NULL,
+    sep_BiSBM = NULL
+  ) {
     # Sanity checks
     netlist <- check_networks_list(
       networks_list = netlist,
@@ -410,7 +458,8 @@ estimate_colBiSBM <-
       thresh = 1L
     )
 
-    switch(colsbm_model,
+    switch(
+      colsbm_model,
       "iid" = {
         free_mixture_row <- FALSE
         free_mixture_col <- FALSE
@@ -502,7 +551,9 @@ estimate_colBiSBM <-
       )
 
     # We choose the the bisbmpop to receive the best_fit in sense of the BICL
-    bisbmpop <- tmp_fits[[which.max(vapply(tmp_fits, function(fit) fit$best_fit$BICL,
+    bisbmpop <- tmp_fits[[which.max(vapply(
+      tmp_fits,
+      function(fit) fit$best_fit$BICL,
       FUN.VALUE = .1
     ))]]
 
@@ -518,7 +569,9 @@ estimate_colBiSBM <-
     # At the end we show the results
     if (global_opts$verbosity >= 1 & nb_run > 1) {
       cat(
-        "\nAfter merging the", nb_run, "model runs,",
+        "\nAfter merging the",
+        nb_run,
+        "model runs,",
         "the criteria are the following:\n"
       )
       bisbmpop$print_metrics()
@@ -530,7 +583,8 @@ estimate_colBiSBM <-
     if (global_opts$verbosity >= 1) {
       cat(
         "\n==== Full computation performed in",
-        format(Sys.time() - start_time, digits = 3), "====\n"
+        format(Sys.time() - start_time, digits = 3),
+        "====\n"
       )
     }
 
@@ -586,45 +640,59 @@ adjust_colBiSBM <- function(
 #'
 #' @export
 extract_nodes_groups <- function(fit, arg = rlang::caller_arg(fit)) {
-  if (!any(inherits(fit, c(
-    "fitSimpleSBMPop",
-    "fitBipartiteSBMPop",
-    "bmpop",
-    "bisbmpop"
-  )))) {
-    cli::cli_abort("{.var {arg}} must be a fitSimpleSBMPop, fitBipartiteSBMPop, bmpop or bisbmpop object.")
+  if (
+    !any(inherits(
+      fit,
+      c(
+        "fitSimpleSBMPop",
+        "fitBipartiteSBMPop",
+        "bmpop",
+        "bisbmpop"
+      )
+    ))
+  ) {
+    cli::cli_abort(
+      "{.var {arg}} must be a fitSimpleSBMPop, fitBipartiteSBMPop, bmpop or bisbmpop object."
+    )
   }
   if (inherits(fit, "bmpop") || inherits(fit, "bisbmpop")) {
-    cli::cli_alert_info("As you've provided {.obj_type_friendly {fit}} and not {.obj_type_friendly {fit$best_fit}}, the function will extract from {.var {arg}$best_fit}.")
+    cli::cli_alert_info(
+      "As you've provided {.obj_type_friendly {fit}} and not {.obj_type_friendly {fit$best_fit}}, the function will extract from {.var {arg}$best_fit}."
+    )
     fit <- fit$best_fit
   }
-
 
   if (inherits(fit, "fitSimpleSBMPop")) {
     cli::cli_text("Extracting nodes groups from a fitSimpleSBMPop object.")
     names(fit$Z) <- fit$net_id
     fit$Z %>%
-      purrr::map_dfr(~ {
-        .x %>%
-          data.frame(node_name = names(.), cluster = .) %>%
-          tibble::rownames_to_column(var = "network")
-      }, .id = "network") -> out
+      purrr::map_dfr(
+        ~ {
+          .x %>%
+            data.frame(node_name = names(.), cluster = .) %>%
+            tibble::rownames_to_column(var = "network")
+        },
+        .id = "network"
+      ) -> out
     return(out)
   }
   if (inherits(fit, "fitBipartiteSBMPop")) {
     cli::cli_text("Extracting nodes groups from a fitBipartiteSBMPop object.")
     names(fit$memberships) <- fit$net_id
     fit$memberships %>%
-      purrr::map_dfr(~ {
-        row_df <- .x$row %>%
-          data.frame(node_name = names(.), cluster = ., node_type = "row") %>%
-          tibble::rownames_to_column(var = "network")
+      purrr::map_dfr(
+        ~ {
+          row_df <- .x$row %>%
+            data.frame(node_name = names(.), cluster = ., node_type = "row") %>%
+            tibble::rownames_to_column(var = "network")
 
-        col_df <- .x$col %>%
-          data.frame(node_name = names(.), cluster = ., node_type = "col") %>%
-          tibble::rownames_to_column(var = "network")
+          col_df <- .x$col %>%
+            data.frame(node_name = names(.), cluster = ., node_type = "col") %>%
+            tibble::rownames_to_column(var = "network")
 
-        dplyr::bind_rows(row_df, col_df)
-      }, .id = "network")
+          dplyr::bind_rows(row_df, col_df)
+        },
+        .id = "network"
+      )
   }
 }

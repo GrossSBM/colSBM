@@ -16,15 +16,16 @@
 #' future::plan(future::multisession)
 #' X <- seq(1, 5)
 #' colsbm_lapply(X, backend = "future", nb_cores = 2L)
-colsbm_lapply <- function(X, FUN, backend = "future",
-                          nb_cores = 1L,
-                          ...) {
+colsbm_lapply <- function(X, FUN, backend = "future", nb_cores = 1L, ...) {
   if (!(backend %in% c("future", "parallel", "no_mc"))) {
     stop("Invalid backend. Choose 'parallel', 'future' or 'no_mc'.")
   }
   if (backend == "future") {
     stopifnot(
-      "The 'future.apply' package must be installed and configured with a plan outside this function." = requireNamespace("future.apply", quietly = TRUE)
+      "The 'future.apply' package must be installed and configured with a plan outside this function." = requireNamespace(
+        "future.apply",
+        quietly = TRUE
+      )
     )
     result <- future.apply::future_lapply(X, FUN, ..., future.seed = TRUE)
     return(result)
@@ -32,14 +33,19 @@ colsbm_lapply <- function(X, FUN, backend = "future",
 
   if (backend == "parallel") {
     stopifnot(
-      "The 'parallel' package must be installed to use this backend." = requireNamespace("parallel", quietly = TRUE)
+      "The 'parallel' package must be installed to use this backend." = requireNamespace(
+        "parallel",
+        quietly = TRUE
+      )
     )
     if (toupper(Sys.info()["sysname"]) == "WINDOWS") {
       cl <- parallel::makeCluster(nb_cores)
       result <- parallel::parLapply(cl, X, FUN, ...)
       parallel::stopCluster(cl)
     } else {
-      result <- parallel::mclapply(X, FUN,
+      result <- parallel::mclapply(
+        X,
+        FUN,
         mc.cores = nb_cores,
         mc.preschedule = FALSE
       )
