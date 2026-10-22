@@ -133,21 +133,23 @@ fitSimpleSBMPop <- R6::R6Class(
     #' from the greedy exploration to  keep track of the starting_point
     #' @param logfactA A quantity used with the Poisson probability distribution
     #' @param fit_opts Fit parameters, used to determine the fitting method/
-    initialize = function(A = NULL,
-                          Q = NULL,
-                          Z = NULL,
-                          mask = NULL,
-                          net_id = NULL,
-                          distribution = "bernoulli",
-                          free_mixture = TRUE,
-                          free_density = TRUE,
-                          directed = NULL,
-                          init_method = "spectral",
-                          weight = NULL, # A vector of size M, the weight of each network
-                          Cpi = NULL,
-                          Calpha = NULL,
-                          logfactA = NULL,
-                          fit_opts = list()) {
+    initialize = function(
+      A = NULL,
+      Q = NULL,
+      Z = NULL,
+      mask = NULL,
+      net_id = NULL,
+      distribution = "bernoulli",
+      free_mixture = TRUE,
+      free_density = TRUE,
+      directed = NULL,
+      init_method = "spectral",
+      weight = NULL, # A vector of size M, the weight of each network
+      Cpi = NULL,
+      Calpha = NULL,
+      logfactA = NULL,
+      fit_opts = list()
+    ) {
       if (is.null(directed)) {
         directed <- !isSymmetric.matrix(A[[1]])
       }
@@ -290,7 +292,8 @@ fitSimpleSBMPop <- R6::R6Class(
         alpha <- self$Calpha * self$alpha
         delta <- self$delta[m]
       }
-      switch(self$distribution,
+      switch(
+        self$distribution,
         "bernoulli" = {
           self$dircoef *
             sum(
@@ -790,7 +793,8 @@ fitSimpleSBMPop <- R6::R6Class(
       Um <- 1 - as.matrix(self$mask[[m]])
       Am <- Um * as.matrix(self$A[[m]])
       while (condition) {
-        tau_new <- switch(self$distribution,
+        tau_new <- switch(
+          self$distribution,
           "bernoulli" = {
             tau_new <-
               t(matrix(
@@ -799,11 +803,11 @@ fitSimpleSBMPop <- R6::R6Class(
                 self$n[m]
               )) +
               Am %*%
-              tau_old %*%
-              t(.logit(self$delta[m] * self$alpha, eps = 1e-9)) +
+                tau_old %*%
+                t(.logit(self$delta[m] * self$alpha, eps = 1e-9)) +
               Um %*%
-              tau_old %*%
-              t(.log(1 - self$alpha * self$delta[m], eps = 1e-9))
+                tau_old %*%
+                t(.log(1 - self$alpha * self$delta[m], eps = 1e-9))
             if (self$directed) {
               tau_new <- tau_new +
                 crossprod(
@@ -827,11 +831,11 @@ fitSimpleSBMPop <- R6::R6Class(
                 self$n[m]
               )) +
               Am %*%
-              tau_old %*%
-              t(log(pmax(self$delta[m] * self$alpha, 1e-12))) -
+                tau_old %*%
+                t(log(pmax(self$delta[m] * self$alpha, 1e-12))) -
               Um %*%
-              tau_old %*%
-              t(self$alpha * self$delta[m])
+                tau_old %*%
+                t(self$alpha * self$delta[m])
             if (self$directed) {
               tau_new <- tau_new +
                 crossprod(
@@ -861,11 +865,11 @@ fitSimpleSBMPop <- R6::R6Class(
         ] <- 1 - 1e-9
         tau_new[, which(self$Cpi[, m])] <-
           tau_new[, which(self$Cpi[, m]), drop = FALSE] /
-            .rowSums(
-              tau_new[, which(self$Cpi[, m]), drop = FALSE],
-              self$n[m],
-              sum(self$Cpi[, m])
-            )
+          .rowSums(
+            tau_new[, which(self$Cpi[, m]), drop = FALSE],
+            self$n[m],
+            sum(self$Cpi[, m])
+          )
         tau_new[, which(!self$Cpi[, m])] <- 0
         it <- it + 1
         emqr <- .tquadform(tau_new, Am)
@@ -1079,7 +1083,8 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @importFrom gtools rdirichlet
     init_clust = function() {
       self$tau <-
-        switch(self$init_method,
+        switch(
+          self$init_method,
           "random" = lapply(
             X = seq_along(self$A),
             FUN = function(m) {
@@ -1210,7 +1215,8 @@ fitSimpleSBMPop <- R6::R6Class(
       if (self$free_density == FALSE) {
         self$update_alpha(map = map)
       } else {
-        switch(self$distribution,
+        switch(
+          self$distribution,
           "poisson" = self$fixed_point_alpha_delta(map = map),
           "bernoulli" = ifelse(
             self$fit_opts$approx_pois,
@@ -1254,9 +1260,11 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @param ... Other parameters
     #'
     #' @return nothing; stores values
-    optimize = function(max_step = self$fit_opts$max_vem_steps,
-                        tol = self$fit_opts$tolerance,
-                        ...) {
+    optimize = function(
+      max_step = self$fit_opts$max_vem_steps,
+      tol = self$fit_opts$tolerance,
+      ...
+    ) {
       if (self$Q == 1) {
         self$tau <- lapply(seq(self$M), function(m) matrix(1, self$n[m], 1))
         self$Z <- lapply(seq(self$M), function(m) rep(1, self$n[m]))
@@ -1319,7 +1327,8 @@ fitSimpleSBMPop <- R6::R6Class(
               lapply(
                 seq(self$M),
                 function(m) {
-                  switch(self$fit_opts$algo_ve,
+                  switch(
+                    self$fit_opts$algo_ve,
                     "fp" = self$fixed_point_tau(m),
                     self$ve_step(m, ...)
                   )
@@ -1335,7 +1344,8 @@ fitSimpleSBMPop <- R6::R6Class(
               lapply(
                 seq(self$M),
                 function(m) {
-                  switch(self$fit_opts$algo_ve,
+                  switch(
+                    self$fit_opts$algo_ve,
                     "fp" = self$fixed_point_tau(seq_m[m]),
                     self$ve_step(seq_m[m], ...)
                   )
@@ -1425,8 +1435,10 @@ fitSimpleSBMPop <- R6::R6Class(
     #' Defaults to `fit_opts$max_vem_steps`.
     #' @param tol the tolerance for the stopping criterion.
     #' Defaults to `fit_opts$tolerance`.
-    cpp_computation = function(max_step = self$fit_opts$max_vem_steps,
-                               tol = self$fit_opts$tolerance) {
+    cpp_computation = function(
+      max_step = self$fit_opts$max_vem_steps,
+      tol = self$fit_opts$tolerance
+    ) {
       if (self$fit_opts$verbosity >= 2) {
         cat("Creating C++ object for Q=", self$Q, "\n")
       }

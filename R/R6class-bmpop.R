@@ -78,16 +78,18 @@ bmpop <- R6::R6Class(
     #' details of the user function for more information.
     #'
     #' @return A new 'sbmpop' object.
-    initialize = function(netlist = NULL,
-                          net_id = NULL,
-                          directed = NULL,
-                          distribution = "bernoulli",
-                          free_density = FALSE,
-                          free_mixture = FALSE,
-                          fit_sbm = NULL,
-                          Z_init = NULL,
-                          global_opts = list(),
-                          fit_opts = list()) {
+    initialize = function(
+      netlist = NULL,
+      net_id = NULL,
+      directed = NULL,
+      distribution = "bernoulli",
+      free_density = FALSE,
+      free_mixture = FALSE,
+      fit_sbm = NULL,
+      Z_init = NULL,
+      global_opts = list(),
+      fit_opts = list()
+    ) {
       self$A <- netlist
       self$n <- vapply(self$A, nrow, FUN.VALUE = .1)
       self$M <- length(self$A)
@@ -319,12 +321,14 @@ bmpop <- R6::R6Class(
     #' absent interaction parameter, defaults to NULL
     #'
     #' @return bmpop object
-    optimize_init = function(index,
-                             Z,
-                             Q,
-                             nb_clusters,
-                             Cpi = NULL,
-                             Calpha = NULL) {
+    optimize_init = function(
+      index,
+      Z,
+      Q,
+      nb_clusters,
+      Cpi = NULL,
+      Calpha = NULL
+    ) {
       mypopbm <- fitSimpleSBMPop$new(
         A = self$A[index],
         mask = self$mask[index],
@@ -455,10 +459,12 @@ bmpop <- R6::R6Class(
     #' @param nb_clusters A subindex for model list, in practice always 1
     #'
     #' @return Q - 1
-    forward_pass = function(Q_min = self$global_opts$Q_min,
-                            Q_max = self$global_opts$Q_max,
-                            index = seq(self$M),
-                            nb_clusters = 1L) {
+    forward_pass = function(
+      Q_min = self$global_opts$Q_min,
+      Q_max = self$global_opts$Q_max,
+      index = seq(self$M),
+      nb_clusters = 1L
+    ) {
       # browser()
       # if (length(self$BICL) != length(rep(-Inf, Q_max))) {
       #   cat("forward")
@@ -673,10 +679,12 @@ bmpop <- R6::R6Class(
     #' @param nb_clusters A subindex for model list, in practice always 1
     #'
     #' @return Q + 1
-    backward_pass = function(Q_min = self$global_opts$Q_min,
-                             Q_max = self$global_opts$Q_max,
-                             index = seq(self$M),
-                             nb_clusters = 1L) {
+    backward_pass = function(
+      Q_min = self$global_opts$Q_min,
+      Q_max = self$global_opts$Q_max,
+      index = seq(self$M),
+      nb_clusters = 1L
+    ) {
       # if (length(self$BICL) != length(rep(-Inf, Q_max))) {
       #   cat("backward")
       #   cat(self$BICL)

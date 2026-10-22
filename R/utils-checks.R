@@ -149,7 +149,8 @@ check_bipartite_colsbm_models <- function(
     error_arg = arg,
     error_call = call
   )
-  switch(colsbm_model,
+  switch(
+    colsbm_model,
     "iid" = {
       free_mixture_row <- FALSE
       free_mixture_col <- FALSE
@@ -192,7 +193,8 @@ check_unipartite_colsbm_models <- function(
     error_arg = arg,
     error_call = call
   )
-  switch(colsbm_model,
+  switch(
+    colsbm_model,
     "iid" = {
       free_density <- FALSE
       free_mixture <- FALSE
@@ -255,7 +257,8 @@ check_networks_list_match_emission_distribution <- function(
     call = call
   )
 
-  switch(emission_distribution,
+  switch(
+    emission_distribution,
     poisson = {
       if (!all(sapply(networks_list, rlang::is_integerish))) {
         cli::cli_abort(

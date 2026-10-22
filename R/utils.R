@@ -33,7 +33,8 @@ generate_unipartite_network <- function(
 
   # Here we switch on the distributions
   adjacency_matrix <- matrix(
-    switch(distribution,
+    switch(
+      distribution,
       "bernoulli" = {
         rbinom(
           length(node_node_interaction_parameter),
@@ -151,7 +152,8 @@ generate_bipartite_network <- function(
     alpha %*%
     colblocks_memberships
   incidence_matrix <- matrix(
-    switch(distribution,
+    switch(
+      distribution,
       "poisson" = {
         rpois(
           length(node_node_interaction_parameter),
@@ -251,7 +253,8 @@ generate_bipartite_collection <- function(
     )
   }
 
-  switch(model,
+  switch(
+    model,
     "iid" = {
       if (rlang::is_list(pi)) {
         cli::cli_abort(

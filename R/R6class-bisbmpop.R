@@ -105,14 +105,16 @@ bisbmpop <- R6::R6Class(
     #' details of the user function for more information.
     #'
     #' @return A new 'bisbmpop' object.
-    initialize = function(netlist = NULL,
-                          net_id = NULL,
-                          distribution = NULL,
-                          free_mixture_row = FALSE,
-                          free_mixture_col = FALSE,
-                          Z_init = NULL,
-                          global_opts = list(),
-                          fit_opts = list()) {
+    initialize = function(
+      netlist = NULL,
+      net_id = NULL,
+      distribution = NULL,
+      free_mixture_row = FALSE,
+      free_mixture_col = FALSE,
+      Z_init = NULL,
+      global_opts = list(),
+      fit_opts = list()
+    ) {
       self$A <- netlist
 
       # Computing the number of rows and cols
@@ -582,7 +584,8 @@ bisbmpop <- R6::R6Class(
       possible_models_size <- 0
 
       # Store the clustering to keep
-      switch(axis,
+      switch(
+        axis,
         row = {
           # If we are merging on the rows
           row_clustering <- lapply(
@@ -634,7 +637,8 @@ bisbmpop <- R6::R6Class(
         function(q) {
           # Once the row and col clustering are correctly merged
           # they are merged
-          switch(axis,
+          switch(
+            axis,
             row = {
               # If it's a row merge
               q_th_Z_init <- lapply(seq.int(self$M), function(m) {
@@ -937,9 +941,11 @@ bisbmpop <- R6::R6Class(
     #'
     #' @return c(Q1_mode, Q2_mode) which indicates the Q1 and Q2
     #' for which the BICL was maximal.
-    greedy_exploration = function(starting_point,
-                                  max_iter = self$fit_opts$greedy_exploration_max_steps,
-                                  max_step_without_improvement = self$fit_opts$greedy_exploration_max_steps_without_improvement) {
+    greedy_exploration = function(
+      starting_point,
+      max_iter = self$fit_opts$greedy_exploration_max_steps,
+      max_step_without_improvement = self$fit_opts$greedy_exploration_max_steps_without_improvement
+    ) {
       # Initialize
       current_Q1 <- starting_point[1]
       current_Q2 <- starting_point[2]
@@ -2450,7 +2456,9 @@ bisbmpop <- R6::R6Class(
     },
     #' The message printed when one prints the object
     #' @param type The title above the message.
-    show = function(type = "Fitted Collection of Bipartite SBM\nwith all fitted models") {
+    show = function(
+      type = "Fitted Collection of Bipartite SBM\nwith all fitted models"
+    ) {
       cat(type, "--", self$distribution, "variant for", self$M, "networks \n")
       cat(
         "=====================================================================\n"
