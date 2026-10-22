@@ -48,6 +48,21 @@ void ColSBM::initialize_state() {
     }
   }
 
+  // Enforce the support on the initial memberships, mirroring R's
+  // init_clust("empty") which zeroes tau[, !Cpi[, m]] and renormalizes the
+  // remaining columns over the support before the VEM. For unconstrained
+  // models (Cpi all TRUE) this is a no-op.
+  for (int m = 0; m < M; ++m) {
+    const arma::uvec supp = arma::find(Cpi.col(m) > 0.5);
+    const arma::uvec not_supp = arma::find(Cpi.col(m) < 0.5);
+    if (not_supp.n_elem > 0) {
+      tau[m].cols(not_supp).zeros();
+      const mat tau_supp = tau[m].cols(supp);
+      tau[m].cols(supp) =
+          tau_supp / arma::repmat(arma::sum(tau_supp, 1), 1, tau_supp.n_cols);
+    }
+  }
+
   for (int m = 0; m < M; ++m) {
     // There we initialize the mask to mask the  diagonal at least
     const int n = A[m].n_rows;
@@ -318,17 +333,33 @@ mat ColSBM::fixed_point_tau(int m, int max_iter = 1, double tol) {
         tau_supp / arma::repmat(arma::sum(tau_supp, 1), 1, tau_supp.n_cols);
     tau_new.cols(supp) = tau_supp;
     tau_new.cols(not_supp).zeros();
+
+    // Recompute the per-network aggregates from the candidate tau and accept
+    // the update only if the network vloss improves, mirroring R's
+    // fixed_point_tau. This keeps the VE step monotone and avoids the
+    // oscillation observed in the undirected Bernoulli case.
+    const mat mask_m = Cpi.col(m) * Cpi.col(m).t();
+    mat emqr_cand = mask_m % (tau_new.t() * Am * tau_new);
+    mat nmqr_cand = mask_m % (tau_new.t() * Um * tau_new);
+    const double new_vloss =
+        compute_network_vloss_params(m, tau_new, emqr_cand, nmqr_cand);
+
+    if (new_vloss <= prev_vloss) {
+      // No improvement: keep the previous tau and stop. Still enforce the
+      // support constraint: forbidden blocks are masked out of the vloss, so
+      // zeroing them here does not change the objective (R's fixed_point_tau
+      // also always keeps tau_new[, !Cpi] zeroed).
+      tau[m].cols(not_supp).zeros();
+      break;
+    }
+
     tau[m] = tau_new;
-
-    const double new_vloss = compute_network_vloss(m);
-
     const double delta_tau = arma::accu(arma::square(tau_new - tau_old)) /
                              static_cast<double>(tau_new.n_elem);
-    const double delta_vloss = std::abs(new_vloss - prev_vloss);
     tau_old = tau_new;
     prev_vloss = new_vloss;
 
-    if (delta_tau <= tol || delta_vloss <= tol) {
+    if (delta_tau <= tol) {
       break;
     }
   }
@@ -406,11 +437,9 @@ void ColSBM::reorder_parameters() {
   Calpha = arma::conv_to<mat>::from(Calpha > 0.5);
 }
 
-double ColSBM::compute_network_vloss(int m) const {
-
-  const mat &tau_m = tau[m];
-  const mat &em = emqr.slice(m);
-  const mat &nm = nmqr.slice(m);
+double ColSBM::compute_network_vloss_params(int m, const mat &tau_m,
+                                            const mat &em,
+                                            const mat &nm) const {
   const double delta_m = delta[m];
   const rowvec pi_m = pi[m];
   // Support of network m: pi and entropy terms are restricted to it, and the
@@ -446,6 +475,10 @@ double ColSBM::compute_network_vloss(int m) const {
   obj += -arma::accu(tau_supp % log_tau);
 
   return obj;
+}
+
+double ColSBM::compute_network_vloss(int m) const {
+  return compute_network_vloss_params(m, tau[m], emqr.slice(m), nmqr.slice(m));
 }
 
 void ColSBM::step() {

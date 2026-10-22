@@ -56,6 +56,8 @@ public:
   void fixed_point_alpha_delta(double tol = 1e-6, int max_iter = 50);
   mat fixed_point_tau(int m, int max_iter, double tol = TOL);
   double compute_network_vloss(int m) const;
+  double compute_network_vloss_params(int m, const mat &tau_m,
+                                      const mat &em, const mat &nm) const;
   void step();
   void optimize(int max_step, double tol);
   std::vector<double> get_vbound() const;
