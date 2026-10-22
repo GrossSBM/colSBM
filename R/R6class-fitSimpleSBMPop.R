@@ -888,7 +888,7 @@ fitSimpleSBMPop <- R6::R6Class(
                 tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
                   log(self$pi[[m]][which(self$Cpi[, m])])
               ) -
-              sum(.xlogx(tau_new[which(self$Cpi[, m])]))
+              sum(.xlogx(tau_new[, which(self$Cpi[, m])]))
           }
           if (self$distribution == "poisson") {
             vl <- self$dircoef *
@@ -902,7 +902,7 @@ fitSimpleSBMPop <- R6::R6Class(
                 tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
                   log(self$pi[[m]][which(self$Cpi[, m])])
               ) -
-              sum(.xlogx(tau_new[which(self$Cpi[, m])])) -
+              sum(.xlogx(tau_new[, which(self$Cpi[, m])])) -
               self$logfactA[m]
           }
           self$vloss[[m]] <- c(self$vloss[[m]], vl)
