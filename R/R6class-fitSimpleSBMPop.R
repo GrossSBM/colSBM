@@ -318,10 +318,11 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @return The computed quantity.
     vb_tau_pi = function(m, map = FALSE) {
       if (!map) {
-        sum(
-          self$tau[[m]][, which(self$Cpi[, m]), drop = FALSE] %*%
-            log(self$pi[[m]][which(self$Cpi[, m])])
-        )
+        sel <- which(self$Cpi[, m])
+        sum(.xlogy(
+          self$tau[[m]][, sel, drop = FALSE],
+          matrix(self$pi[[m]][sel], nrow(self$tau[[m]]), length(sel), byrow = TRUE)
+        ))
       } else {
         sum(.xlogy(tabulate(self$Z[[m]], self$Q), self$map$pi[[m]]))
       }
@@ -916,13 +917,13 @@ fitSimpleSBMPop <- R6::R6Class(
           up <- TRUE
         }
 
-        if (up) {
+        if (isTRUE(up)) {
           self$tau[[m]] <- tau_new
           tau_old <- tau_new
         }
         condition <- mean((tau_new - tau_old)**2) > tol &
           it < max_iter &
-          up
+          isTRUE(up)
       }
       invisible(self$tau[[m]])
     },
@@ -954,6 +955,7 @@ fitSimpleSBMPop <- R6::R6Class(
       while (condition) {
         d <- rowSums(emqr, dim = 1) /
           rowSums(aperm(array(a, c(self$Q, self$Q, self$M))) * nmqr, dim = 1)
+        d[!is.finite(d)] <- 0
         d[1] <- 1
         a <- colSums(emqr, dim = 1) /
           colSums(array(d, c(self$M, self$Q, self$Q)) * nmqr, dim = 1)
