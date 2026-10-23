@@ -45,9 +45,8 @@ test_that("clusterize_unipartite_networks_iid", {
     directed = FALSE,
     distribution = "bernoulli",
     nb_run = 1,
-    global_opts = list(nb_cores = 1, backend = "no_mc"),
+    global_opts = list(nb_cores = 1, backend = "no_mc", Q_max = 2),
     fit_opts = list(
-      Q_max = 2,
       nb_init = 1,
       nb_models = 1,
       depth = 1
@@ -84,10 +83,10 @@ test_that("estimate_colsbm_poisson_delta with verbosity", {
         nb_run = 1,
         global_opts = list(
           nb_cores = 1L,
-          verbosity = 4L
+          verbosity = 4L,
+          Q_max = 2
         ),
         fit_opts = list(
-          Q_max = 2,
           nb_init = 1,
           nb_models = 1,
           depth = 1
@@ -122,9 +121,8 @@ test_that("estimate_colsbm_poisson_delta NULL fit_sbm", {
         distribution = "poisson",
         nb_run = 1,
         fit_sbm = NULL,
-        global_opts = list(nb_cores = 1),
+        global_opts = list(nb_cores = 1, Q_max = 2),
         fit_opts = list(
-          Q_max = 2,
           nb_init = 1,
           nb_models = 1,
           depth = 1
@@ -162,9 +160,8 @@ test_that("estimate_colsbm_poisson_delta with NA", {
         directed = FALSE,
         distribution = "poisson",
         nb_run = 1,
-        global_opts = list(nb_cores = 1),
+        global_opts = list(nb_cores = 1, Q_max = 2),
         fit_opts = list(
-          Q_max = 2,
           nb_init = 1,
           nb_models = 1,
           depth = 1
@@ -198,9 +195,8 @@ test_that("estimate_colsbm_poisson with pi model", {
         directed = FALSE,
         distribution = "poisson",
         nb_run = 1,
-        global_opts = list(nb_cores = 1),
+        global_opts = list(nb_cores = 1, Q_max = 2),
         fit_opts = list(
-          Q_max = 2,
           nb_init = 1,
           nb_models = 1,
           depth = 1
@@ -234,9 +230,8 @@ test_that("estimate_colsbm_poisson with deltapi model", {
         directed = FALSE,
         distribution = "poisson",
         nb_run = 1L,
-        global_opts = list(nb_cores = 1L),
+        global_opts = list(nb_cores = 1L, Q_max = 2L),
         fit_opts = list(
-          Q_max = 2L,
           nb_init = 1L,
           nb_models = 1L,
           depth = 1L

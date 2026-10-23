@@ -80,7 +80,7 @@ test_that("cpp poisson vbound agrees with the R procedure on identical parameter
 
       # Feed the C++ final parameters back into the R object and ask R for its
       # own vbound: the two must agree to machine precision.
-      fit <- colSBM:::fitSimpleSBMPop$new(
+      fit <- fitSimpleSBMPop$new(
         A = A,
         Q = Q,
         Z = taus,
@@ -89,7 +89,7 @@ test_that("cpp poisson vbound agrees with the R procedure on identical parameter
         free_mixture = TRUE,
         free_density = free_density,
         init_method = "given",
-        fit_opts = colSBM:::default_fit_opts_unipartite()
+        fit_opts = default_fit_opts_unipartite()
       )
       fit$tau <- info$tau
       fit$pi <- info$pi
