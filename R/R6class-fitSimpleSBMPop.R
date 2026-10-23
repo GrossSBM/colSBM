@@ -321,7 +321,12 @@ fitSimpleSBMPop <- R6::R6Class(
         sel <- which(self$Cpi[, m])
         sum(.xlogy(
           self$tau[[m]][, sel, drop = FALSE],
-          matrix(self$pi[[m]][sel], nrow(self$tau[[m]]), length(sel), byrow = TRUE)
+          matrix(
+            self$pi[[m]][sel],
+            nrow(self$tau[[m]]),
+            length(sel),
+            byrow = TRUE
+          )
         ))
       } else {
         sum(.xlogy(tabulate(self$Z[[m]], self$Q), self$map$pi[[m]]))
