@@ -6,12 +6,24 @@ eps <- 0.05
 pir <- c(0.1, 0.5, 0.2, 0.2)
 pic <- c(1 / 3, 1 / 3, 1 / 3)
 
-alpha <- matrix(c(
-  0.7, 0.6, 0.6,
-  0.6, 0.5, eps,
-  0.6, eps, eps,
-  eps, eps, 0.9
-), nrow = 4, byrow = TRUE)
+alpha <- matrix(
+  c(
+    0.7,
+    0.6,
+    0.6,
+    0.6,
+    0.5,
+    eps,
+    0.6,
+    eps,
+    eps,
+    eps,
+    eps,
+    0.9
+  ),
+  nrow = 4,
+  byrow = TRUE
+)
 
 M <- 5
 
@@ -42,15 +54,27 @@ test_that("Generate bipartite collection with vectors for nc and nr", {
   expect_equal(lapply(increasingCol, ncol), as.list(nc))
   #  Wrong M
   expect_error(generate_bipartite_collection(
-    nr, nc, pir, pic, alpha,
+    nr,
+    nc,
+    pir,
+    pic,
+    alpha,
     M + 1
   ))
   expect_error(generate_bipartite_collection(
-    c(nr, 1), nc, pir, pic, alpha,
+    c(nr, 1),
+    nc,
+    pir,
+    pic,
+    alpha,
     M
   ))
   expect_error(generate_bipartite_collection(
-    nr, c(nc, 1), pir, pic, alpha,
+    nr,
+    c(nc, 1),
+    pir,
+    pic,
+    alpha,
     M
   ))
 })
@@ -58,35 +82,55 @@ test_that("Generate bipartite collection with vectors for nc and nr", {
 test_that("Testing the different models for generating bipartite networks", {
   expect_error(
     generate_bipartite_collection(
-      nr, nc, pir, pic, alpha,
+      nr,
+      nc,
+      pir,
+      pic,
+      alpha,
       M,
       model = "iidi"
     )
   )
   expect_no_error(
     generate_bipartite_collection(
-      nr, nc, pir, pic, alpha,
+      nr,
+      nc,
+      pir,
+      pic,
+      alpha,
       M,
       model = "iid"
     )
   )
   expect_no_error(
     generate_bipartite_collection(
-      nr, nc, pir_list, pic, alpha,
+      nr,
+      nc,
+      pir_list,
+      pic,
+      alpha,
       M,
       model = "pi"
     )
   )
   expect_no_error(
     generate_bipartite_collection(
-      nr, nc, pir, pic_list, alpha,
+      nr,
+      nc,
+      pir,
+      pic_list,
+      alpha,
       M,
       model = "rho"
     )
   )
   expect_no_error(
     generate_bipartite_collection(
-      nr, nc, pir_list, pic_list, alpha,
+      nr,
+      nc,
+      pir_list,
+      pic_list,
+      alpha,
       M,
       model = "pirho"
     )
@@ -97,29 +141,41 @@ test_that("Wrong block proportions for generating collections", {
   # pi model, pi is not a list
 
   expect_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir, rho = pic, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir,
+    rho = pic,
+    alpha = alpha,
     model = "pi",
     M = M,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir, rho = pic, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir,
+    rho = pic,
+    alpha = alpha,
     model = "rho",
     M = M,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir, rho = pic_list, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir,
+    rho = pic_list,
+    alpha = alpha,
     model = "pirho",
     M = M,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir_list, rho = pic, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir_list,
+    rho = pic,
+    alpha = alpha,
     model = "pirho",
     M = M,
     distribution = "bernoulli"
@@ -130,22 +186,31 @@ test_that("Correct block proportions for generating collections", {
   # pi model, pi is not a list
 
   expect_no_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir_list, rho = pic, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir_list,
+    rho = pic,
+    alpha = alpha,
     model = "pi",
     M = M,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir, rho = pic_list, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir,
+    rho = pic_list,
+    alpha = alpha,
     model = "rho",
     M = M,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_bipartite_collection(
-    nr = nr, nc = nc,
-    pi = pir_list, rho = pic_list, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pir_list,
+    rho = pic_list,
+    alpha = alpha,
     model = "pirho",
     M = M,
     distribution = "bernoulli"
@@ -157,11 +222,21 @@ test_that("Testing various wrong arguments for generating bipartite networks", {
   nc <- 10L
 
   alpha <- matrix(c(1L, 1L, 1L, 1L), nrow = 2)
-  alpha_3 <- matrix(c(
-    0.9, 0.4, 0.1,
-    0.4, 0.1, 0.05,
-    0.1, 0.05, 0.05
-  ), byrow = TRUE, ncol = 3)
+  alpha_3 <- matrix(
+    c(
+      0.9,
+      0.4,
+      0.1,
+      0.4,
+      0.1,
+      0.05,
+      0.1,
+      0.05,
+      0.05
+    ),
+    byrow = TRUE,
+    ncol = 3
+  )
   wrong_alpha_bernoulli <- matrix(2L)
   wrong_alpha_negative <- matrix(-5L)
 
@@ -172,69 +247,105 @@ test_that("Testing various wrong arguments for generating bipartite networks", {
 
   #  Wrong alpha
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = wrong_alpha_bernoulli,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = wrong_alpha_bernoulli,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = wrong_alpha_negative,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = wrong_alpha_negative,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = wrong_alpha_negative,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = wrong_alpha_negative,
     distribution = "poisson"
   ))
   # No error
   expect_no_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = alpha,
     distribution = "poisson"
   ))
   expect_no_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi_sum_float, rho = pi_sum_float, alpha = alpha_3,
+    nr = nr,
+    nc = nc,
+    pi = pi_sum_float,
+    rho = pi_sum_float,
+    alpha = alpha_3,
     distribution = "bernoulli"
   ))
 
   #  Wrong pi
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = wrong_pi_sum, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = wrong_pi_sum,
+    rho = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = wrong_pi_value, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = wrong_pi_value,
+    rho = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   #  Wrong rho
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = wrong_pi_sum, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = wrong_pi_sum,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = wrong_pi_value, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = wrong_pi_value,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
 
   # No error
   expect_no_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_bipartite_network(
-    nr = nr, nc = nc,
-    pi = pi, rho = pi, alpha = alpha,
+    nr = nr,
+    nc = nc,
+    pi = pi,
+    rho = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
 })
@@ -243,11 +354,21 @@ test_that("Testing various wrong arguments for generating unipartite networks", 
   n <- 10L
 
   alpha <- matrix(c(1L, 1L, 1L, 1L), nrow = 2)
-  alpha_3 <- matrix(c(
-    0.9, 0.4, 0.1,
-    0.4, 0.1, 0.05,
-    0.1, 0.05, 0.05
-  ), byrow = TRUE, ncol = 3)
+  alpha_3 <- matrix(
+    c(
+      0.9,
+      0.4,
+      0.1,
+      0.4,
+      0.1,
+      0.05,
+      0.1,
+      0.05,
+      0.05
+    ),
+    byrow = TRUE,
+    ncol = 3
+  )
   wrong_alpha_bernoulli <- matrix(2L)
   wrong_alpha_negative <- matrix(-5L)
 
@@ -259,58 +380,68 @@ test_that("Testing various wrong arguments for generating unipartite networks", 
   #  Wrong alpha
   expect_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = wrong_alpha_bernoulli,
+    pi = pi,
+    alpha = wrong_alpha_bernoulli,
     distribution = "bernoulli"
   ))
   expect_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = wrong_alpha_negative,
+    pi = pi,
+    alpha = wrong_alpha_negative,
     distribution = "bernoulli"
   ))
   expect_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = wrong_alpha_negative,
+    pi = pi,
+    alpha = wrong_alpha_negative,
     distribution = "poisson"
   ))
 
   # No error
   expect_no_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "poisson"
   ))
   expect_no_error(generate_unipartite_network(
     n = n,
-    pi = pi_sum_float, alpha = alpha_3,
+    pi = pi_sum_float,
+    alpha = alpha_3,
     distribution = "bernoulli"
   ))
 
   #  Wrong pi
   expect_error(generate_unipartite_network(
     n = n,
-    pi = wrong_pi_sum, alpha = alpha,
+    pi = wrong_pi_sum,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_error(generate_unipartite_network(
     n = n,
-    pi = wrong_pi_value, alpha = alpha,
+    pi = wrong_pi_value,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
 
   # No error
   expect_no_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
   expect_no_error(generate_unipartite_network(
     n = n,
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "bernoulli"
   ))
 })
@@ -333,11 +464,11 @@ test_that("Testing that all arguments work for generating unipartite networks", 
   # Wrong M error
   expect_error(generate_unipartite_collection(
     n = c(50, 50, 40),
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "bernoulli",
     M = 2
   ))
-
 
   expect_false(
     isNested(
@@ -364,7 +495,8 @@ test_that("Testing that all arguments work for generating unipartite networks", 
 
   expect_no_error(generate_unipartite_collection(
     n = c(50, 50, 40),
-    pi = pi, alpha = alpha,
+    pi = pi,
+    alpha = alpha,
     distribution = "bernoulli",
     M = 3L
   ))
@@ -386,7 +518,9 @@ test_that("Spectral clustering too many clusters works", {
   X <- generate_unipartite_network(n = 10, pi = 1, alpha = 0.9)
   expect_message(
     spectral_clustering(
-      X = X, K = 12, kmeans.iter.max = 50,
+      X = X,
+      K = 12,
+      kmeans.iter.max = 50,
       kmeans.nstart = 100
     ),
   )
@@ -416,7 +550,10 @@ test_that("Base case hierarchical biclustering", {
 
 test_that("Hierarchical biclustering works", {
   X <- generate_bipartite_network(
-    nr = 10, 10, pi = c(0.4, 0.6), rho = 1,
+    nr = 10,
+    10,
+    pi = c(0.4, 0.6),
+    rho = 1,
     alpha = matrix(c(0.9, 0.1), byrow = TRUE, nrow = 2)
   )
   expect_no_error(
@@ -425,18 +562,113 @@ test_that("Hierarchical biclustering works", {
 })
 
 test_that("split_clust fails with a table", {
-  X <- as.table(matrix(c(
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-    0, 1, 1, 1, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-    1, 2, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-    1, 1, 0, 1, 0, 0, 1, 0, 0, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    1, 1, 0, 1, 0, 0, 0, 0, 1, 1,
-    0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 0, 0, 0, 0, 0, 1, 0, 0
-  ), nrow = 10, ncol = 10, byrow = TRUE))
+  X <- as.table(matrix(
+    c(
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ),
+    nrow = 10,
+    ncol = 10,
+    byrow = TRUE
+  ))
   Z <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
   expect_no_error(split_clust(X = X, Q = 2, Z = Z, is_bipartite = TRUE))

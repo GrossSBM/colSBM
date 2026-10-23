@@ -164,6 +164,8 @@ parameters}
     \item \href{#method-fitSimpleSBMPop-ve_step}{\code{fitSimpleSBMPop$ve_step()}}
     \item \href{#method-fitSimpleSBMPop-update_mqr}{\code{fitSimpleSBMPop$update_mqr()}}
     \item \href{#method-fitSimpleSBMPop-optimize}{\code{fitSimpleSBMPop$optimize()}}
+    \item \href{#method-fitSimpleSBMPop-reorder_parameters}{\code{fitSimpleSBMPop$reorder_parameters()}}
+    \item \href{#method-fitSimpleSBMPop-cpp_computation}{\code{fitSimpleSBMPop$cpp_computation()}}
     \item \href{#method-fitSimpleSBMPop-show}{\code{fitSimpleSBMPop$show()}}
     \item \href{#method-fitSimpleSBMPop-print}{\code{fitSimpleSBMPop$print()}}
     \item \href{#method-fitSimpleSBMPop-clone}{\code{fitSimpleSBMPop$clone()}}
@@ -191,7 +193,7 @@ parameters}
   Cpi = NULL,
   Calpha = NULL,
   logfactA = NULL,
-  fit_opts = list(algo_ve = "fp", approx_pois = FALSE, minibatch = TRUE, verbosity = 1)
+  fit_opts = list()
 )}
     \if{html}{\out{</div>}}
   }
@@ -510,7 +512,7 @@ Computes the BICL criterion
 \subsection{\code{fitSimpleSBMPop$compute_BICL()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE)}
+    \preformatted{fitSimpleSBMPop$compute_BICL(map = TRUE, ...)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -522,7 +524,7 @@ to FALSE.}
     \if{html}{\out{</div>}}
   }
   \subsection{Returns}{
-    The ICL for the model.
+    The BICL for the model.
 Computes the exact ICL criterion
   }
 }
@@ -823,7 +825,11 @@ Perform the whole initialization and VEM algorithm}
 \subsection{\code{fitSimpleSBMPop$optimize()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$optimize(max_step = self$fit_opts$max_step, tol = 0.001, ...)}
+    \preformatted{fitSimpleSBMPop$optimize(
+  max_step = self$fit_opts$max_vem_steps,
+  tol = self$fit_opts$tolerance,
+  ...
+)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{
@@ -837,7 +843,48 @@ Perform the whole initialization and VEM algorithm}
   }
   \subsection{Returns}{
     nothing; stores values
-The message printed when one prints the object
+To reorder the parameters according to diag(alpha)
+decreasing order
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitSimpleSBMPop-reorder_parameters"></a>}}
+\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-reorder_parameters}{}}}
+\subsection{\code{fitSimpleSBMPop$reorder_parameters()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$reorder_parameters()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    nothing
+Used to compute with C++ reimplementation
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fitSimpleSBMPop-cpp_computation"></a>}}
+\if{latex}{\out{\hypertarget{method-fitSimpleSBMPop-cpp_computation}{}}}
+\subsection{\code{fitSimpleSBMPop$cpp_computation()}}{
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{fitSimpleSBMPop$cpp_computation(
+  max_step = self$fit_opts$max_vem_steps,
+  tol = self$fit_opts$tolerance
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{max_step}}{the maximum number of steps for the VEM
+Defaults to \code{fit_opts$max_vem_steps}.}
+      \item{\code{tol}}{the tolerance for the stopping criterion.
+Defaults to \code{fit_opts$tolerance}.
+The message printed when one prints the object}
+    }
+    \if{html}{\out{</div>}}
   }
 }
 

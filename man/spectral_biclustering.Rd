@@ -5,7 +5,7 @@
 \title{Perform a spectral bi-clustering, clusters by row
 and by columns independently}
 \usage{
-spectral_biclustering(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 50L)
+spectral_biclustering(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 1000L)
 }
 \arguments{
 \item{A}{a bipartite adjacency matrix}

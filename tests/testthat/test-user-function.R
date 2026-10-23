@@ -1,7 +1,8 @@
 # colSBM
 test_that("colsbm-model not correct raises an error", {
   set.seed(1234L)
-  expect_error(estimate_colSBM(list(matrix(runif(100, 10, 10))),
+  expect_error(estimate_colSBM(
+    list(matrix(runif(100, 10, 10))),
     netmodel = "pid"
   ))
 })
@@ -15,8 +16,7 @@ test_that("Estimate colSBM runs without problems", {
       matrix(as.numeric(runif(100) > 0.5), nrow = 10),
       matrix(as.numeric(runif(100) > 0.5), nrow = 10)
     ),
-    colsbm_model =
-      "iid",
+    colsbm_model = "iid",
     global_opts = list(
       nb_cores = 1L,
       backend = "no_mc",
@@ -48,8 +48,7 @@ test_that("Wrong model raises an error", {
       matrix(as.numeric(runif(100) > 0.5), nrow = 10),
       matrix(as.numeric(runif(100) > 0.5), nrow = 10)
     ),
-    colsbm_model =
-      "wrongmodel",
+    colsbm_model = "wrongmodel",
     global_opts = list(
       nb_cores = 1L,
       backend = "no_mc",
@@ -65,8 +64,10 @@ test_that("Estimate network benefitting from joint modelisation with null nb_cor
     pi = c(0.4, 0.6),
     alpha = matrix(
       c(
-        0.9, 0.05,
-        0.05, 0.4
+        0.9,
+        0.05,
+        0.05,
+        0.4
       ),
       nrow = 2L
     ),
@@ -204,9 +205,12 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
     rho = rho_list,
     alpha = matrix(
       c(
-        0.2, 0.9,
-        0.05, 0.5,
-        0.05, 0.05
+        0.2,
+        0.9,
+        0.05,
+        0.5,
+        0.05,
+        0.05
       ),
       nrow = 3L
     ),
@@ -343,13 +347,19 @@ test_that("Estimate colBiSBM runs with pi, rho and pirho. With and without NA", 
 test_that("Check that LBM and colBiSBM with one network return the same", {
   set.seed(1234)
   testNet <- generate_bipartite_network(
-    nr = 60L, nc = 60L,
+    nr = 60L,
+    nc = 60L,
     pi = c(0.3, 0.7),
     rho = c(0.45, 0.55),
-    alpha = matrix(c(
-      0.8, 0.4,
-      0.2, 0.05
-    ), nrow = 2L)
+    alpha = matrix(
+      c(
+        0.8,
+        0.4,
+        0.2,
+        0.05
+      ),
+      nrow = 2L
+    )
   )
   init_lbm <- sbm::estimateBipartiteSBM(
     netMat = testNet,
@@ -373,7 +383,8 @@ test_that("Check that LBM and colBiSBM with one network return the same", {
   lbm[["optimize"]]()
 
   colBiSBM <- estimate_colBiSBM(
-    netlist = list(testNet), colsbm_model = "iid",
+    netlist = list(testNet),
+    colsbm_model = "iid",
     nb_run = 1L,
     global_opts = list(verbosity = 0L, backend = "no_mc"),
     fit_opts = fit_opts
@@ -400,9 +411,12 @@ test_that("Test that merging works with pirho", {
     rho = rho_list,
     alpha = matrix(
       c(
-        0.2, 0.9,
-        0.05, 0.5,
-        0.05, 0.05
+        0.2,
+        0.9,
+        0.05,
+        0.5,
+        0.05,
+        0.05
       ),
       nrow = 3L
     ),
@@ -425,7 +439,11 @@ test_that("Test that merging works with pirho", {
   )
 
   main_bisbmpop <- fit_pirho$clone()
-  far_bisbmpop <- adjust_colBiSBM(fitted_bisbmpop = main_bisbmpop, Q = c(8, 8), depth = 0)
+  far_bisbmpop <- adjust_colBiSBM(
+    fitted_bisbmpop = main_bisbmpop,
+    Q = c(8, 8),
+    depth = 0
+  )
   holes_bisbmpop <- main_bisbmpop$clone()
   for (q in list(c(1, 2), c(2, 1), c(2, 2), c(4, 2), c(4, 3))) {
     # Here we erase the position to create a model list with 'holes'
@@ -435,7 +453,14 @@ test_that("Test that merging works with pirho", {
     holes_bisbmpop[["BICL"]][q[1], q[2]] <- -Inf
   }
 
-  merged_bisbmpop <- merge_multiple_runs_bipartite(fits = list(main_bisbmpop, far_bisbmpop, holes_bisbmpop))
-  merged_other_bisbmpop <- merge_multiple_runs_bipartite(fits = list(holes_bisbmpop, far_bisbmpop, main_bisbmpop))
-  expect_equal(merged_bisbmpop[["model_list"]], merged_other_bisbmpop[["model_list"]])
+  merged_bisbmpop <- merge_multiple_runs_bipartite(
+    fits = list(main_bisbmpop, far_bisbmpop, holes_bisbmpop)
+  )
+  merged_other_bisbmpop <- merge_multiple_runs_bipartite(
+    fits = list(holes_bisbmpop, far_bisbmpop, main_bisbmpop)
+  )
+  expect_equal(
+    merged_bisbmpop[["model_list"]],
+    merged_other_bisbmpop[["model_list"]]
+  )
 })

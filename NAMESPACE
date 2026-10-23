@@ -12,6 +12,8 @@ export(clusterize_bipartite_networks)
 export(clusterize_bipartite_networks_d_a)
 export(clusterize_bipartite_networks_graphon)
 export(clusterize_unipartite_networks)
+export(clusterize_unipartite_networks_cpp)
+export(cpp_estimate_colSBM)
 export(dist_bisbmpop_max)
 export(dist_bmpop_max)
 export(estimate_colBiSBM)
@@ -81,3 +83,4 @@ importFrom(utils,
   modifyList,
   tail
 )
+useDynLib(colSBM)

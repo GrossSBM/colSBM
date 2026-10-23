@@ -133,26 +133,23 @@ fitSimpleSBMPop <- R6::R6Class(
     #' from the greedy exploration to  keep track of the starting_point
     #' @param logfactA A quantity used with the Poisson probability distribution
     #' @param fit_opts Fit parameters, used to determine the fitting method/
-    initialize = function(A = NULL,
-                          Q = NULL,
-                          Z = NULL,
-                          mask = NULL,
-                          net_id = NULL,
-                          distribution = "bernoulli",
-                          free_mixture = TRUE,
-                          free_density = TRUE,
-                          directed = NULL,
-                          init_method = "spectral",
-                          weight = NULL, # A vector of size M, the weight of each network
-                          Cpi = NULL,
-                          Calpha = NULL,
-                          logfactA = NULL,
-                          fit_opts = list(
-                            algo_ve = "fp",
-                            approx_pois = FALSE,
-                            minibatch = TRUE,
-                            verbosity = 1
-                          )) {
+    initialize = function(
+      A = NULL,
+      Q = NULL,
+      Z = NULL,
+      mask = NULL,
+      net_id = NULL,
+      distribution = "bernoulli",
+      free_mixture = TRUE,
+      free_density = TRUE,
+      directed = NULL,
+      init_method = "spectral",
+      weight = NULL, # A vector of size M, the weight of each network
+      Cpi = NULL,
+      Calpha = NULL,
+      logfactA = NULL,
+      fit_opts = list()
+    ) {
       if (is.null(directed)) {
         directed <- !isSymmetric.matrix(A[[1]])
       }
@@ -160,7 +157,11 @@ fitSimpleSBMPop <- R6::R6Class(
       self$A <- A
       self$M <- length(A)
       self$n <- vapply(seq_along(A), function(m) nrow(A[[m]]), FUN.VALUE = .1)
-      self$e <- vapply(seq_along(A), function(m) sum(A[[m]], na.rm = TRUE), FUN.VALUE = .1)
+      self$e <- vapply(
+        seq_along(A),
+        function(m) sum(A[[m]], na.rm = TRUE),
+        FUN.VALUE = .1
+      )
       if (!is.null(mask)) {
         self$mask <- mask
       } else {
@@ -185,11 +186,14 @@ fitSimpleSBMPop <- R6::R6Class(
       self$free_density <- free_density
       if (is.null(Cpi) | is.null(Calpha) | !self$free_mixture) {
         self$Cpi <- matrix(TRUE, self$Q, self$M)
-        self$Calpha <- (Reduce("+", lapply(
-          seq(self$M),
-          function(m) tcrossprod(self$Cpi[, m])
-        ))
-        > 0)
+        self$Calpha <- (Reduce(
+          "+",
+          lapply(
+            seq(self$M),
+            function(m) tcrossprod(self$Cpi[, m])
+          )
+        ) >
+          0)
       } else {
         self$Cpi <- Cpi
         self$Calpha <- Calpha
@@ -208,15 +212,10 @@ fitSimpleSBMPop <- R6::R6Class(
           self$logfactA <- logfactA
         }
       }
-      lapply(seq_along(self$A), function(m) self$A[[m]][is.na(self$A[[m]])] <- -1)
-      self$fit_opts <- list(
-        algo_ve = "fp",
-        approx_pois = FALSE,
-        minibatch = TRUE,
-        verbosity = 1,
-        max_step = 100L,
-        nlopt_algo = "NLOPT_LD_MMA"
-      )
+      lapply(seq_along(self$A), function(m) {
+        self$A[[m]][is.na(self$A[[m]])] <- -1
+      })
+      self$fit_opts <- default_fit_opts_unipartite()
       self$fit_opts <- modifyList(self$fit_opts, fit_opts)
       self$weight <- weight
       self$pi <- vector("list", self$M)
@@ -236,7 +235,8 @@ fitSimpleSBMPop <- R6::R6Class(
         self$df_mixture <- self$Q - 1
       }
       self$df_density <- self$M - 1
-      self$df_connect <- ifelse(self$directed,
+      self$df_connect <- ifelse(
+        self$directed,
         sum(self$Calpha),
         sum(self$Calpha[lower.tri(self$Calpha, diag = TRUE)])
       )
@@ -247,13 +247,18 @@ fitSimpleSBMPop <- R6::R6Class(
       }
       self$delta <- rep(1, self$M)
       if (self$free_density) {
-        self$delta <- self$e / ((self$n * (self$n - 1))) /
+        self$delta <- self$e /
+          ((self$n * (self$n - 1))) /
           (self$e[1] / ((self$n[1] * (self$n[1] - 1))))
       }
       self$alpha <- matrix(.5, Q, Q) * self$Calpha
       self$init_method <- init_method
       self$nb_inter <- self$dircoef *
-        vapply(seq(self$M), function(m) self$n[m]**2 - sum(self$mask[[m]]), FUN.VALUE = .1)
+        vapply(
+          seq(self$M),
+          function(m) self$n[m]**2 - sum(self$mask[[m]]),
+          FUN.VALUE = .1
+        )
       self$vbound <- vector("list", self$M)
     },
     #' Method to compute the maximum a posteriori for Z clustering
@@ -287,18 +292,23 @@ fitSimpleSBMPop <- R6::R6Class(
         alpha <- self$Calpha * self$alpha
         delta <- self$delta[m]
       }
-      switch(self$distribution,
+      switch(
+        self$distribution,
         "bernoulli" = {
-          self$dircoef * sum(
-            self$Calpha * .xlogy(emqr, alpha * delta, eps = 1e-12) +
-              self$Calpha * .xlogy(nmqr - emqr, 1 - alpha * delta, eps = 1e-12)
-          )
+          self$dircoef *
+            sum(
+              self$Calpha *
+                .xlogy(emqr, alpha * delta, eps = 1e-12) +
+                self$Calpha *
+                  .xlogy(nmqr - emqr, 1 - alpha * delta, eps = 1e-12)
+            )
         },
         "poisson" = {
           #          tau_tmp <- self$tau[[m]]
-          self$dircoef * (sum(self$Calpha * emqr * log(pmax(alpha * delta, 1e-12))) -
-            sum(nmqr * self$Calpha * alpha * delta) -
-            self$logfactA[m])
+          self$dircoef *
+            (sum(self$Calpha * emqr * log(pmax(alpha * delta, 1e-12))) -
+              sum(nmqr * self$Calpha * alpha * delta) -
+              self$logfactA[m])
         }
       )
     },
@@ -308,7 +318,16 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @return The computed quantity.
     vb_tau_pi = function(m, map = FALSE) {
       if (!map) {
-        sum(self$tau[[m]][, which(self$Cpi[, m]), drop = FALSE] %*% log(self$pi[[m]][which(self$Cpi[, m])]))
+        sel <- which(self$Cpi[, m])
+        sum(.xlogy(
+          self$tau[[m]][, sel, drop = FALSE],
+          matrix(
+            self$pi[[m]][sel],
+            nrow(self$tau[[m]]),
+            length(sel),
+            byrow = TRUE
+          )
+        ))
       } else {
         sum(.xlogy(tabulate(self$Z[[m]], self$Q), self$map$pi[[m]]))
       }
@@ -339,10 +358,16 @@ fitSimpleSBMPop <- R6::R6Class(
       }
       delta <- c(1, par[1:self$df_density + df_connect])
       res <-
-        vapply(seq_along(self$A),
+        vapply(
+          seq_along(self$A),
           function(m) {
-            -.5 * sum(emqr[m, , ] * .log(alpha * delta[m], eps = 1e-9) +
-              (nmqr[m, , ] - emqr[m, , ]) * .log(1 - alpha * delta[m], eps = 1e-9))
+            -.5 *
+              sum(
+                emqr[m, , ] *
+                  .log(alpha * delta[m], eps = 1e-9) +
+                  (nmqr[m, , ] - emqr[m, , ]) *
+                    .log(1 - alpha * delta[m], eps = 1e-9)
+              )
           },
           FUN.VALUE = .1
         )
@@ -372,23 +397,33 @@ fitSimpleSBMPop <- R6::R6Class(
         lapply(
           seq_along(self$A),
           function(m) {
-            emqr[m, , ] / pmax(alpha, 1e-9) -
-              (nmqr[m, , ] - emqr[m, , ]) * (delta[m] / pmax(1 - alpha * delta[m], 1e-9))
+            emqr[m, , ] /
+              pmax(alpha, 1e-9) -
+              (nmqr[m, , ] - emqr[m, , ]) *
+                (delta[m] / pmax(1 - alpha * delta[m], 1e-9))
           }
         )
       res_alpha <- Reduce("+", res_alpha)
       res_delta <-
-        vapply(seq_along(self$A),
+        vapply(
+          seq_along(self$A),
           function(m) {
-            sum(emqr[m, , ] / (pmax(delta[m], 1e-9)) -
-              (nmqr[m, , ] - emqr[m, , ]) * (delta[m] / pmax(1 - alpha * delta[m], 1e-9)))
+            sum(
+              emqr[m, , ] /
+                (pmax(delta[m], 1e-9)) -
+                (nmqr[m, , ] - emqr[m, , ]) *
+                  (delta[m] / pmax(1 - alpha * delta[m], 1e-9))
+            )
           },
           FUN.VALUE = .1
         )
       if (self$directed) {
         res <- -c(as.vector(res_alpha), res_delta[2:self$M])
       } else {
-        res <- -c(as.vector(res_alpha[lower.tri(res_alpha, diag = TRUE)]), res_delta[2:self$M])
+        res <- -c(
+          as.vector(res_alpha[lower.tri(res_alpha, diag = TRUE)]),
+          res_delta[2:self$M]
+        )
       }
       invisible(res)
     },
@@ -407,7 +442,9 @@ fitSimpleSBMPop <- R6::R6Class(
           seq(self$M - 1),
           function(m) {
             c(par[1:self$df_density + df_connect])[m] *
-              par[1:df_connect] - 1 + 1e-9
+              par[1:df_connect] -
+              1 +
+              1e-9
           },
           FUN.VALUE = rep(.1, df_connect)
         )
@@ -481,13 +518,15 @@ fitSimpleSBMPop <- R6::R6Class(
         ),
         eval_g_ineq = self$eval_g0_vb_alpha_delta,
         eval_jac_g_ineq = self$eval_jac_g0_vb_alpha_delta,
-        opts = list( # "algorithm" = "NLOPT_LD_MMA",
+        opts = list(
+          # "algorithm" = "NLOPT_LD_MMA",
           "algorithm" = self$fit_opts$nlopt_algo,
           # "local_opts" = list("algorithm" = "NLOPT_LD_LBFGS",
           #                     "xtol_rel" = 1.0e-4),
           "xtol_rel" = 1.0e-4
         ),
-        emqr = emqr, nmqr = nmqr
+        emqr = emqr,
+        nmqr = nmqr
       )
       a <- matrix(0, self$Q, self$Q)
       if (self$directed) {
@@ -511,7 +550,9 @@ fitSimpleSBMPop <- R6::R6Class(
     compute_vbound = function() {
       sum(vapply(
         seq_along(self$A),
-        function(m) self$entropy_tau(m) + self$vb_tau_pi(m) + self$vb_tau_alpha(m),
+        function(m) {
+          self$entropy_tau(m) + self$vb_tau_pi(m) + self$vb_tau_alpha(m)
+        },
         FUN.VALUE = .1
       ))
     },
@@ -525,17 +566,23 @@ fitSimpleSBMPop <- R6::R6Class(
         self$df_mixture <- self$Q - 1
       }
       self$df_density <- self$M - 1
-      self$df_connect <- ifelse(self$directed,
+      self$df_connect <- ifelse(
+        self$directed,
         sum(self$Calpha),
         sum(self$Calpha[lower.tri(self$Calpha, diag = TRUE)])
       )
       df_connect <- self$df_connect
-      if (self$free_density) df_connect <- self$df_connect + self$df_density
-      self$penalty <- .5 * (df_connect * log(sum(self$nb_inter)) +
-        ifelse(self$free_mixture,
-          sum(self$df_mixture * log(self$n)),
-          self$df_mixture * log(sum(self$n))
-        ))
+      if (self$free_density) {
+        df_connect <- self$df_connect + self$df_density
+      }
+      self$penalty <- .5 *
+        (df_connect *
+          log(sum(self$nb_inter)) +
+          ifelse(
+            self$free_mixture,
+            sum(self$df_mixture * log(self$n)),
+            self$df_mixture * log(sum(self$n))
+          ))
       invisible(self$penalty)
     },
 
@@ -555,9 +602,12 @@ fitSimpleSBMPop <- R6::R6Class(
       ICL <-
         sum(vapply(
           seq_along(self$A),
-          function(m) self$vb_tau_pi(m, map = map) + self$vb_tau_alpha(m, map = map),
+          function(m) {
+            self$vb_tau_pi(m, map = map) + self$vb_tau_alpha(m, map = map)
+          },
           FUN.VALUE = .1
-        )) - self$compute_penalty()
+        )) -
+        self$compute_penalty()
       if (map) {
         self$map$ICL <- ICL
       } else {
@@ -568,8 +618,8 @@ fitSimpleSBMPop <- R6::R6Class(
     #' Computes the BICL criterion
     #' @param map Wether to use the MAP parameters or not, a boolean, defaults
     #' to FALSE.
-    #' @return The ICL for the model.
-    compute_BICL = function(map = TRUE) {
+    #' @return The BICL for the model.
+    compute_BICL = function(map = TRUE, ...) {
       # browser()
       #    Z_unique <- lapply(self$Z, function(Z) sort(unique(Z)))
       #    uz <- unique(Z_unique)
@@ -587,8 +637,13 @@ fitSimpleSBMPop <- R6::R6Class(
       #                          sum(df_mixture *log(self$n[self$net_clustering == g])))
       #    }
       #    self$penalty_clustering <- pen
-      self$BICL <- self$compute_vbound() - self$compute_penalty() -
-        ifelse(self$free_mixture, sum(log(choose(self$Q, colSums(self$Cpi)))) + self$M * log(self$Q), 0) #-
+      self$BICL <- self$compute_vbound() -
+        self$compute_penalty() -
+        ifelse(
+          self$free_mixture,
+          sum(log(choose(self$Q, colSums(self$Cpi)))) + self$M * log(self$Q),
+          0
+        ) #-
       #        ifelse(self$free_mixture, self$Q*self$M*log(2), 0)
       # nqr <- colSums(self$map$nmqr, dim = 1)
       # df_mixture <- vapply(seq(self$M), function(m) sum(self$map$pi[[m]] > 0),
@@ -615,13 +670,16 @@ fitSimpleSBMPop <- R6::R6Class(
       df_mixture <- ifelse(self$free_mixture, (self$Q - 1), self$Q - 1)
       df_connect <-
         ifelse(self$directed, self$Q**2, self$Q * (self$Q + 1) / 2)
-      if (self$free_density) df_connect <- df_connect + self$M - 1
+      if (self$free_density) {
+        df_connect <- df_connect + self$M - 1
+      }
       eqr <- colSums(self$emqr, 1)
       nqr <- colSums(self$nmqr, 1)
       if (!self$directed) {
         diag(eqr) <- diag(eqr) / 2
         diag(nqr) <- diag(nqr) / 2
-        exicl <- -df_mixture * lbeta(.5, .5) +
+        exicl <- -df_mixture *
+          lbeta(.5, .5) +
           self$M * (lgamma(.5 * self$Q) - self$Q * lgamma(.5)) +
           sum(lbeta(.5 + eqr, .5 + nqr - eqr)[lower.tri(eqr, diag = TRUE)]) +
           Reduce(
@@ -635,7 +693,8 @@ fitSimpleSBMPop <- R6::R6Class(
             )
           )
       } else {
-        exicl <- df_mixture * (1 / lbeta(.5, .5)) +
+        exicl <- df_mixture *
+          (1 / lbeta(.5, .5)) +
           self$M * (lgamma(.5 * self$Q) - self$Q * lgamma(.5)) +
           sum(lbeta(.5 + eqr, .5 + nqr - eqr)) +
           Reduce(
@@ -667,9 +726,13 @@ fitSimpleSBMPop <- R6::R6Class(
         lapply(
           seq_along(self$A),
           function(m) {
-            -df_mixture * lbeta(.5, .5) +
+            -df_mixture *
+              lbeta(.5, .5) +
               (lgamma(.5 * self$Q) - self$Q * lgamma(.5)) +
-              sum(lbeta(.5 + emqr[m, , ], .5 + nmqr[m, , ] - emqr[m, , ])[lower.tri(emqr[m, , ], diag = TRUE)]) +
+              sum(lbeta(
+                .5 + emqr[m, , ],
+                .5 + nmqr[m, , ] - emqr[m, , ]
+              )[lower.tri(emqr[m, , ], diag = TRUE)]) +
               sum(lgamma(self$n[m] * self$pi[[m]] + .5)) -
               lgamma(sum(self$n[m] * self$pi[[m]] + .5))
           }
@@ -723,26 +786,34 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @param tol The tolerance for which to stop iterating defaults to 1e-2
     #'
     #' @return The new tau values
-    fixed_point_tau = function(m, max_iter = 1, tol = 1e-2) {
+    fixed_point_tau = function(m, max_iter = 1, tol = 1e-6) {
       condition <- TRUE
       it <- 0
       # reup_counter <- 0
       self$vloss[[m]] <-
-        c(self$vloss[[m]], self$vb_tau_alpha(m) + self$vb_tau_pi(m) + self$entropy_tau(m))
+        c(
+          self$vloss[[m]],
+          self$vb_tau_alpha(m) + self$vb_tau_pi(m) + self$entropy_tau(m)
+        )
       tau_old <- t(self$Cpi[, m] * t(self$tau[[m]]))
       Um <- 1 - as.matrix(self$mask[[m]])
       Am <- Um * as.matrix(self$A[[m]])
       while (condition) {
-        tau_new <- switch(self$distribution,
+        tau_new <- switch(
+          self$distribution,
           "bernoulli" = {
             tau_new <-
-              t(matrix(.xlogy(self$Cpi[, m], self$pi[[m]]), self$Q, self$n[m])) +
+              t(matrix(
+                .xlogy(self$Cpi[, m], self$pi[[m]]),
+                self$Q,
+                self$n[m]
+              )) +
               Am %*%
-              tau_old %*%
-              t(.logit(self$delta[m] * self$alpha, eps = 1e-9)) +
+                tau_old %*%
+                t(.logit(self$delta[m] * self$alpha, eps = 1e-9)) +
               Um %*%
-              tau_old %*%
-              t(.log(1 - self$alpha * self$delta[m], eps = 1e-9))
+                tau_old %*%
+                t(.log(1 - self$alpha * self$delta[m], eps = 1e-9))
             if (self$directed) {
               tau_new <- tau_new +
                 crossprod(
@@ -760,13 +831,17 @@ fitSimpleSBMPop <- R6::R6Class(
           },
           "poisson" = {
             tau_new <-
-              t(matrix(.xlogy(self$Cpi[, m], self$pi[[m]]), self$Q, self$n[m])) +
+              t(matrix(
+                .xlogy(self$Cpi[, m], self$pi[[m]]),
+                self$Q,
+                self$n[m]
+              )) +
               Am %*%
-              tau_old %*%
-              t(log(pmax(self$delta[m] * self$alpha, 1e-12))) -
+                tau_old %*%
+                t(log(pmax(self$delta[m] * self$alpha, 1e-12))) -
               Um %*%
-              tau_old %*%
-              t(self$alpha * self$delta[m])
+                tau_old %*%
+                t(self$alpha * self$delta[m])
             if (self$directed) {
               tau_new <- tau_new +
                 crossprod(
@@ -777,7 +852,8 @@ fitSimpleSBMPop <- R6::R6Class(
                 crossprod(
                   Um,
                   tau_old %*%
-                    self$alpha * self$delta[m]
+                    self$alpha *
+                    self$delta[m]
                 )
             }
             invisible(tau_new)
@@ -795,7 +871,11 @@ fitSimpleSBMPop <- R6::R6Class(
         ] <- 1 - 1e-9
         tau_new[, which(self$Cpi[, m])] <-
           tau_new[, which(self$Cpi[, m]), drop = FALSE] /
-            .rowSums(tau_new[, which(self$Cpi[, m]), drop = FALSE], self$n[m], sum(self$Cpi[, m]))
+          .rowSums(
+            tau_new[, which(self$Cpi[, m]), drop = FALSE],
+            self$n[m],
+            sum(self$Cpi[, m])
+          )
         tau_new[, which(!self$Cpi[, m])] <- 0
         it <- it + 1
         emqr <- .tquadform(tau_new, Am)
@@ -804,24 +884,36 @@ fitSimpleSBMPop <- R6::R6Class(
         nmqr[is.nan(nmqr)] <- 0
         if (it >= 1) {
           if (self$distribution == "bernoulli") {
-            vl <- self$dircoef * sum(
-              outer(self$Cpi[, m], self$Cpi[, m]) * (
-                .xlogy(emqr, self$alpha * self$delta[m], eps = 1e-12) +
-                  .xlogy(nmqr - emqr, 1 - self$alpha * self$delta[m], eps = 1e-12))
-            ) +
-              sum(tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
-                log(self$pi[[m]][which(self$Cpi[, m])])) -
-              sum(.xlogx(tau_new[which(self$Cpi[, m])]))
+            vl <- self$dircoef *
+              sum(
+                outer(self$Cpi[, m], self$Cpi[, m]) *
+                  (.xlogy(emqr, self$alpha * self$delta[m], eps = 1e-12) +
+                    .xlogy(
+                      nmqr - emqr,
+                      1 - self$alpha * self$delta[m],
+                      eps = 1e-12
+                    ))
+              ) +
+              sum(
+                tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
+                  log(self$pi[[m]][which(self$Cpi[, m])])
+              ) -
+              sum(.xlogx(tau_new[, which(self$Cpi[, m])]))
           }
           if (self$distribution == "poisson") {
-            vl <- self$dircoef * sum(
-              outer(self$Cpi[, m], self$Cpi[, m]) * (
-                emqr * log(pmax(self$alpha * self$delta[m], 1e-12)) -
-                  nmqr * self$alpha * self$delta[m])
-            ) +
-              sum(tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
-                log(self$pi[[m]][which(self$Cpi[, m])])) -
-              sum(.xlogx(tau_new[which(self$Cpi[, m])])) - self$logfactA[m]
+            vl <- self$dircoef *
+              sum(
+                outer(self$Cpi[, m], self$Cpi[, m]) *
+                  (emqr *
+                    log(pmax(self$alpha * self$delta[m], 1e-12)) -
+                    nmqr * self$alpha * self$delta[m])
+              ) +
+              sum(
+                tau_new[, which(self$Cpi[, m]), drop = FALSE] %*%
+                  log(self$pi[[m]][which(self$Cpi[, m])])
+              ) -
+              sum(.xlogx(tau_new[, which(self$Cpi[, m])])) -
+              self$logfactA[m]
           }
           self$vloss[[m]] <- c(self$vloss[[m]], vl)
           up <- self$vloss[[m]][length(self$vloss[[m]])] >
@@ -829,19 +921,14 @@ fitSimpleSBMPop <- R6::R6Class(
         } else {
           up <- TRUE
         }
-        # if (self$vloss[[m]][length(self$vloss[[m]])] <
-        #     self$vloss[[m]][length(self$vloss[[m]]) - 1] & it == 1 & reup_counter == 0) {
-        #     tau_old <- t(vapply(seq(self$n[m]),
-        #                     function(i) gtools::rdirichlet(1, exp(self$tau[[m]][i])/sum(exp(self$tau[[m]][i]))),
-        #                     FUN.VALUE = rep(.1, self$Q)))
-        #     it == 0
-        # }
-        if (up) {
+
+        if (isTRUE(up)) {
           self$tau[[m]] <- tau_new
           tau_old <- tau_new
         }
         condition <- mean((tau_new - tau_old)**2) > tol &
-          it < max_iter & up
+          it < max_iter &
+          isTRUE(up)
       }
       invisible(self$tau[[m]])
     },
@@ -873,6 +960,7 @@ fitSimpleSBMPop <- R6::R6Class(
       while (condition) {
         d <- rowSums(emqr, dim = 1) /
           rowSums(aperm(array(a, c(self$Q, self$Q, self$M))) * nmqr, dim = 1)
+        d[!is.finite(d)] <- 0
         d[1] <- 1
         a <- colSums(emqr, dim = 1) /
           colSums(array(d, c(self$M, self$Q, self$Q)) * nmqr, dim = 1)
@@ -906,7 +994,8 @@ fitSimpleSBMPop <- R6::R6Class(
           self$pi[[m]] <- self$pim[[m]]
         } else {
           # A changer, update juste pim a chaque m puis dire pi = sum(n*pim)/sum(n)
-          pi1 <- vapply(seq(self$M),
+          pi1 <- vapply(
+            seq(self$M),
             function(x) self$n[x] * self$pim[[x]],
             FUN.VALUE = rep(.1, self$Q)
           )
@@ -921,7 +1010,8 @@ fitSimpleSBMPop <- R6::R6Class(
           self$map$pi[[m]] <- self$map$pim[[m]]
           #          pi <- tabulate(self$Z[[m]], self$Q)/self$n[m]
         } else {
-          pi1 <- vapply(seq(self$M),
+          pi1 <- vapply(
+            seq(self$M),
             function(x) self$n[x] * self$map$pim[[x]],
             FUN.VALUE = rep(.1, self$Q)
           )
@@ -960,11 +1050,15 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @return the alpham and stores the values
     update_alpham = function(m, map = FALSE) {
       if (!map) {
-        alpham <- outer(self$Cpi[, m], self$Cpi[, m]) * self$emqr[m, , ] / self$nmqr[m, , ]
+        alpham <- outer(self$Cpi[, m], self$Cpi[, m]) *
+          self$emqr[m, , ] /
+          self$nmqr[m, , ]
         alpham[is.nan(alpham)] <- 0
         self$alpham[[m]] <- alpham
       } else {
-        alpham <- outer(self$Cpi[, m], self$Cpi[, m]) * self$map$emqr[m, , ] / self$map$nmqr[m, , ]
+        alpham <- outer(self$Cpi[, m], self$Cpi[, m]) *
+          self$map$emqr[m, , ] /
+          self$map$nmqr[m, , ]
         alpham[is.nan(alpham)] <- 0
         self$map$alpham[[m]] <- alpham
       }
@@ -978,11 +1072,13 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @return the alpha and stores the values
     update_alpha = function(map = FALSE) {
       if (!map) {
-        alpha <- self$Calpha * (colSums(self$emqr, dims = 1) / colSums(self$nmqr, dims = 1))
+        alpha <- self$Calpha *
+          (colSums(self$emqr, dims = 1) / colSums(self$nmqr, dims = 1))
         alpha[is.nan(alpha)] <- 0
         self$alpha <- alpha
       } else {
-        alpha <- self$Calpha * (colSums(self$map$emqr, dims = 1) / colSums(self$map$nmqr, dims = 1))
+        alpha <- self$Calpha *
+          (colSums(self$map$emqr, dims = 1) / colSums(self$map$nmqr, dims = 1))
         alpha[is.nan(alpha)] <- 0
         self$map$alpha <- alpha
       }
@@ -994,7 +1090,8 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @importFrom gtools rdirichlet
     init_clust = function() {
       self$tau <-
-        switch(self$init_method,
+        switch(
+          self$init_method,
           "random" = lapply(
             X = seq_along(self$A),
             FUN = function(m) {
@@ -1017,9 +1114,13 @@ fitSimpleSBMPop <- R6::R6Class(
             FUN = function(m) {
               Um <- 1 - as.matrix(self$mask[[m]])
               Am <- as.matrix(self$A[[m]]) * Um
-              tau_tmp <- .one_hot(spectral_clustering(
-                as.matrix(self$A[[m]]), self$Q
-              ), self$Q)
+              tau_tmp <- .one_hot(
+                spectral_clustering(
+                  as.matrix(self$A[[m]]),
+                  self$Q
+                ),
+                self$Q
+              )
               tau_tmp[tau_tmp < 1e-6] <- 1e-6
               tau_tmp[tau_tmp > 1 - 1e-6] <- 1 - 1e-6
               tau_tmp <- tau_tmp / .rowSums(tau_tmp, self$n[m], self$Q)
@@ -1045,7 +1146,6 @@ fitSimpleSBMPop <- R6::R6Class(
                   .threshold(tau_tmp[, self$Cpi[, m], drop = FALSE])
                 self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
                 self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
-                tau_tmp
               } else {
                 tau_tmp <- .one_hot(self$Z[[m]], self$Q)
                 tau_tmp[, self$Cpi[, m]] <-
@@ -1056,14 +1156,12 @@ fitSimpleSBMPop <- R6::R6Class(
                 #   .rowSums(tau_tmp[,self$Cpi[,m], drop = FALSE], self$n[m], sum(self$Cpi[,m]))
                 self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
                 self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
-                # a <- self$emqr[m,,]/self$nmqr[m,,]
-                # prob <- self$Q*diag(a) #+ rowSums(a)
-                # p <- sample(self$Q, prob = prob)
-                # tau_tmp <- tau_tmp[,p]
-                # self$emqr[m,,] <- self$emqr[m,p,p]
-                # self$nmqr[m,,] <- self$nmqr[m,p,p]
-                tau_tmp
               }
+              a <- self$emqr[m, , ] / self$nmqr[m, , ]
+              p <- order(diag(a), decreasing = TRUE)
+              tau_tmp <- tau_tmp[, p]
+              self$emqr[m, , ] <- self$emqr[m, p, p]
+              self$nmqr[m, , ] <- self$nmqr[m, p, p]
               tau_tmp
             }
           ),
@@ -1073,19 +1171,34 @@ fitSimpleSBMPop <- R6::R6Class(
               Um <- 1 - as.matrix(self$mask[[m]])
               Am <- as.matrix(self$A[[m]]) * Um
               tau_tmp <- self$tau[[m]]
+              if (is.null(tau_tmp)) {
+                if (is.matrix(self$Z[[m]])) {
+                  tau_tmp <- self$Z[[m]]
+                } else {
+                  tau_tmp <- .one_hot(self$Z[[m]], self$Q)
+                }
+              }
               tau_tmp[, which(!self$Cpi[, m])] <- 0
               tau_tmp[, self$Cpi[, m]] <-
                 .threshold(tau_tmp[, self$Cpi[, m], drop = FALSE])
               self$emqr[m, , ] <- .tquadform(tau_tmp, Am)
               self$nmqr[m, , ] <- .tquadform(tau_tmp, Um)
+              a <- self$emqr[m, , ] / self$nmqr[m, , ]
+              p <- order(diag(a), decreasing = TRUE)
+              tau_tmp <- tau_tmp[, p]
+              self$emqr[m, , ] <- self$emqr[m, p, p]
+              self$nmqr[m, , ] <- self$nmqr[m, p, p]
               tau_tmp
             }
           )
         )
       lapply(seq(self$M), function(m) self$update_alpham(m))
       # To have a good initialization point for gradient descent
-      if (self$distribution == "bernoulli" & self$free_density &
-        !self$fit_opts$approx_pois) {
+      if (
+        self$distribution == "bernoulli" &
+          self$free_density &
+          !self$fit_opts$approx_pois
+      ) {
         self$fixed_point_alpha_delta()
       }
     },
@@ -1109,13 +1222,14 @@ fitSimpleSBMPop <- R6::R6Class(
       if (self$free_density == FALSE) {
         self$update_alpha(map = map)
       } else {
-        switch(self$distribution,
+        switch(
+          self$distribution,
           "poisson" = self$fixed_point_alpha_delta(map = map),
-          "bernoulli" =
-            ifelse(self$fit_opts$approx_pois,
-              self$fixed_point_alpha_delta(map = map),
-              self$update_alpha_delta(map = map)
-            )
+          "bernoulli" = ifelse(
+            self$fit_opts$approx_pois,
+            self$fixed_point_alpha_delta(map = map),
+            self$update_alpha_delta(map = map)
+          )
         )
       }
     },
@@ -1141,8 +1255,10 @@ fitSimpleSBMPop <- R6::R6Class(
       tau_tmp <- self$tau[[m]]
       Um <- 1 - as.matrix(self$mask[[m]])
       Am <- as.matrix(self$A[[m]]) * Um
-      self$emqr[m, , ] <- outer(self$Cpi[, m], self$Cpi[, m]) * .tquadform(tau_tmp, Am)
-      self$nmqr[m, , ] <- outer(self$Cpi[, m], self$Cpi[, m]) * .tquadform(tau_tmp, Um)
+      self$emqr[m, , ] <- outer(self$Cpi[, m], self$Cpi[, m]) *
+        .tquadform(tau_tmp, Am)
+      self$nmqr[m, , ] <- outer(self$Cpi[, m], self$Cpi[, m]) *
+        .tquadform(tau_tmp, Um)
     },
     #' Perform the whole initialization and VEM algorithm
     #'
@@ -1151,7 +1267,11 @@ fitSimpleSBMPop <- R6::R6Class(
     #' @param ... Other parameters
     #'
     #' @return nothing; stores values
-    optimize = function(max_step = self$fit_opts$max_step, tol = 1e-3, ...) {
+    optimize = function(
+      max_step = self$fit_opts$max_vem_steps,
+      tol = self$fit_opts$tolerance,
+      ...
+    ) {
       if (self$Q == 1) {
         self$tau <- lapply(seq(self$M), function(m) matrix(1, self$n[m], 1))
         self$Z <- lapply(seq(self$M), function(m) rep(1, self$n[m]))
@@ -1159,7 +1279,11 @@ fitSimpleSBMPop <- R6::R6Class(
         self$pim <- lapply(seq(self$M), function(m) 1)
         lapply(seq(self$M), function(m) self$update_mqr(m))
         if (self$free_density) {
-          self$alpha <- matrix(sum(self$emqr[1, , ]) / sum(self$nmqr[1, , ]), 1, 1)
+          self$alpha <- matrix(
+            sum(self$emqr[1, , ]) / sum(self$nmqr[1, , ]),
+            1,
+            1
+          )
           self$delta <- vapply(
             seq(self$M),
             function(m) {
@@ -1173,7 +1297,9 @@ fitSimpleSBMPop <- R6::R6Class(
         }
         self$alpham <- lapply(
           seq(self$M),
-          function(m) matrix(sum(self$emqr[m, , ]) / sum(self$nmqr[m, , ]), 1, 1)
+          function(m) {
+            matrix(sum(self$emqr[m, , ]) / sum(self$nmqr[m, , ]), 1, 1)
+          }
         )
         self$map <- list(
           Z = self$tau,
@@ -1188,57 +1314,66 @@ fitSimpleSBMPop <- R6::R6Class(
       } else {
         #  browser()
         self$init_clust()
-        # lapply(seq(self$M), function(m) self$update_mqr(m))
-        self$m_step(...)
-        lapply(seq(self$M), function(m) self$update_pim(m, map = FALSE))
-        if (self$free_mixture) {
-          self$pi <- self$pim
+        if (self$fit_opts$use_cpp) {
+          self$cpp_computation(max_step = max_step, tol = tol)
         } else {
-          self$update_pi(1, map = FALSE)
-        }
-        step <- 0
-        vb <- self$compute_vbound()
-        self$vbound <- vb
-        step_condition <- TRUE
-        while (step_condition) {
-          if (!self$fit_opts$minibatch) {
-            lapply(
-              seq(self$M),
-              function(m) {
-                switch(self$fit_opts$algo_ve,
-                  "fp" = self$fixed_point_tau(m),
-                  self$ve_step(m, ...)
-                )
-                self$update_mqr(m)
-              }
-            )
-            lapply(seq_along(self$pi), function(m) self$update_pi(m, map = FALSE))
-            self$m_step(...)
+          # lapply(seq(self$M), function(m) self$update_mqr(m))
+          self$m_step(...)
+          lapply(seq(self$M), function(m) self$update_pim(m, map = FALSE))
+          if (self$free_mixture) {
+            self$pi <- self$pim
           } else {
-            seq_m <- sample.int(self$M)
-            lapply(
-              seq(self$M),
-              function(m) {
-                switch(self$fit_opts$algo_ve,
-                  "fp" = self$fixed_point_tau(seq_m[m]),
-                  self$ve_step(seq_m[m], ...)
-                )
-                self$update_mqr(seq_m[m])
-                self$update_pi(seq_m[m], map = FALSE)
-                self$m_step(...)
-              }
-            )
+            self$update_pi(1, map = FALSE)
           }
+          step <- 0
           vb <- self$compute_vbound()
-          self$vbound <- c(self$vbound, vb)
-          step <- step + 1
-          step_condition <- step < max_step &
-            self$vbound[length(self$vbound)] -
-              self$vbound[length(self$vbound) - 1] > tol
-          if (step %% 5 == 0) {
-            if (self$fit_opts$verbosity >= 1) {
-              print(paste0(step, ": ", vb))
-              print(self$alpha)
+          self$vbound <- vb
+          step_condition <- TRUE
+          while (step_condition) {
+            if (!self$fit_opts$minibatch) {
+              lapply(
+                seq(self$M),
+                function(m) {
+                  switch(
+                    self$fit_opts$algo_ve,
+                    "fp" = self$fixed_point_tau(m),
+                    self$ve_step(m, ...)
+                  )
+                  self$update_mqr(m)
+                }
+              )
+              lapply(seq_along(self$pi), function(m) {
+                self$update_pi(m, map = FALSE)
+              })
+              self$m_step(...)
+            } else {
+              seq_m <- sample.int(self$M)
+              lapply(
+                seq(self$M),
+                function(m) {
+                  switch(
+                    self$fit_opts$algo_ve,
+                    "fp" = self$fixed_point_tau(seq_m[m]),
+                    self$ve_step(seq_m[m], ...)
+                  )
+                  self$update_mqr(seq_m[m])
+                  self$update_pi(seq_m[m], map = FALSE)
+                  self$m_step(...)
+                }
+              )
+            }
+            vb <- self$compute_vbound()
+            self$vbound <- c(self$vbound, vb)
+            step <- step + 1
+            step_condition <- step < max_step &
+              self$vbound[length(self$vbound)] -
+                self$vbound[length(self$vbound) - 1] >
+                tol
+            if (step %% 5 == 0) {
+              if (self$fit_opts$verbosity >= 1) {
+                print(paste0(step, ": ", vb))
+                print(self$alpha)
+              }
             }
           }
         }
@@ -1252,6 +1387,7 @@ fitSimpleSBMPop <- R6::R6Class(
         } else {
           self$update_pi(1, map = TRUE)
         }
+        self$reorder_parameters()
         #  self$compute_parameters()
         #    self$compute_icl()
       }
@@ -1265,14 +1401,104 @@ fitSimpleSBMPop <- R6::R6Class(
       self$compute_icl(map = TRUE)
       self$compute_BICL()
     },
+    #' To reorder the parameters according to diag(alpha)
+    #' decreasing order
+    #' @return nothing
+    reorder_parameters = function() {
+      if (self$Q != 1) {
+        lapply(seq(self$M), function(m) {
+          ord_m <- order(diag(self$alpham[[m]]), decreasing = TRUE)
+          self$Z[[m]] <- Z_label_switch(self$Z[[m]], ord_m)
+          self$tau[[m]] <- self$tau[[m]][, ord_m]
+          self$Cpi[, m] <- self$Cpi[ord_m, m, drop = FALSE]
+          self$pim[[m]] <- self$pim[[m]][ord_m]
+          self$pi[[m]] <- self$pi[[m]][ord_m]
+          self$emqr[m, , ] <- self$emqr[m, ord_m, ord_m]
+          self$nmqr[m, , ] <- self$nmqr[m, ord_m, ord_m]
+          self$alpham[[m]] <- matrix(
+            self$alpham[[m]][ord_m, ord_m, drop = FALSE],
+            nrow = self$Q,
+            ncol = self$Q
+          )
+
+          # MAP
+          self$map$Z[[m]] <- self$map$Z[[m]][, ord_m]
+          self$map$pim[[m]] <- self$map$pim[[m]][ord_m]
+          self$map$pi[[m]] <- self$map$pi[[m]][ord_m]
+          self$map$emqr[m, , ] <- self$map$emqr[m, ord_m, ord_m]
+          self$map$nmqr[m, , ] <- self$map$nmqr[m, ord_m, ord_m]
+          self$map$alpham[[m]] <- matrix(
+            self$map$alpham[[m]][ord_m, ord_m, drop = FALSE],
+            nrow = self$Q,
+            ncol = self$Q
+          )
+        })
+        self$update_alpha()
+        self$update_alpha(map = TRUE)
+      }
+    },
+    #' Used to compute with C++ reimplementation
+    #' @param max_step the maximum number of steps for the VEM
+    #' Defaults to `fit_opts$max_vem_steps`.
+    #' @param tol the tolerance for the stopping criterion.
+    #' Defaults to `fit_opts$tolerance`.
+    cpp_computation = function(
+      max_step = self$fit_opts$max_vem_steps,
+      tol = self$fit_opts$tolerance
+    ) {
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Creating C++ object for Q=", self$Q, "\n")
+      }
+      ptr <- colsbm_create(
+        A = self$A,
+        Q = self$Q,
+        tau = self$tau,
+        directed = self$directed,
+        distribution = self$distribution,
+        free_mixture = self$free_mixture,
+        free_density = self$free_density,
+        Cpi = self$Cpi,
+        Calpha = self$Calpha
+      )
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Starting C++ VEM\n")
+      }
+      colsbm_optimize(ptr, max_step = max_step, tol = tol)
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Finished C++ VEM, exporting back to R\n")
+      }
+      info <- colsbm_info(ptr)
+      if (self$fit_opts$verbosity >= 2) {
+        cat("Took ", info$iterations, " steps of VEM\n")
+      }
+      self$alpha <- info[["alpha"]]
+      self$delta <- info[["delta"]]
+      self$alpham <- info[["alpham"]]
+      self$pim <- info[["pim"]]
+      self$pi <- info[["pi"]]
+      self$tau <- info[["tau"]]
+      self$emqr <- aperm(info[["emqr"]], c(3, 1, 2))
+      self$nmqr <- aperm(info[["nmqr"]], c(3, 1, 2))
+      self$vbound <- info$vbound
+      self$vloss <- info$vloss
+
+      # The C++ reorders blocks (and thus Cpi) during optimization; read the
+      # support back so it matches the final block ordering.
+      self$Cpi <- info$Cpi > 0
+      self$Calpha <- info$Calpha > 0
+    },
     #' The message printed when one prints the object
     #' @param type The title above the message.
     show = function(type = "Fitted Collection of Simple SBM") {
       cat(type, "--", self$distribution, "variant for", self$M, "networks \n")
-      cat("=====================================================================\n")
+      cat(
+        "=====================================================================\n"
+      )
       cat("Dimension = (", self$n, ") - (", self$Q, ") blocks.\n")
       cat("BICL = ", self$BICL, " -- #Empty blocks : ", sum(!self$Cpi), " \n")
-      cat("=====================================================================\n")
+      cat(
+        "=====================================================================\n"
+      )
       cat("* Useful fields \n")
       cat("  $distribution, $nb_nodes, $nb_clusters, $support, $Z \n")
       cat("  $memberships, $parameters, $BICL, $vbound, $pred_dyads \n")
