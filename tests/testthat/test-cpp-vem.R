@@ -302,3 +302,25 @@ test_that("cpp VE yields the same results as the R procedure on core-periphery n
     rep(1, M)
   )
 })
+
+test_that("cpp warns when the VEM does not converge within max_step", {
+  set.seed(1)
+  n <- 20L
+  A <- list(matrix(rbinom(n * n, 1, 0.3), n, n))
+  diag(A[[1]]) <- 0
+  Q <- 2L
+  tau <- list(matrix(runif(n * Q), n, Q))
+  tau[[1]] <- tau[[1]] / rowSums(tau[[1]])
+
+  ptr <- colsbm_create(
+    A = A,
+    Q = Q,
+    tau = tau,
+    directed = TRUE,
+    distribution = "bernoulli"
+  )
+  expect_warning(
+    colsbm_optimize(ptr, max_step = 5L, tol = 1e-12),
+    "failed to converge"
+  )
+})
