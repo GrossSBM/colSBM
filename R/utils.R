@@ -353,22 +353,88 @@ generate_bipartite_collection <- function(
   return(out)
 }
 
-#' Perform a spectral clustering
+#' Cluster the rows of the spectral embedding with kmeans, retrying with a
+#' larger iteration budget on non-convergence and falling back to a
+#' hierarchical clustering if kmeans still fails.
 #'
-#' @importFrom stats kmeans
+#' @param U A matrix whose rows are to be clustered.
+#' @param K The number of clusters.
+#' @param nstart The number of random starts for kmeans.
+#' @param iter.max The maximum number of kmeans iterations.
+#' @param iter.max.retry A larger iteration budget used to retry kmeans when
+#' the first fit did not converge.
 #'
-#' @param X an adjacency matrix
-#' @param K the number of clusters
-#' @param kmeans.nstart the number of random starts for the kmeans algorithm.
-#' Defaults to 400. Ensures consistency of the results.
-#' @param kmeans.iter.max the maximum number of iterations for the kmeans
-#' algorithm. Defaults to 50.
+#' @return An integer vector of cluster memberships.
+#' @noRd
+spectral_kmeans <- function(
+  U,
+  K,
+  nstart = 400L,
+  iter.max = 1000L,
+  iter.max.retry = 1e5L
+) {
+  # Cap K on the number of distinct rows so that kmeans cannot fail with
+  # "more cluster centers than distinct data points".
+  K_eff <- min(K, nrow(unique(U)))
+  if (K_eff < K) {
+    cli::cli_warn(
+      "Asked for {.val {K}} clusters but can only provide {.val {K_eff}}. Results might be inaccurate."
+    )
+  }
+  if (K_eff < 2) {
+    return(rep(1L, nrow(U)))
+  }
+  fit_kmeans <- function(imax) {
+    km <- try(
+      suppressWarnings(
+        stats::kmeans(U, K_eff, iter.max = imax, nstart = nstart)
+      ),
+      silent = TRUE
+    )
+    if (inherits(km, "try-error")) {
+      return(km)
+    }
+    cl <- km$cluster
+    # Non-convergence is signalled either by the ifault field (1) or by the
+    # iteration count hitting the budget. Both are locale-independent, unlike
+    # the warning message emitted by stats::kmeans.
+    not_converged <- isTRUE(km$ifault == 1L) || isTRUE(km$iter >= imax)
+    attr(cl, "not_converged") <- not_converged
+    cl
+  }
+  cl <- try(fit_kmeans(iter.max), silent = TRUE)
+  if (!inherits(cl, "try-error") && isTRUE(attr(cl, "not_converged"))) {
+    cl <- try(fit_kmeans(iter.max.retry), silent = TRUE)
+  }
+  if (inherits(cl, "try-error") || isTRUE(attr(cl, "not_converged"))) {
+    cl <- try(
+      stats::cutree(
+        stats::hclust(stats::dist(U), method = "ward.D2"),
+        k = K_eff
+      ),
+      silent = TRUE
+    )
+  }
+  if (inherits(cl, "try-error")) {
+    cli::cli_warn(c(
+      "There errors while trying to perform spectral clustering, hierarchical clustering failed.",
+      "i" = "The clustering returned will be all {.val 1}."
+    ))
+    cl <- rep(1L, nrow(U))
+  }
+  as.integer(cl)
+}
+
+#' Cluster the rows of the spectral embedding, using kmeans with a robust
+#' fallback.
 #'
-#' @return A vector : The clusters labels
+#' @param U A matrix whose rows are to be clustered.
+#' @param K The number of clusters.
+#' @param kmeans.nstart The number of random starts for kmeans.
+#' @param kmeans.iter.max The maximum number of kmeans iterations.
 #'
 #' @keywords internal
-#'
-#' @return A vector : The clusters labels
+#' @return An integer vector of cluster memberships.
 spectral_clustering <- function(
   X,
   K,
@@ -395,7 +461,10 @@ spectral_clustering <- function(
   Labs <- D_moins1_2 %*% X %*% D_moins1_2
   specabs <- eigen(Labs, symmetric = TRUE)
   if (K >= nrow(X)) {
-    message("Too many clusters for Spectral Clustering")
+    cli::cli_inform(c(
+      "Too many clusters for Spectral Clustering",
+      "i" = "Asked for {.val K={K}}, can provide at max {.val K_eff={nrow(X)}}"
+    ))
     K_old <- K
     K <- nrow(X) - 1
   }
@@ -406,30 +475,12 @@ spectral_clustering <- function(
     U[is.na(U)] <- 0
     U[is.nan(U)] <- 0
     U[is.infinite(U)] <- 0
-    cl <- try(
-      expr = {
-        stats::kmeans(
-          U,
-          K,
-          iter.max = kmeans.iter.max,
-          nstart = kmeans.nstart
-        )$cluster
-      },
-      silent = TRUE
+    cl <- spectral_kmeans(
+      U,
+      K,
+      nstart = kmeans.nstart,
+      iter.max = kmeans.iter.max
     )
-    while (inherits(cl, "try-error")) {
-      cl <- try(
-        expr = {
-          stats::kmeans(
-            U,
-            K,
-            iter.max = kmeans.iter.max,
-            nstart = kmeans.nstart
-          )$cluster
-        },
-        silent = TRUE
-      )
-    }
   } else {
     cl <- rep(1, nrow(X))
   }
@@ -692,6 +743,8 @@ default_fit_opts_unipartite <- function() {
     use_cpp = FALSE,
     tolerance = 1e-3,
     max_vem_steps = 1000L,
+    kmeans_nstart = 400L,
+    kmeans_iter_max = 1000L,
     nlopt_algo = "NLOPT_LD_MMA"
   )
 }

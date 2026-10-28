@@ -132,7 +132,9 @@ cpp_estimate_colSBM <-
         spectral_clustering,
         backend = global_opts[["backend"]],
         nb_cores = global_opts[["nb_cores"]],
-        K = 2
+        K = 2,
+        kmeans.nstart = fit_opts$kmeans_nstart,
+        kmeans.iter.max = fit_opts$kmeans_iter_max
       )
       spectral_taus <- lapply(spectral_inits, .one_hot, Q = 2)
       spectral_taus <- lapply(spectral_taus, function(mat) {

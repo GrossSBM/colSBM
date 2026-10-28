@@ -56,7 +56,17 @@ test_that("clusterize_unipartite_networks_iid", {
     {
       cl$partition[[1]]$M
     },
-    4L
+    2L
+  )
+  expect_identical(
+    sort(unname(cl$cluster)),
+    c(1, 1, 2, 2)
+  )
+  expect_identical(
+    {
+      cl$partition[[1]]$Q
+    },
+    1L
   )
 })
 

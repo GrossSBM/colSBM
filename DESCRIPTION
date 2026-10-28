@@ -31,8 +31,6 @@ Imports:
     progressr,
     purrr,
     R6,
-    Rcpp,
-    RcppArmadillo,
     reshape2,
     rlang,
     sbm,
