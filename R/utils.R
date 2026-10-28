@@ -416,6 +416,10 @@ spectral_kmeans <- function(
     )
   }
   if (inherits(cl, "try-error")) {
+    cli::cli_warn(c(
+      "There errors while trying to perform spectral clustering, hierarchical clustering failed.",
+      "i" = "The clustering returned will be all {.val 1}."
+    ))
     cl <- rep(1L, nrow(U))
   }
   as.integer(cl)
