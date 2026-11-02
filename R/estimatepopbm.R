@@ -196,6 +196,7 @@ clusterize_unipartite_networks <- function(
             distribution = distribution,
             nb_run = min(sum(cl == k), nb_run),
             Z_init = Z_init,
+            directed = fit$directed,
             global_opts = global_opts,
             fit_opts = fit_opts,
             fit_sbm = fit$fit_sbm[cl == k],

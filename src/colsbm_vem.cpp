@@ -570,7 +570,7 @@ void ColSBM::optimize(int max_step, double tol = VBOUND_TOL) {
         break;
       }
     }
-    if (iterations > max_step) {
+    if (iterations >= max_step) {
       Rcpp::warning("The VEM failed to converge in %i max steps for Q=%i !",
                     max_step, Q);
     }

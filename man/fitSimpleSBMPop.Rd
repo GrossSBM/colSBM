@@ -580,7 +580,7 @@ Method to update tau values with a fixed-point algorithm
 \subsection{\code{fitSimpleSBMPop$fixed_point_tau()}}{
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
-    \preformatted{fitSimpleSBMPop$fixed_point_tau(m, max_iter = 1, tol = 0.01)}
+    \preformatted{fitSimpleSBMPop$fixed_point_tau(m, max_iter = 1, tol = 1e-06)}
     \if{html}{\out{</div>}}
   }
   \subsection{Arguments}{

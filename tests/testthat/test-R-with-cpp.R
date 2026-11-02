@@ -33,6 +33,31 @@ test_that("R with C++ yields the same results as the R procedure on modular netw
     global_opts = list(verbosity = 2L),
     nb_run = 1L
   )
+
+  # Both procedures return a fitted collection with a best model
+  expect_s3_class(cpp_fit, "bmpop")
+  expect_s3_class(R_fit, "bmpop")
+  expect_s3_class(cpp_fit$best_fit, "fitSimpleSBMPop")
+  expect_s3_class(R_fit$best_fit, "fitSimpleSBMPop")
+
+  # Both procedures select the same number of blocks
+  expect_identical(cpp_fit$best_fit$Q, R_fit$best_fit$Q)
+
+  # Comparable objective values and parameters
+  expect_equal(cpp_fit$best_fit$BICL, R_fit$best_fit$BICL, tolerance = 1e-2)
+  expect_equal(
+    cpp_fit$best_fit$alpham,
+    R_fit$best_fit$alpham,
+    tolerance = 1e-1
+  )
+
+  # The recovered clusterings coincide
+  expect_identical(
+    sapply(seq_along(A), function(m) {
+      aricode::ARI(R_fit$best_fit$Z[[m]], cpp_fit$best_fit$Z[[m]])
+    }),
+    rep(1, length(A))
+  )
 })
 
 test_that("R with C++ yields the same results as the R procedure on core-periphery networks", {

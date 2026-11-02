@@ -2,27 +2,25 @@
 % Please edit documentation in R/utils.R
 \name{spectral_clustering}
 \alias{spectral_clustering}
-\title{Perform a spectral clustering}
+\title{Cluster the rows of the spectral embedding, using kmeans with a robust
+fallback.}
 \usage{
 spectral_clustering(X, K, kmeans.nstart = 400L, kmeans.iter.max = 1000L)
 }
 \arguments{
-\item{X}{an adjacency matrix}
+\item{K}{The number of clusters.}
 
-\item{K}{the number of clusters}
+\item{kmeans.nstart}{The number of random starts for kmeans.}
 
-\item{kmeans.nstart}{the number of random starts for the kmeans algorithm.
-Defaults to 400. Ensures consistency of the results.}
+\item{kmeans.iter.max}{The maximum number of kmeans iterations.}
 
-\item{kmeans.iter.max}{the maximum number of iterations for the kmeans
-algorithm. Defaults to 50.}
+\item{U}{A matrix whose rows are to be clustered.}
 }
 \value{
-A vector : The clusters labels
-
-A vector : The clusters labels
+An integer vector of cluster memberships.
 }
 \description{
-Perform a spectral clustering
+Cluster the rows of the spectral embedding, using kmeans with a robust
+fallback.
 }
 \keyword{internal}

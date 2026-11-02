@@ -1117,7 +1117,9 @@ fitSimpleSBMPop <- R6::R6Class(
               tau_tmp <- .one_hot(
                 spectral_clustering(
                   as.matrix(self$A[[m]]),
-                  self$Q
+                  self$Q,
+                  kmeans.nstart = self$fit_opts$kmeans_nstart,
+                  kmeans.iter.max = self$fit_opts$kmeans_iter_max
                 ),
                 self$Q
               )

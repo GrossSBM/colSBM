@@ -12,11 +12,9 @@ spectral_biclustering(A, Q, kmeans.nstart = 400L, kmeans.iter.max = 1000L)
 
 \item{Q}{the two numbers of clusters}
 
-\item{kmeans.nstart}{the number of random starts for the kmeans algorithm.
-Defaults to 400. Ensures consistency of the results.}
+\item{kmeans.nstart}{The number of random starts for kmeans.}
 
-\item{kmeans.iter.max}{the maximum number of iterations for the kmeans
-algorithm. Defaults to 50.}
+\item{kmeans.iter.max}{The maximum number of kmeans iterations.}
 }
 \value{
 A list of two vectors : The clusters labels. They are accessed using
