@@ -15,7 +15,8 @@ test_that("plot.bmpop and plot.fitSimpleSBMPop plot without error", {
     }
   )
 
-  cl <- estimate_colSBM(Net,
+  cl <- estimate_colSBM(
+    Net,
     colsbm_model = "delta",
     directed = FALSE,
     distribution = "bernoulli",
@@ -57,7 +58,6 @@ test_that("plot.bisbmpop plot.fitBipartiteSBMPop plot without error", {
     M = 2
   )
 
-
   # A collection where joint modelisation makes sense
   cl_bipartite <- estimate_colBiSBM(
     netlist = first_collection,
@@ -77,8 +77,10 @@ test_that("plot.bisbmpop plot.fitBipartiteSBMPop plot without error", {
   expect_no_error(plot(cl_bipartite$best_fit, type = "meso"))
   expect_no_error(plot(cl_bipartite$best_fit, type = "meso", values = TRUE))
   expect_no_error(plot(cl_bipartite$best_fit, type = "meso", mixture = TRUE))
-  expect_no_error(plot(cl_bipartite$best_fit,
-    type = "meso", values = TRUE,
+  expect_no_error(plot(
+    cl_bipartite$best_fit,
+    type = "meso",
+    values = TRUE,
     mixture = TRUE
   ))
   expect_no_error(plot(cl_bipartite$best_fit, type = "block", net_id = 1))

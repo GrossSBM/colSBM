@@ -64,6 +64,12 @@ test_that("extract_nodes_groups extracts from best_fit for bmpop and bisbmpop", 
   bmpop_fit <- structure(list(best_fit = fit_simple), class = "bmpop")
   bisbmpop_fit <- structure(list(best_fit = fit_simple), class = "bisbmpop")
 
-  expect_equal(extract_nodes_groups(bmpop_fit), extract_nodes_groups(fit_simple))
-  expect_equal(extract_nodes_groups(bisbmpop_fit), extract_nodes_groups(fit_simple))
+  expect_equal(
+    extract_nodes_groups(bmpop_fit),
+    extract_nodes_groups(fit_simple)
+  )
+  expect_equal(
+    extract_nodes_groups(bisbmpop_fit),
+    extract_nodes_groups(fit_simple)
+  )
 })

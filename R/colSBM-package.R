@@ -8,5 +8,6 @@
 #' @importFrom stats rmultinom
 #' @importFrom stats rpois
 #' @importFrom stats setNames
+#' @useDynLib colSBM
 ## usethis namespace: end
 NULL

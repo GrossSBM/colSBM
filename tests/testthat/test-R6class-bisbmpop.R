@@ -12,16 +12,24 @@ iid_pic <- c(0.2, 0.8)
 iid_Q <- c(length(iid_pir), length(iid_pic))
 iid_alpha <- matrix(
   c(
-    0.9, iid_eps,
-    iid_eps, 0.8
+    0.9,
+    iid_eps,
+    iid_eps,
+    0.8
   ),
-  nrow = iid_Q[1], ncol = iid_Q[2], byrow = TRUE
+  nrow = iid_Q[1],
+  ncol = iid_Q[2],
+  byrow = TRUE
 )
 
 iid_bipartite_collection <-
   colSBM::generate_bipartite_collection(
-    iid_nr, iid_nc, iid_pir, iid_pic,
-    iid_alpha, iid_M,
+    iid_nr,
+    iid_nc,
+    iid_pir,
+    iid_pic,
+    iid_alpha,
+    iid_M,
     return_memberships = TRUE
   )
 
@@ -41,8 +49,10 @@ iid_choosed_bisbmpop <- colSBM::estimate_colBiSBM(
   netlist = iid_bipartite_collection_incidence,
   colsbm_model = "iid",
   global_opts = list(
-    nb_cores = 2, backend = "parallel",
-    plot_details = 0, verbosity = 0
+    nb_cores = 2,
+    backend = "parallel",
+    plot_details = 0,
+    verbosity = 0
   )
 )
 
