@@ -114,6 +114,8 @@ An R6 Class object, a collection of model for population of sbm netowrks
 
 - [`bmpop$backward_pass()`](#method-bmpop-backward_pass)
 
+- [`bmpop$show_trace()`](#method-bmpop-show_trace)
+
 - [`bmpop$optimize()`](#method-bmpop-optimize)
 
 - [`bmpop$choose_models()`](#method-bmpop-choose_models)
@@ -419,7 +421,7 @@ Q + 1 The optimization method
 
 ------------------------------------------------------------------------
 
-### `bmpop$optimize()`
+### `bmpop$show_trace()`
 
 This method performs the burn in and the steps of moving window with
 cluster splitting (forward pass) and merging (backward pass) around the
@@ -427,12 +429,21 @@ mode found.
 
 #### Usage
 
-    bmpop$optimize()
+    bmpop$show_trace()
 
 #### Returns
 
-nothing; but stores the values Performs the model selection based on the
-BICL criterion
+nothing; but stores the values Draw the trace of the fitted criteria
+(BICL, ICL, vbound, SBM) as a function of Q, consistent with
+plot(bmpop).
+
+------------------------------------------------------------------------
+
+### `bmpop$optimize()`
+
+#### Usage
+
+    bmpop$optimize()
 
 ------------------------------------------------------------------------
 

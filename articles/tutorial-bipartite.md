@@ -41,7 +41,7 @@ res_pp_iid <- estimate_colBiSBM(
 #> vbound : 
 #>       [,1] [,2] [,3] [,4] [,5]
 #> [1,] -725 -625 -620 -620 -Inf
-#> [2,] -720 -614 -604 -603 -Inf
+#> [2,] -720 -614 -603 -604 -Inf
 #> [3,] -720 -606 -592 -586 -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
@@ -49,9 +49,9 @@ res_pp_iid <- estimate_colBiSBM(
 #> 
 #> ICL    : 
 #>       [,1] [,2] [,3] [,4] [,5]
-#> [1,] -729 -635 -643 -652 -Inf
-#> [2,] -733 -652 -667 -690 -Inf
-#> [3,] -739 -672 -659 -667 -Inf
+#> [1,] -729 -635 -642 -653 -Inf
+#> [2,] -733 -667 -655 -675 -Inf
+#> [3,] -818 -669 -659 -665 -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
 #> [6,] -Inf -Inf -Inf -Inf -Inf 
@@ -59,7 +59,7 @@ res_pp_iid <- estimate_colBiSBM(
 #> BICL   : 
 #>       [,1] [,2] [,3] [,4] [,5]
 #> [1,] -729 -635 -636 -642 -Inf
-#> [2,] -730 -634 -634 -643 -Inf
+#> [2,] -730 -634 -633 -643 -Inf
 #> [3,] -736 -636 -636 -644 -Inf
 #> [4,] -Inf -Inf -Inf -Inf -Inf
 #> [5,] -Inf -Inf -Inf -Inf -Inf
@@ -67,14 +67,12 @@ res_pp_iid <- estimate_colBiSBM(
 #> 
 #> Best fit at Q=( 2, 3 )
 #> 
-#> 
-#> 
-#> ==== Best fits criterion for the 2 networks. Computed in 0.434 secs ====
+#> ==== Best fits criterion for the 2 networks. Computed in 0.617 secs ====
 #> Sep BiSBM total BICL:  -640.6602
-#> colBiSBM BICL: -633.793
+#> colBiSBM BICL: -633.079
 #> Joint modelisation preferred. With Q = ( 2, 3 ).
 #> 
-#> ==== Full computation performed in 10.8 secs ====
+#> ==== Full computation performed in 14.6 secs ====
 ```
 
 The output indicates that the collection benefits from a joint
@@ -114,7 +112,7 @@ best_fit
 #> =====================================================================
 #> net_id = ( medan2002ld medan2002rb )
 #> Dimensions = ( c(45, 21), c(72, 23) ) - ( 2, 3 ) blocks.
-#> BICL =  -633.793 penalty factor =  0.5 
+#> BICL =  -633.079 penalty factor =  0.5 
 #> #Empty row blocks on all networks:  0  -- #Empty columns blocks on all networks:  0  
 #> * Useful fields 
 #>   $distribution, $nb_nodes, $nb_blocks, $support, $prob_memberships 
@@ -131,23 +129,23 @@ We can retrieve:
 best_fit$parameters
 #> $alpha
 #>           [,1]       [,2]        [,3]
-#> [1,] 0.5163350 0.17559012 0.007013446
-#> [2,] 0.2256061 0.07806944 0.100620584
+#> [1,] 0.4946554 0.13925486 0.006579462
+#> [2,] 0.2077386 0.07711098 0.116932761
 #> 
 #> $pi
 #> $pi[[1]]
-#> [1] 0.5198281 0.4801719
+#> [1] 0.7762506 0.2237494
 #> 
 #> $pi[[2]]
-#> [1] 0.5198281 0.4801719
+#> [1] 0.7762506 0.2237494
 #> 
 #> 
 #> $rho
 #> $rho[[1]]
-#> [1] 0.08760477 0.07312403 0.83927121
+#> [1] 0.08953043 0.09410867 0.81636091
 #> 
 #> $rho[[2]]
-#> [1] 0.08760477 0.07312403 0.83927121
+#> [1] 0.08953043 0.09410867 0.81636091
 ```
 
 - The block memberships:
@@ -158,7 +156,7 @@ best_fit$memberships[[2]]$row[1:10]
 #>        Birds Trochilidae Sappho sparganura 
 #>                                          2 
 #>     Coleoptera Buprestidae Buprestidae sp. 
-#>                                          2 
+#>                                          1 
 #>     Coleoptera Cantharidae Cantharidae sp. 
 #>                                          1 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
@@ -170,7 +168,7 @@ best_fit$memberships[[2]]$row[1:10]
 #> Coleoptera Curculionidae Curculionidae sp. 
 #>                                          1 
 #>           Coleoptera Meloidae Epicauta sp. 
-#>                                          2 
+#>                                          1 
 #>     Coleoptera Mordellidae Mordellidae sp. 
 #>                                          1 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
@@ -183,25 +181,25 @@ And their probabilities:
 
 best_fit$prob_memberships[[2]][[1]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
-#>                                 0.01374514 
+#>                                 0.02341637 
 #>     Coleoptera Buprestidae Buprestidae sp. 
-#>                                 0.43349968 
+#>                                 0.66793861 
 #>     Coleoptera Cantharidae Cantharidae sp. 
-#>                                 0.91784856 
+#>                                 0.97694587 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
-#>                                 0.97666560 
+#>                                 0.99389195 
 #>  Coleoptera Coccinellidae Coccinelidae sp2 
-#>                                 0.91784855 
+#>                                 0.97694587 
 #>  Coleoptera Coccinellidae Coccinelidae sp3 
-#>                                 0.91784855 
+#>                                 0.97694587 
 #> Coleoptera Curculionidae Curculionidae sp. 
-#>                                 0.91784856 
+#>                                 0.97694587 
 #>           Coleoptera Meloidae Epicauta sp. 
-#>                                 0.16978144 
+#>                                 0.95448713 
 #>     Coleoptera Mordellidae Mordellidae sp. 
-#>                                 0.97666560 
+#>                                 0.99389195 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
-#>                                 0.91784855
+#>                                 0.97694587
 ```
 
 - The prediction for each dyads in the networks
@@ -210,25 +208,25 @@ best_fit$prob_memberships[[2]][[1]][1:10, 1]
 
 best_fit$pred_dyads[[2]][1:10, 1]
 #>        Birds Trochilidae Sappho sparganura 
-#>                                 0.07941097 
+#>                                 0.07856673 
 #>     Coleoptera Buprestidae Buprestidae sp. 
-#>                                 0.12034631 
+#>                                 0.11862043 
 #>     Coleoptera Cantharidae Cantharidae sp. 
-#>                                 0.16758103 
+#>                                 0.13782362 
 #>  Coleoptera Coccinellidae Coccinelidae sp1 
-#>                                 0.17331699 
+#>                                 0.13887673 
 #>  Coleoptera Coccinellidae Coccinelidae sp2 
-#>                                 0.16758102 
+#>                                 0.13782362 
 #>  Coleoptera Coccinellidae Coccinelidae sp3 
-#>                                 0.16758102 
+#>                                 0.13782362 
 #> Coleoptera Curculionidae Curculionidae sp. 
-#>                                 0.16758103 
+#>                                 0.13782362 
 #>           Coleoptera Meloidae Epicauta sp. 
-#>                                 0.09462796 
+#>                                 0.13642793 
 #>     Coleoptera Mordellidae Mordellidae sp. 
-#>                                 0.17331699 
+#>                                 0.13887673 
 #>      Diptera Anthomyiidae Anthomyiidae sp2 
-#>                                 0.16758102
+#>                                 0.13782362
 ```
 
 We can also plot the networks individually:
@@ -286,16 +284,12 @@ res_pp_iid_sep <- estimate_colBiSBM(
   )
 )
 #> 
-#> 
-#> 
-#> 
-#> 
-#> ==== Best fits criterion for the 4 networks. Computed in 1.4 secs ====
+#> ==== Best fits criterion for the 4 networks. Computed in 1.64 secs ====
 #> Sep BiSBM total BICL:  -813.0666
-#> colBiSBM BICL: -817.5148
+#> colBiSBM BICL: -817.0678
 #> Separated modelisation preferred.
 #> 
-#> ==== Full computation performed in 8.03 secs ====
+#> ==== Full computation performed in 11.8 secs ====
 ```
 
 The output indicates that the collection does not benefit from a joint
@@ -353,7 +347,7 @@ net_clust <- clusterize_bipartite_networks(
     Q2_max = 9L
   )
 )
-#> ℹ A save file will be created at "/tmp/RtmpW45fv2/file6473418badcb.Rds" and updated after each step
+#> ℹ A save file will be created at "/tmp/RtmpuZp5GF/file644d545425a2.Rds" and updated after each step
 #> 
 #> ── Fitting the full collection ─────────────────────────────────────────────────
 #> 
@@ -421,8 +415,8 @@ net_clust <- clusterize_bipartite_networks(
 #> The window will work best on valid configurations
 #> ✖ Splitting collections decreased the BIC-L criterion
 #> ✔ Finished clustering
-#> ℹ After clustering the partition has a BIC-L of -1996.64962380348
-#> ℹ The final results are saved at "/tmp/RtmpW45fv2/file6473418badcb.Rds"
+#> ℹ After clustering the partition has a BIC-L of -1999.31853322521
+#> ℹ The final results are saved at "/tmp/RtmpuZp5GF/file644d545425a2.Rds"
 ```
 
 ``` r
