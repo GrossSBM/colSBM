@@ -1453,13 +1453,11 @@ fitBipartiteSBMPop <- R6::R6Class(
     #' @return nothing; stores the new ordering
     reorder_parameters = function() {
       Z_label_switch <- function(Z, new_order) {
-        # Create a mapping of old labels to new labels
-        old_names <- names(Z)
-        label_map <- setNames(new_order, unique(Z))
-
-        # Use the mapping to replace labels in the vector
-        switched_labels <- label_map[Z]
-        names(switched_labels) <- old_names
+        # The parameters are reordered as param[new_order], so the new block j
+        # is the old block new_order[j]. Hence the old label k becomes the
+        # position of k in new_order.
+        switched_labels <- match(Z, new_order)
+        names(switched_labels) <- names(Z)
         return(switched_labels)
       }
       if (all(self$Q == c(1, 1))) {
@@ -1516,7 +1514,6 @@ fitBipartiteSBMPop <- R6::R6Class(
         self$Z[[m]][[2]] <- Z_label_switch(self$Z[[m]][[2]], p2)
 
         # MAP parameters
-        # Work needed to relabel correctly!
         self$MAP$Z[[m]][[1]] <- Z_label_switch(self$MAP$Z[[m]][[1]], p1)
         self$MAP$Z[[m]][[2]] <- Z_label_switch(self$MAP$Z[[m]][[2]], p2)
         self$MAP$emqr[m, , ] <- self$MAP$emqr[m, p1, p2, drop = FALSE]
